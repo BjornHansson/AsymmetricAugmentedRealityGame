@@ -9,10 +9,20 @@ import static spark.Spark.post;
 
 public class WebAPI {
 	public static void main(String[] args) {
+		new WebAPI();
+		while (true) {
+		}
+	}
+
+	public WebAPI() {
+		init();
+	}
+
+	private void init() {
 		System.out.println("Listening to stuff");
 		port(8080);
 		enableCORS("*", "*", "*");
-		
+
 		/*
 		 * Get information about older and current games
 		 */
@@ -20,7 +30,7 @@ public class WebAPI {
 			System.out.println("Get information about older and current games");
 			return null;
 		});
-		
+
 		/*
 		 * Start a game
 		 */
@@ -28,7 +38,7 @@ public class WebAPI {
 			System.out.println("Start a game");
 			return null;
 		});
-		
+
 		/*
 		 * Get information on a specific game
 		 */
@@ -36,7 +46,7 @@ public class WebAPI {
 			System.out.println("Get information on a specific game");
 			return null;
 		});
-		
+
 		/*
 		 * Join a game
 		 */
@@ -44,7 +54,7 @@ public class WebAPI {
 			System.out.println("Join a game");
 			return null;
 		});
-		
+
 		/*
 		 * Leave a game
 		 */
@@ -52,7 +62,7 @@ public class WebAPI {
 			System.out.println("Leave a game");
 			return null;
 		});
-		
+
 		/*
 		 * Defuse a bomb
 		 */
@@ -60,7 +70,7 @@ public class WebAPI {
 			System.out.println("Defuse a bomb");
 			return null;
 		});
-		
+
 		/*
 		 * Get information on defusal attempts
 		 */
@@ -72,45 +82,45 @@ public class WebAPI {
 
 	private static void enableCORS(final String origin, final String methods, final String headers) {
 
-	    options("/*", (request, response) -> {
+		options("/*", (request, response) -> {
 
-	        String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
-	        if (accessControlRequestHeaders != null) {
-	            response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
-	        }
+			String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+			if (accessControlRequestHeaders != null) {
+				response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+			}
 
-	        String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
-	        if (accessControlRequestMethod != null) {
-	            response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-	        }
+			String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+			if (accessControlRequestMethod != null) {
+				response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+			}
 
-	        return "OK";
-	    });
+			return "OK";
+		});
 
-	    before((request, response) -> {
-	        response.header("Access-Control-Allow-Origin", origin);
-	        response.header("Access-Control-Request-Method", methods);
-	        response.header("Access-Control-Allow-Headers", headers);
-	        response.type("application/json");
-	    });
+		before((request, response) -> {
+			response.header("Access-Control-Allow-Origin", origin);
+			response.header("Access-Control-Request-Method", methods);
+			response.header("Access-Control-Allow-Headers", headers);
+			response.type("application/json");
+		});
 	}
-	
+
 	/* TEMPORARY STUFF */
-	
+
 	/**
 	 * 
 	 */
 	private void startGame() {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 */
 	private void getGameInfo() {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 * @param game
@@ -118,7 +128,7 @@ public class WebAPI {
 	private void getGameInfo(int game) {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 * @param game
@@ -127,7 +137,7 @@ public class WebAPI {
 	private void joinGame(int game, int player) {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 * @param game
@@ -136,7 +146,7 @@ public class WebAPI {
 	private void leaveGame(int game, int player) {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 * @param game
@@ -145,7 +155,7 @@ public class WebAPI {
 	private void defuseBomb(int game, int player) {
 		// TODO: Move to another file
 	}
-	
+
 	/**
 	 * 
 	 * @param game
