@@ -7,10 +7,17 @@ import static spark.Spark.options;
 import static spark.Spark.port;
 import static spark.Spark.post;
 
+import java.net.HttpURLConnection;
+
+import com.google.gson.Gson;
+
 public class WebAPI {
+	private static final Gson gson = new Gson();
+
 	public static void main(String[] args) {
 		new WebAPI();
 		while (true) {
+			// Infinitive loop to keep server alive
 		}
 	}
 
@@ -28,7 +35,13 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			return null;
+			response.status(HttpURLConnection.HTTP_OK);
+
+			// TODO: Get real data
+			GamesInformation gamesInformation = new GamesInformation();
+			gamesInformation.setTest("currentgame");
+
+			return gson.toJson(gamesInformation);
 		});
 
 		/*
