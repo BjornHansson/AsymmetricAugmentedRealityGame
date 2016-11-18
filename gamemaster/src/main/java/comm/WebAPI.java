@@ -11,6 +11,8 @@ import java.net.HttpURLConnection;
 
 import com.google.gson.Gson;
 
+import models.GamesInformation;
+
 public class WebAPI {
 	private static final Gson gson = new Gson();
 
@@ -36,12 +38,7 @@ public class WebAPI {
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
 			response.status(HttpURLConnection.HTTP_OK);
-
-			// TODO: Get real data
-			GamesInformation gamesInformation = new GamesInformation();
-			gamesInformation.setTest("currentgame");
-
-			return gson.toJson(gamesInformation);
+			return getGameInfo();
 		});
 
 		/*
@@ -130,8 +127,13 @@ public class WebAPI {
 	/**
 	 * 
 	 */
-	private void getGameInfo() {
+	private String getGameInfo() {
 		// TODO: Move to another file
+		// TODO: Get real data
+		GamesInformation gamesInformation = new GamesInformation();
+		// gamesInformation.setTest("currentgame");
+
+		return gson.toJson(gamesInformation);
 	}
 
 	/**

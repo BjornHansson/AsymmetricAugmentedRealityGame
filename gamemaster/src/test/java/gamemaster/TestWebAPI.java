@@ -44,6 +44,8 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games").request(MediaType.APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+		// Instead of matching the full structure, only checking it contains
+		// something relevant
 		assertThat(actualBody, containsString("currentgame"));
 	}
 }
