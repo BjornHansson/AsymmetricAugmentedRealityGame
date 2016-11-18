@@ -58,6 +58,7 @@ public class AxisViewer {
 				throw new CmdLineException(parser, "URL to camera stream required.", null);
 			}
 			// http://1.0.0.6:8085/axis-cgi/jpg/image.cgi?resolution=640x480
+			// http://http://127.0.0.1/:8080/axis-cgi/jpg/image.cgi?resolution=640x480
 			Camera axis = new Camera("Axis 2100 Network Camera", _url, "root", "pass", Constants.REFRESH_RATE);
 
 			CameraFrame frame = new CameraFrame(axis);

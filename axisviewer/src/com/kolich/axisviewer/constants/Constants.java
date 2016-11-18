@@ -30,6 +30,6 @@ public class Constants {
 
 	public final static long REFRESH_RATE = 40L;
 	public final static long MAX_REFRESH_RATE = 5000L;
-	public final static long MIN_REFRESH_RATE = 0L;
+	public final static long MIN_REFRESH_RATE = 20L;
 
 }
