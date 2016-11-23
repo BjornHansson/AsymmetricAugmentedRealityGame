@@ -129,9 +129,8 @@ public class WebAPI {
 	 */
 	private String getGameInfo() {
 		// TODO: Move to another file
-		// TODO: Get real data
-		GamesInformation gamesInformation = new GamesInformation();
-		// gamesInformation.setTest("currentgame");
+		// TODO: Get real data from game
+		GamesInformation gamesInformation = new GamesInformation(1337);
 
 		return gson.toJson(gamesInformation);
 	}
