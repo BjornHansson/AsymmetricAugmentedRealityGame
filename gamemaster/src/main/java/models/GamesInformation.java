@@ -34,4 +34,8 @@ public class GamesInformation {
 	public void setActions(Actions actions) {
 		this.actions = actions;
 	}
+
+	public void addGame(GameInfo gi) {
+		games.add(gi);
+	}
 }

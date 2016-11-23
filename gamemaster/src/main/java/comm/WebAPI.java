@@ -11,10 +11,14 @@ import java.net.HttpURLConnection;
 
 import com.google.gson.Gson;
 
+import models.GameInfo;
 import models.GamesInformation;
+import models.SpecificGameInformation;
 
 public class WebAPI {
 	private static final Gson gson = new Gson();
+	// TODO: Use real game data
+	private GamesInformation gamesInformation = new GamesInformation(1337);
 
 	public static void main(String[] args) {
 		new WebAPI();
@@ -46,7 +50,9 @@ public class WebAPI {
 		 */
 		post("/games", (request, response) -> {
 			System.out.println("Start a game");
-			return null;
+			startGame();
+			response.status(HttpURLConnection.HTTP_CREATED);
+			return "";
 		});
 
 		/*
@@ -54,7 +60,8 @@ public class WebAPI {
 		 */
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
-			return null;
+			int gameId = Integer.parseInt(request.params("gameid"));
+			return getGameInfo(gameId);
 		});
 
 		/*
@@ -62,6 +69,8 @@ public class WebAPI {
 		 */
 		post("/games/:gameid", (request, response) -> {
 			System.out.println("Join a game");
+			int gameId = Integer.parseInt(request.params("gameid"));
+			joinGame(gameId, 1337);
 			return null;
 		});
 
@@ -122,6 +131,11 @@ public class WebAPI {
 	 */
 	private void startGame() {
 		// TODO: Move to another file
+		// TODO: Get real data from game
+		GameInfo gi = new GameInfo();
+		gi.setId(6666);
+		gi.setName("Hodor");
+		gamesInformation.addGame(gi);
 	}
 
 	/**
@@ -130,8 +144,6 @@ public class WebAPI {
 	private String getGameInfo() {
 		// TODO: Move to another file
 		// TODO: Get real data from game
-		GamesInformation gamesInformation = new GamesInformation(1337);
-
 		return gson.toJson(gamesInformation);
 	}
 
@@ -139,8 +151,12 @@ public class WebAPI {
 	 * 
 	 * @param game
 	 */
-	private void getGameInfo(int game) {
+	private String getGameInfo(int game) {
 		// TODO: Move to another file
+		// TODO: Get real data from game
+		SpecificGameInformation sgi = new SpecificGameInformation();
+		sgi.setGameId(game);
+		return gson.toJson(sgi);
 	}
 
 	/**
