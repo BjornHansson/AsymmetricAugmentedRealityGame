@@ -11,14 +11,11 @@ import java.net.HttpURLConnection;
 
 import com.google.gson.Gson;
 
-import models.GameInfo;
 import models.GamesInformation;
 import models.SpecificGameInformation;
 
 public class WebAPI {
 	private static final Gson gson = new Gson();
-	// TODO: Use real game data
-	private GamesInformation gamesInformation = new GamesInformation(1337);
 
 	public static void main(String[] args) {
 		new WebAPI();
@@ -42,7 +39,8 @@ public class WebAPI {
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
 			response.status(HttpURLConnection.HTTP_OK);
-			return getGameInfo();
+			GamesInformation gi = getGameInfo();
+			return gson.toJson(gi);
 		});
 
 		/*
@@ -50,8 +48,8 @@ public class WebAPI {
 		 */
 		post("/games", (request, response) -> {
 			System.out.println("Start a game");
-			startGame();
 			response.status(HttpURLConnection.HTTP_CREATED);
+			startGame();
 			return "";
 		});
 
@@ -60,8 +58,10 @@ public class WebAPI {
 		 */
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
+			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			return getGameInfo(gameId);
+			SpecificGameInformation sgi = getGameInfo(gameId);
+			return gson.toJson(sgi);
 		});
 
 		/*
@@ -69,9 +69,11 @@ public class WebAPI {
 		 */
 		post("/games/:gameid", (request, response) -> {
 			System.out.println("Join a game");
-			int gameId = Integer.parseInt(request.params("gameid"));
-			joinGame(gameId, 42);
 			response.status(HttpURLConnection.HTTP_CREATED);
+			int gameId = Integer.parseInt(request.params("gameid"));
+			String body = request.body();
+			Player player = gson.fromJson(body, Player.class);
+			joinGame(gameId, player.getId());
 			return "";
 		});
 
@@ -81,6 +83,9 @@ public class WebAPI {
 		delete("/games/:gameid/:playerid", (request, response) -> {
 			System.out.println("Leave a game");
 			response.status(HttpURLConnection.HTTP_NO_CONTENT);
+			int gameId = Integer.parseInt(request.params("gameid"));
+			int playerId = Integer.parseInt(request.params("playerid"));
+			leaveGame(gameId, playerId);
 			return "";
 		});
 
@@ -90,6 +95,10 @@ public class WebAPI {
 		post("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Defuse a bomb");
 			response.status(HttpURLConnection.HTTP_CREATED);
+			int gameId = Integer.parseInt(request.params("gameid"));
+			String body = request.body();
+			Player player = gson.fromJson(body, Player.class);
+			defuseBomb(gameId, player.getId());
 			return "";
 		});
 
@@ -99,7 +108,9 @@ public class WebAPI {
 		get("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Get information on defusal attempts");
 			response.status(HttpURLConnection.HTTP_OK);
-			return "";
+			int gameId = Integer.parseInt(request.params("gameid"));
+			DefuseInformation di = getDefuseInfo(gameId);
+			return gson.toJson(di);
 		});
 	}
 
@@ -136,31 +147,25 @@ public class WebAPI {
 	private void startGame() {
 		// TODO: Move to another file
 		// TODO: Get real data from game
-		GameInfo gi = new GameInfo();
-		gi.setId(6666);
-		gi.setName("Hodor");
-		gamesInformation.addGame(gi);
 	}
 
 	/**
 	 * 
 	 */
-	private String getGameInfo() {
+	private GamesInformation getGameInfo() {
 		// TODO: Move to another file
 		// TODO: Get real data from game
-		return gson.toJson(gamesInformation);
+		return null;
 	}
 
 	/**
 	 * 
 	 * @param game
 	 */
-	private String getGameInfo(int game) {
+	private SpecificGameInformation getGameInfo(int game) {
 		// TODO: Move to another file
 		// TODO: Get real data from game
-		SpecificGameInformation sgi = new SpecificGameInformation();
-		sgi.setGameId(game);
-		return gson.toJson(sgi);
+		return null;
 	}
 
 	/**
@@ -194,7 +199,8 @@ public class WebAPI {
 	 * 
 	 * @param game
 	 */
-	private void getDefuseInfo(int game) {
+	private DefuseInformation getDefuseInfo(int game) {
 		// TODO: Move to another file
+		return null;
 	}
 }
