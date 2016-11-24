@@ -65,9 +65,19 @@ public class WebAPI {
 		});
 
 		/*
+		 * List all players in a game
+		 */
+		get("/games/:gameid/players", (request, response) -> {
+			System.out.println("Join a game");
+			int gameId = Integer.parseInt(request.params("gameid"));
+			listPlayers(gameId);
+			return null;
+		});
+
+		/*
 		 * Join a game
 		 */
-		post("/games/:gameid", (request, response) -> {
+		post("/games/:gameid/players", (request, response) -> {
 			System.out.println("Join a game");
 			int gameId = Integer.parseInt(request.params("gameid"));
 			joinGame(gameId, 1337);
@@ -97,6 +107,11 @@ public class WebAPI {
 			System.out.println("Get information on defusal attempts");
 			return null;
 		});
+	}
+
+	private void listPlayers(int gameId) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private static void enableCORS(final String origin, final String methods, final String headers) {
@@ -162,6 +177,14 @@ public class WebAPI {
 	/**
 	 * 
 	 * @param game
+	 */
+	private void getDefuseInfo(int game) {
+		// TODO: Move to another file
+	}
+
+	/**
+	 * 
+	 * @param game
 	 * @param player
 	 */
 	private void joinGame(int game, int player) {
@@ -183,14 +206,6 @@ public class WebAPI {
 	 * @param player
 	 */
 	private void defuseBomb(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 */
-	private void getDefuseInfo(int game) {
 		// TODO: Move to another file
 	}
 }
