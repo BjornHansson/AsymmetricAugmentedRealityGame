@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.net.HttpURLConnection;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class TestWebAPI {
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
 		// Test the structure, e.g. response can be converted from JSON to Java
-		GamesInformation gi = gson.fromJson(actualBody, GamesInformation.class);
+		gson.fromJson(actualBody, GamesInformation.class);
 	}
 
 	@Test
@@ -64,8 +65,8 @@ public class TestWebAPI {
 
 	@Test
 	public void testGetInformationSpecificGame() {
-		// Post first so we have some test data and get first ID
-		int idToTest = postDummyTestGameData();
+		int idToTest = 1337;
+		WebAPI mockedApi = mock(WebAPI.class);
 		// Now the actually thing to test
 		Response responseToTest = client.target(URL + "games/" + idToTest).request(APPLICATION_JSON).get();
 		assertEquals(HttpURLConnection.HTTP_OK, responseToTest.getStatus());
