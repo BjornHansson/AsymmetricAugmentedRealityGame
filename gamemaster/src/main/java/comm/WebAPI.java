@@ -70,8 +70,9 @@ public class WebAPI {
 		post("/games/:gameid", (request, response) -> {
 			System.out.println("Join a game");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			joinGame(gameId, 1337);
-			return null;
+			joinGame(gameId, 42);
+			response.status(HttpURLConnection.HTTP_CREATED);
+			return "";
 		});
 
 		/*
@@ -79,7 +80,8 @@ public class WebAPI {
 		 */
 		delete("/games/:gameid/:playerid", (request, response) -> {
 			System.out.println("Leave a game");
-			return null;
+			response.status(HttpURLConnection.HTTP_NO_CONTENT);
+			return "";
 		});
 
 		/*
@@ -87,7 +89,8 @@ public class WebAPI {
 		 */
 		post("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Defuse a bomb");
-			return null;
+			response.status(HttpURLConnection.HTTP_CREATED);
+			return "";
 		});
 
 		/*
@@ -95,7 +98,8 @@ public class WebAPI {
 		 */
 		get("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Get information on defusal attempts");
-			return null;
+			response.status(HttpURLConnection.HTTP_OK);
+			return "";
 		});
 	}
 
