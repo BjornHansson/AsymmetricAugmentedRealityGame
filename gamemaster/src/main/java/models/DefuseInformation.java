@@ -1,4 +1,4 @@
-package comm;
+package models;
 
 public class DefuseInformation {
 

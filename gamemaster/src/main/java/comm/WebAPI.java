@@ -11,7 +11,9 @@ import java.net.HttpURLConnection;
 
 import com.google.gson.Gson;
 
+import models.DefuseInformation;
 import models.GamesInformation;
+import models.Player;
 import models.SpecificGameInformation;
 
 public class WebAPI {
