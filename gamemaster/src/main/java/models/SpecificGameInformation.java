@@ -1,7 +1,7 @@
 package models;
 
 /**
- * Contains information when using GET on /games/{id} URL.
+ * Contains information when using GET on /games/:id URL.
  */
 public class SpecificGameInformation {
 	private int gameId;

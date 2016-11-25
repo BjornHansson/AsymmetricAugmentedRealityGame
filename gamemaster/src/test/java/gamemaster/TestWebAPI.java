@@ -4,6 +4,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -25,6 +27,8 @@ import com.google.gson.reflect.TypeToken;
 
 import comm.Game;
 import comm.WebAPI;
+import models.DefuseInformation;
+import models.GameInfo;
 import models.GamesInformation;
 import models.Player;
 import models.SpecificGameInformation;
@@ -34,21 +38,35 @@ public class TestWebAPI {
 	private static final Client client = ClientBuilder.newClient();
 	private static final Gson gson = new Gson();
 	private static final int gameIdToTest = 1337;
+	private static final String gameNameToTest = "Hodor";
 	private static final int playerIdToTest = 42;
 
 	@BeforeClass
 	public static void onlyOnce() {
+		// Setting up mock data
+		GamesInformation gi = new GamesInformation(gameIdToTest);
+		GameInfo g = new GameInfo();
+		g.setId(gameIdToTest);
+		g.setName(gameNameToTest);
+		gi.addGame(g);
+
 		SpecificGameInformation sgi = new SpecificGameInformation();
 		sgi.setGameId(gameIdToTest);
+
 		Player player = new Player();
 		player.setId(playerIdToTest);
 		List<Player> players = new ArrayList<Player>();
 		players.add(player);
 
+		DefuseInformation di = new DefuseInformation(gameIdToTest);
+		di.addAttempt(true);
+
 		Game mockedGame = mock(Game.class);
+		when(mockedGame.getGameInfo()).thenReturn(gi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);
+		when(mockedGame.getDefuseInfo(gameIdToTest)).thenReturn(di);
 
 		new WebAPI(mockedGame);
 	}
@@ -72,8 +90,12 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		// Test the structure, e.g. response can be converted from JSON to Java
-		gson.fromJson(actualBody, GamesInformation.class);
+		// Test the structure, e.g. response can be converted from JSON to Java,
+		// and values
+		GamesInformation gi = gson.fromJson(actualBody, GamesInformation.class);
+		assertEquals(gameIdToTest, gi.getGames().get(0).getId());
+		assertEquals(gameNameToTest, gi.getGames().get(0).getName());
+		assertEquals(HttpMethod.GET, gi.getActions().getCurrentgame().getMethod());
 	}
 
 	@Test
@@ -120,7 +142,9 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games/" + gameIdToTest + "/defuses").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		GamesInformation gi = gson.fromJson(actualBody, GamesInformation.class);
+		DefuseInformation di = gson.fromJson(actualBody, DefuseInformation.class);
+		assertEquals(1, di.getAttempts().size());
+		assertTrue(di.getAttempts().get(0));
 	}
 
 	@Test

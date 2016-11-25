@@ -56,7 +56,6 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			response.status(HttpURLConnection.HTTP_OK);
 			GamesInformation gi = myGame.getGameInfo();
 			return myGson.toJson(gi);
 		});
@@ -76,7 +75,6 @@ public class WebAPI {
 		 */
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
-			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			SpecificGameInformation sgi = myGame.getGameInfo(gameId);
 			return myGson.toJson(sgi);
@@ -135,7 +133,6 @@ public class WebAPI {
 		 */
 		get("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Get information on defusal attempts");
-			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			DefuseInformation di = myGame.getDefuseInfo(gameId);
 			return myGson.toJson(di);
