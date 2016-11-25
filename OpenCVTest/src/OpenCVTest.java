@@ -1,23 +1,35 @@
-import org.bytedeco.javacpp.opencv_core.*;
+import static org.bytedeco.javacpp.helper.opencv_core.RGB;
+import static org.bytedeco.javacpp.opencv_core.cvScalar;
+import static org.bytedeco.javacpp.opencv_imgproc.COLOR_BGR2HSV;
+import static org.bytedeco.javacpp.opencv_imgproc.MORPH_ELLIPSE;
+import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
+import static org.bytedeco.javacpp.opencv_imgproc.dilate;
+import static org.bytedeco.javacpp.opencv_imgproc.erode;
+import static org.bytedeco.javacpp.opencv_imgproc.getStructuringElement;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import org.bytedeco.javacpp.opencv_core.CvScalar;
+import org.bytedeco.javacpp.opencv_core.IplImage;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Scalar;
+import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber.Exception;
-import org.bytedeco.javacv.JavaCV;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
-import static org.bytedeco.javacpp.opencv_core.*;
-import static org.bytedeco.javacpp.opencv_imgcodecs.*;
-import static org.bytedeco.javacpp.opencv_imgproc.*;
-
-import org.bytedeco.javacpp.opencv_core;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class OpenCVTest {
-	
+
 	static CvScalar rgba_min = cvScalar(0, 0, 0, 0);// RED wide dabur birko
-    static CvScalar rgba_max = cvScalar(255, 255, 255, 255);
-    
-    static int iLowH = 170;
+	static CvScalar rgba_max = cvScalar(255, 255, 255, 255);
+
+	static int iLowH = 170;
 	static int iHighH = 179;
 
 	static int iLowS = 150;
@@ -26,127 +38,171 @@ public class OpenCVTest {
 	static int iLowV = 60;
 	static int iHighV = 255;
 
-	public static void main(String[] args) {	
+	public OpenCVTest() {
+		FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(
+				"http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
 
-		
-		FFmpegFrameGrabber grabber =new FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
-		
 		try {
 			grabber.start();
 			OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 			OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat();
-			//IplImage grabbedImage = converter.convert(grabber.grab());
+			// IplImage grabbedImage = converter.convert(grabber.grab());
 			Mat grabbedImage = matConverter.convert(grabber.grab());
 			IplImage grabbedImage2 = converter.convert(grabber.grab());
-			
-			CanvasFrame frameOriginal = new CanvasFrame("Original", CanvasFrame.getDefaultGamma()/grabber.getGamma());
-			CanvasFrame frameProcessed = new CanvasFrame("Processed", CanvasFrame.getDefaultGamma()/grabber.getGamma());
-			
+
+			CanvasFrame frameOriginal = new CanvasFrame("Original", CanvasFrame.getDefaultGamma() / grabber.getGamma());
+			frameOriginal.addKeyListener(new keyb());
+			CanvasFrame frameProcessed = new CanvasFrame("Processed",
+					CanvasFrame.getDefaultGamma() / grabber.getGamma());
+
 			while (frameOriginal.isVisible() && (grabbedImage = matConverter.convert(grabber.grab())) != null) {
-				
+
 				Mat imgHSV = new Mat();
 
 				cvtColor(grabbedImage, imgHSV, COLOR_BGR2HSV);
-				
+
 				Mat imgThresholded = imgHSV.clone();
 
-				//IplImage imgHSV = grabbedImage2.clone();
-				//cvCvtColor(grabbedImage2,imgHSV,CV_BGR2HSV );
-				
-				//IplImage imgThresholded = imgHSV.clone();
-				
-				
+				// IplImage imgHSV = grabbedImage2.clone();
+				// cvCvtColor(grabbedImage2,imgHSV,CV_BGR2HSV );
+
+				// IplImage imgThresholded = imgHSV.clone();
+
 				Scalar lowScalar = RGB(iLowH, iLowS, iLowV);
 				Scalar highScalar = RGB(iHighH, iHighS, iHighV);
-				Mat lowMat = new Mat(4,1,imgHSV.type(),new Scalar());
-				Mat highMat = new Mat(4,1,imgHSV.type(),new Scalar());
-			    //inRange(imgHSV, lowMat, highMat, imgThresholded); //Threshold the image
-			
-			    
-				
-			    //cvInRangeS(grabbedImage, rgba_min, rgba_max, imgThresholded);
-				
-			    
-			    
-				//morphological opening (removes small objects from the foreground)
+				Mat lowMat = new Mat(4, 1, imgHSV.type(), new Scalar());
+				Mat highMat = new Mat(4, 1, imgHSV.type(), new Scalar());
+				// inRange(imgHSV, lowMat, highMat, imgThresholded); //Threshold
+				// the image
+
+				// cvInRangeS(grabbedImage, rgba_min, rgba_max, imgThresholded);
+
+				// morphological opening (removes small objects from the
+				// foreground)
 				erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, new Size(5, 5)));
 				dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, new Size(5, 5)));
 
-				//morphological closing (removes small holes from the foreground)
+				// morphological closing (removes small holes from the
+				// foreground)
 				dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, new Size(5, 5)));
 				erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, new Size(5, 5)));
-				
-				//IplImage test = new IplImage()
-				//cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
-				
-				//IplImage imgThreshold = cvCreateImage(cvGetSize(grabbedImage), 8, 1);
-		        //
-		       // cvInRangeS(grabbedImage, rgba_min, rgba_max, imgThreshold);// red
-		        //cvSmooth(imgThreshold, imgThreshold, CV_MEDIAN, 15,0,0,0);
-		        
-		        Frame fP = matConverter.convert(imgThresholded);
+
+				// IplImage test = new IplImage()
+				// cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+
+				// IplImage imgThreshold =
+				// cvCreateImage(cvGetSize(grabbedImage), 8, 1);
+				//
+				// cvInRangeS(grabbedImage, rgba_min, rgba_max, imgThreshold);//
+				// red
+				// cvSmooth(imgThreshold, imgThreshold, CV_MEDIAN, 15,0,0,0);
+
+				Frame fP = matConverter.convert(imgThresholded);
 				frameProcessed.showImage(fP);
-				
-				/*Mat imgHSV;
 
-				cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
+				/*
+				 * Mat imgHSV;
+				 * 
+				 * cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the
+				 * captured frame from BGR to HSV
+				 * 
+				 * Mat imgThresholded;
+				 * 
+				 * inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH,
+				 * iHighS, iHighV), imgThresholded); //Threshold the image
+				 * 
+				 * //morphological opening (removes small objects from the
+				 * foreground) erode(imgThresholded, imgThresholded,
+				 * getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+				 * dilate(imgThresholded, imgThresholded,
+				 * getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+				 * 
+				 * //morphological closing (removes small holes from the
+				 * foreground) dilate(imgThresholded, imgThresholded,
+				 * getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+				 * erode(imgThresholded, imgThresholded,
+				 * getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+				 * 
+				 * //Calculate the moments of the thresholded image Moments
+				 * oMoments = moments(imgThresholded);
+				 * 
+				 * double dM01 = oMoments.m01; double dM10 = oMoments.m10;
+				 * double dArea = oMoments.m00;
+				 * 
+				 * // if the area <= 10000, I consider that the there are no
+				 * object in the image and it's because of the noise, the area
+				 * is not zero if (dArea > 10000) { //calculate the position of
+				 * the ball int posX = dM10 / dArea; int posY = dM01 / dArea;
+				 * 
+				 * if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0) {
+				 * //Draw a red line from the previous point to the current
+				 * point line(imgLines, Point(posX, posY), Point(iLastX,
+				 * iLastY), Scalar(0, 0, 255), 2); }
+				 * 
+				 * iLastX = posX; iLastY = posY; }
+				 */
 
-				Mat imgThresholded;
-
-				inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-
-				//morphological opening (removes small objects from the foreground)
-				erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-				dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-				//morphological closing (removes small holes from the foreground)
-				dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-				erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
-
-				//Calculate the moments of the thresholded image
-				Moments oMoments = moments(imgThresholded);
-
-				double dM01 = oMoments.m01;
-				double dM10 = oMoments.m10;
-				double dArea = oMoments.m00;
-
-				// if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero 
-				if (dArea > 10000)
-				{
-					//calculate the position of the ball
-					int posX = dM10 / dArea;
-					int posY = dM01 / dArea;
-
-					if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
-					{
-						//Draw a red line from the previous point to the current point
-						line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0, 0, 255), 2);
-					}
-
-					iLastX = posX;
-					iLastY = posY;
-				}*/
-				
 				Frame f = matConverter.convert(grabbedImage);
 				frameOriginal.showImage(f);
-			
+
 			}
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-//         Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
-//         System.out.println("mat = " + mat.dump());
-//
-//         
-//         VideoCapture cap = new VideoCapture("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi");
-//         
-//         if(cap.isOpened()){
-//        	 System.out.println("It worked!");
-//         }
+
+		// Mat mat = Mat.eye(3, 3, CvType.CV_8UC1);
+		// System.out.println("mat = " + mat.dump());
+		//
+		//
+		// VideoCapture cap = new
+		// VideoCapture("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi");
+		//
+		// if(cap.isOpened()){
+		// System.out.println("It worked!");
+		// }
+	}
+
+	public static void main(String[] args) {
+		new OpenCVTest();
+	}
+
+	class keyb implements KeyListener {
+
+		public void keyPressed(KeyEvent e) {
+			int keyCode = e.getKeyCode();
+			switch (keyCode) {
+			case KeyEvent.VK_UP:
+				System.out.println("handle up");
+				break;
+			case KeyEvent.VK_DOWN:
+				System.out.println("handle down");
+				break;
+			case KeyEvent.VK_LEFT:
+				System.out.println("handle left");
+				break;
+			case KeyEvent.VK_RIGHT:
+				System.out.println("handle right");
+				try {
+					Unirest.post("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("name", "Mark")
+							.field("last", "Polo").asJson();
+				} catch (UnirestException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				// ("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi?rpan=10");
+				break;
+			}
+		}
+
+		public void keyReleased(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+
+		public void keyTyped(KeyEvent arg0) {
+			// TODO Auto-generated method stub
+		}
 	}
 
 }
