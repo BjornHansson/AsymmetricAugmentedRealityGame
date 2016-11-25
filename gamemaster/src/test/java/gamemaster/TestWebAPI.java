@@ -79,7 +79,7 @@ public class TestWebAPI {
 	public void testPostJoinGame() {
 		int idToTest = postDummyTestGameData();
 		Entity<String> payload = Entity.json("{'name': 'Björn and his merry bomb squad'}");
-		Response response = client.target(URL + "games/" + idToTest).request(APPLICATION_JSON).post(payload);
+		Response response = client.target(URL + "games/" + idToTest + "/players").request(APPLICATION_JSON).post(payload);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
 	}
 
