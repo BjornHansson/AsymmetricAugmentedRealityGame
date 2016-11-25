@@ -8,19 +8,18 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import com.google.gson.Gson;
 
-import models.GameInfo;
 import models.DefuseInformation;
 import models.GamesInformation;
 import models.Player;
 import models.SpecificGameInformation;
 
 public class WebAPI {
-	private static final Gson gson = new Gson();
-	// TODO: Use real game data
-	private GamesInformation gamesInformation = new GamesInformation(1337);
+	private static final Gson myGson = new Gson();
+	private Game myGame;
 
 	public static void main(String[] args) {
 		new WebAPI();
@@ -29,7 +28,21 @@ public class WebAPI {
 		}
 	}
 
+	/**
+	 * Default constructor. Starts a new game
+	 */
 	public WebAPI() {
+		myGame = new Game();
+		init();
+	}
+
+	/**
+	 * Constructor that allows a game as parameter
+	 * 
+	 * @param game
+	 */
+	public WebAPI(Game game) {
+		myGame = game;
 		init();
 	}
 
@@ -44,8 +57,8 @@ public class WebAPI {
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
 			response.status(HttpURLConnection.HTTP_OK);
-			GamesInformation gi = getGameInfo();
-			return gson.toJson(gi);
+			GamesInformation gi = myGame.getGameInfo();
+			return myGson.toJson(gi);
 		});
 
 		/*
@@ -54,7 +67,7 @@ public class WebAPI {
 		post("/games", (request, response) -> {
 			System.out.println("Start a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
-			startGame();
+			myGame.startGame();
 			return "";
 		});
 
@@ -65,8 +78,8 @@ public class WebAPI {
 			System.out.println("Get information on a specific game");
 			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			SpecificGameInformation sgi = getGameInfo(gameId);
-			return gson.toJson(sgi);
+			SpecificGameInformation sgi = myGame.getGameInfo(gameId);
+			return myGson.toJson(sgi);
 		});
 
 		/*
@@ -75,8 +88,8 @@ public class WebAPI {
 		get("/games/:gameid/players", (request, response) -> {
 			System.out.println("Join a game");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			listPlayers(gameId);
-			return null;
+			List<Player> players = myGame.listPlayers(gameId);
+			return myGson.toJson(players);
 		});
 
 		/*
@@ -87,8 +100,8 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = gson.fromJson(body, Player.class);
-			joinGame(gameId, player.getId());
+			Player player = myGson.fromJson(body, Player.class);
+			myGame.joinGame(gameId, player.getId());
 			return "";
 		});
 
@@ -100,7 +113,7 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_NO_CONTENT);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			int playerId = Integer.parseInt(request.params("playerid"));
-			leaveGame(gameId, playerId);
+			myGame.leaveGame(gameId, playerId);
 			return "";
 		});
 
@@ -112,8 +125,8 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = gson.fromJson(body, Player.class);
-			defuseBomb(gameId, player.getId());
+			Player player = myGson.fromJson(body, Player.class);
+			myGame.defuseBomb(gameId, player.getId());
 			return "";
 		});
 
@@ -124,14 +137,9 @@ public class WebAPI {
 			System.out.println("Get information on defusal attempts");
 			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			DefuseInformation di = getDefuseInfo(gameId);
-			return gson.toJson(di);
+			DefuseInformation di = myGame.getDefuseInfo(gameId);
+			return myGson.toJson(di);
 		});
-	}
-
-	private void listPlayers(int gameId) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private static void enableCORS(final String origin, final String methods, final String headers) {
@@ -157,76 +165,5 @@ public class WebAPI {
 			response.header("Access-Control-Allow-Headers", headers);
 			response.type("application/json");
 		});
-	}
-
-	/* TEMPORARY STUFF */
-
-	/**
-	 * 
-	 */
-	private void startGame() {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-		GameInfo gi = new GameInfo();
-		gi.setId(6666);
-		gi.setName("Hodor");
-		gamesInformation.addGame(gi);
-	}
-
-	/**
-	 * 
-	 */
-	private GamesInformation getGameInfo() {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-		return gamesInformation;
-	}
-
-	/**
-	 * 
-	 * @param game
-	 */
-	private SpecificGameInformation getGameInfo(int game) {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-		SpecificGameInformation sgi = new SpecificGameInformation();
-		sgi.setGameId(game);
-		return sgi;
-	}
-
-	/**
-	 * 
-	 * @param game
-	 */
-	private DefuseInformation getDefuseInfo(int game) {
-		// TODO: Move to another file
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void joinGame(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void leaveGame(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void defuseBomb(int game, int player) {
-		// TODO: Move to another file
 	}
 }
