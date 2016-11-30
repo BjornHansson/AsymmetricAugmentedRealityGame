@@ -62,7 +62,7 @@ public class TestWebAPI {
 		di.addAttempt(true);
 
 		Game mockedGame = mock(Game.class);
-		when(mockedGame.getGameInfo()).thenReturn(gi);
+		when(mockedGame.getGamesInfo()).thenReturn(gi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);

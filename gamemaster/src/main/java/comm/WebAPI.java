@@ -56,7 +56,7 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			GamesInformation gi = myGame.getGameInfo();
+			GamesInformation gi = myGame.getGamesInfo();
 			return myGson.toJson(gi);
 		});
 
