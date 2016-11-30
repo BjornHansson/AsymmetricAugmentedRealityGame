@@ -51,7 +51,7 @@ public class OpenCVTest {
 			IplImage grabbedImage2 = converter.convert(grabber.grab());
 
 			CanvasFrame frameOriginal = new CanvasFrame("Original", CanvasFrame.getDefaultGamma() / grabber.getGamma());
-			frameOriginal.addKeyListener(new keyb());
+			frameOriginal.addKeyListener(new CameraControll());
 			CanvasFrame frameProcessed = new CanvasFrame("Processed",
 					CanvasFrame.getDefaultGamma() / grabber.getGamma());
 
@@ -166,43 +166,6 @@ public class OpenCVTest {
 
 	public static void main(String[] args) {
 		new OpenCVTest();
-	}
-
-	class keyb implements KeyListener {
-
-		public void keyPressed(KeyEvent e) {
-			int keyCode = e.getKeyCode();
-			switch (keyCode) {
-			case KeyEvent.VK_UP:
-				System.out.println("handle up");
-				break;
-			case KeyEvent.VK_DOWN:
-				System.out.println("handle down");
-				break;
-			case KeyEvent.VK_LEFT:
-				System.out.println("handle left");
-				break;
-			case KeyEvent.VK_RIGHT:
-				System.out.println("handle right");
-				try {
-					Unirest.post("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("name", "Mark")
-							.field("last", "Polo").asJson();
-				} catch (UnirestException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				// ("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi?rpan=10");
-				break;
-			}
-		}
-
-		public void keyReleased(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-		}
-
-		public void keyTyped(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-		}
 	}
 
 }

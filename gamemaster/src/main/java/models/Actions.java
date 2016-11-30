@@ -12,4 +12,20 @@ public class Actions {
 	public void setCurrentGame(Action currentGame) {
 		this.currentGame = currentGame;
 	}
+
+	public Action getRegistration() {
+		return registration;
+	}
+
+	public void setRegistration(Action registration) {
+		this.registration = registration;
+	}
+
+	public Action getInformation() {
+		return information;
+	}
+
+	public void setInformation(Action information) {
+		this.information = information;
+	}
 }

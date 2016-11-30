@@ -8,6 +8,7 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 import java.net.HttpURLConnection;
+import java.util.List;
 
 import com.google.gson.Gson;
 
@@ -17,7 +18,8 @@ import models.Player;
 import models.SpecificGameInformation;
 
 public class WebAPI {
-	private static final Gson gson = new Gson();
+	private static final Gson myGson = new Gson();
+	private Game myGame;
 
 	public static void main(String[] args) {
 		new WebAPI();
@@ -26,7 +28,21 @@ public class WebAPI {
 		}
 	}
 
+	/**
+	 * Default constructor. Starts a new game
+	 */
 	public WebAPI() {
+		myGame = new Game();
+		init();
+	}
+
+	/**
+	 * Constructor that allows a game as parameter
+	 * 
+	 * @param game
+	 */
+	public WebAPI(Game game) {
+		myGame = game;
 		init();
 	}
 
@@ -40,9 +56,8 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			response.status(HttpURLConnection.HTTP_OK);
-			GamesInformation gi = getGameInfo();
-			return gson.toJson(gi);
+			GamesInformation gi = myGame.getGameInfo();
+			return myGson.toJson(gi);
 		});
 
 		/*
@@ -51,7 +66,7 @@ public class WebAPI {
 		post("/games", (request, response) -> {
 			System.out.println("Start a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
-			startGame();
+			myGame.startGame();
 			return "";
 		});
 
@@ -60,22 +75,31 @@ public class WebAPI {
 		 */
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
-			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			SpecificGameInformation sgi = getGameInfo(gameId);
-			return gson.toJson(sgi);
+			SpecificGameInformation sgi = myGame.getGameInfo(gameId);
+			return myGson.toJson(sgi);
+		});
+
+		/*
+		 * List all players in a game
+		 */
+		get("/games/:gameid/players", (request, response) -> {
+			System.out.println("Join a game");
+			int gameId = Integer.parseInt(request.params("gameid"));
+			List<Player> players = myGame.listPlayers(gameId);
+			return myGson.toJson(players);
 		});
 
 		/*
 		 * Join a game
 		 */
-		post("/games/:gameid", (request, response) -> {
+		post("/games/:gameid/players", (request, response) -> {
 			System.out.println("Join a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = gson.fromJson(body, Player.class);
-			joinGame(gameId, player.getId());
+			Player player = myGson.fromJson(body, Player.class);
+			myGame.joinGame(gameId, player.getId());
 			return "";
 		});
 
@@ -87,7 +111,7 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_NO_CONTENT);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			int playerId = Integer.parseInt(request.params("playerid"));
-			leaveGame(gameId, playerId);
+			myGame.leaveGame(gameId, playerId);
 			return "";
 		});
 
@@ -99,8 +123,8 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = gson.fromJson(body, Player.class);
-			defuseBomb(gameId, player.getId());
+			Player player = myGson.fromJson(body, Player.class);
+			myGame.defuseBomb(gameId, player.getId());
 			return "";
 		});
 
@@ -109,10 +133,9 @@ public class WebAPI {
 		 */
 		get("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Get information on defusal attempts");
-			response.status(HttpURLConnection.HTTP_OK);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			DefuseInformation di = getDefuseInfo(gameId);
-			return gson.toJson(di);
+			DefuseInformation di = myGame.getDefuseInfo(gameId);
+			return myGson.toJson(di);
 		});
 	}
 
@@ -139,70 +162,5 @@ public class WebAPI {
 			response.header("Access-Control-Allow-Headers", headers);
 			response.type("application/json");
 		});
-	}
-
-	/* TEMPORARY STUFF */
-
-	/**
-	 * 
-	 */
-	private void startGame() {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-	}
-
-	/**
-	 * 
-	 */
-	private GamesInformation getGameInfo() {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param game
-	 */
-	private SpecificGameInformation getGameInfo(int game) {
-		// TODO: Move to another file
-		// TODO: Get real data from game
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void joinGame(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void leaveGame(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 * @param player
-	 */
-	private void defuseBomb(int game, int player) {
-		// TODO: Move to another file
-	}
-
-	/**
-	 * 
-	 * @param game
-	 */
-	private DefuseInformation getDefuseInfo(int game) {
-		// TODO: Move to another file
-		return null;
 	}
 }
