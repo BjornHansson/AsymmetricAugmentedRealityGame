@@ -25,7 +25,7 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import comm.Game;
+import comm.GamesHolder;
 import comm.WebAPI;
 import models.DefuseInformation;
 import models.GameInfo;
@@ -61,7 +61,7 @@ public class TestWebAPI {
 		DefuseInformation di = new DefuseInformation(gameIdToTest);
 		di.addAttempt(true);
 
-		Game mockedGame = mock(Game.class);
+		GamesHolder mockedGame = mock(GamesHolder.class);
 		when(mockedGame.getGamesInfo()).thenReturn(gi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
 		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);

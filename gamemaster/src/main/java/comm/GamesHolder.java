@@ -8,7 +8,7 @@ import models.Player;
 import models.SpecificGameInformation;
 
 // TODO: Get real data from game
-public class Game {
+public class GamesHolder {
 	/**
 	 * Get specific information about a game
 	 * 
