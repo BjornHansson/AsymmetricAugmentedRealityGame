@@ -27,31 +27,27 @@ import com.google.gson.reflect.TypeToken;
 
 import comm.GamesHolder;
 import comm.WebAPI;
+import models.AllGamesInfo;
 import models.DefuseInformation;
 import models.GameInfo;
-import models.GamesInformation;
-import models.Player;
-import models.SpecificGameInformation;
+import models.sub.Player;
 
 public class TestWebAPI {
 	private static final String URL = "http://localhost:8080/";
 	private static final Client client = ClientBuilder.newClient();
 	private static final Gson gson = new Gson();
 	private static final int gameIdToTest = 1337;
-	private static final String gameNameToTest = "Hodor";
+	private static final String gameNameToTest = "Björn and his merry bomb squad";
 	private static final int playerIdToTest = 42;
 
 	@BeforeClass
 	public static void onlyOnce() {
 		// Setting up mock data
-		GamesInformation gi = new GamesInformation(gameIdToTest);
+		AllGamesInfo gi = new AllGamesInfo(gameIdToTest);
 		GameInfo g = new GameInfo();
-		g.setId(gameIdToTest);
+		g.setGameId(gameIdToTest);
 		g.setName(gameNameToTest);
 		gi.addGame(g);
-
-		SpecificGameInformation sgi = new SpecificGameInformation();
-		sgi.setGameId(gameIdToTest);
 
 		Player player = new Player();
 		player.setId(playerIdToTest);
@@ -63,10 +59,10 @@ public class TestWebAPI {
 
 		GamesHolder mockedGame = mock(GamesHolder.class);
 		when(mockedGame.getGamesInfo()).thenReturn(gi);
-		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
-		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(sgi);
+		when(mockedGame.getGameInfo(gameIdToTest)).thenReturn(g);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);
 		when(mockedGame.getDefuseInfo(gameIdToTest)).thenReturn(di);
+		when(mockedGame.startGame(gameNameToTest)).thenReturn(gameIdToTest);
 
 		new WebAPI(mockedGame);
 	}
@@ -92,17 +88,24 @@ public class TestWebAPI {
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
 		// Test the structure, e.g. response can be converted from JSON to Java,
 		// and values
-		GamesInformation gi = gson.fromJson(actualBody, GamesInformation.class);
-		assertEquals(gameIdToTest, gi.getGames().get(0).getId());
+		AllGamesInfo gi = gson.fromJson(actualBody, AllGamesInfo.class);
+		assertEquals(gameIdToTest, gi.getGames().get(0).getGameId());
 		assertEquals(gameNameToTest, gi.getGames().get(0).getName());
 		assertEquals(HttpMethod.GET, gi.getActions().getCurrentgame().getMethod());
 	}
 
 	@Test
-	public void testPostGame() {
-		Entity<String> payload = Entity.json("{'name': 'Björn and his merry bomb squad'}");
+	public void testPostStartGame() {
+		Entity<String> payload = Entity.json("{'name': '" + gameNameToTest + "'}");
 		Response response = client.target(URL + "games").request(APPLICATION_JSON).post(payload);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
+		String actualBody = response.readEntity(String.class);
+		GameInfo gi = gson.fromJson(actualBody, GameInfo.class);
+		assertEquals(gameIdToTest, gi.getGameId());
+		assertEquals(gameNameToTest, gi.getName());
+		assertEquals(HttpMethod.POST, gi.getActions().getRegistration().getMethod());
+		assertEquals("name", gi.getActions().getRegistration().getParameters().get(0));
+		assertEquals(HttpMethod.GET, gi.getActions().getInformation().getMethod());
 	}
 
 	@Test
@@ -110,7 +113,7 @@ public class TestWebAPI {
 		Response responseToTest = client.target(URL + "games/" + gameIdToTest).request(APPLICATION_JSON).get();
 		assertEquals(HttpURLConnection.HTTP_OK, responseToTest.getStatus());
 		String actualBodyToTest = responseToTest.readEntity(String.class);
-		SpecificGameInformation giToTest = gson.fromJson(actualBodyToTest, SpecificGameInformation.class);
+		GameInfo giToTest = gson.fromJson(actualBodyToTest, GameInfo.class);
 		assertEquals(gameIdToTest, giToTest.getGameId());
 	}
 

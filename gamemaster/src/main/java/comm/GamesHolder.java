@@ -1,36 +1,56 @@
 package comm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import models.DefuseInformation;
-import models.GamesInformation;
-import models.Player;
-import models.SpecificGameInformation;
+import models.GameInfo;
+import models.sub.Player;
+import models.AllGamesInfo;
 
-// TODO: Get real data from game
+/**
+ * Holds all the games
+ */
 public class GamesHolder {
+	private List<Game> myGames = new ArrayList<Game>();
+	private int gameIdsCounter = 0;
+
 	/**
 	 * Get specific information about a game
 	 * 
-	 * @param game
+	 * @param gameId
 	 *            the game ID to get information about
+	 * @return the found game info if found, else return null
 	 */
-	public SpecificGameInformation getGameInfo(int game) {
+	public GameInfo getGameInfo(int gameId) {
+		for (int i = 0; i < myGames.size(); i++) {
+			if (myGames.get(i).getId() == gameId) {
+				return myGames.get(i).getGameInfo();
+			}
+		}
+		// TODO Do not return null
 		return null;
 	}
 
 	/**
 	 * Start a new game
+	 * 
+	 * @param gameName
+	 *            The new name of the game
 	 */
-	public void startGame() {
-		// TODO: Move to another file
-		// TODO: Get real data from game
+	public int startGame(String gameName) {
+		gameIdsCounter++;
+		Game newGame = new Game();
+		newGame.setId(gameIdsCounter);
+		newGame.setName(gameName);
+		myGames.add(newGame);
+		return gameIdsCounter;
 	}
 
 	/**
 	 * Get information about all games (historical and current)
 	 */
-	public GamesInformation getGamesInfo() {
+	public AllGamesInfo getGamesInfo() {
 		return null;
 	}
 
