@@ -5,14 +5,17 @@ import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
+import models.sub.Action;
+import models.sub.AllActions;
+
 /**
  * Contains information when using GET on /games URL.
  */
-public class GamesInformation {
+public class AllGamesInfo {
 	private List<GameInfo> games = new ArrayList<GameInfo>();
-	private Actions actions = new Actions();
+	private AllActions actions = new AllActions();
 
-	public GamesInformation(int currentGameId) {
+	public AllGamesInfo(int currentGameId) {
 		Action currentGame = new Action();
 		currentGame.setUrl("/games/" + currentGameId);
 		currentGame.setMethod(HttpMethod.GET);
@@ -27,11 +30,11 @@ public class GamesInformation {
 		this.games = games;
 	}
 
-	public Actions getActions() {
+	public AllActions getActions() {
 		return actions;
 	}
 
-	public void setActions(Actions actions) {
+	public void setActions(AllActions actions) {
 		this.actions = actions;
 	}
 
