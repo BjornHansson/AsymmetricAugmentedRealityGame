@@ -51,6 +51,13 @@ public class GamesHolder {
 	 * Get information about all games (historical and current)
 	 */
 	public AllGamesInfo getGamesInfo() {
+		//maybe move currentgame logic to this class 
+		// fullfill test goals
+//		AllGameInfo agi = new AllGamesInfo();
+//		for (int i = 0; i < myGames.size(); i++) {
+//			games.addGame();
+//		}
+		
 		return null;
 	}
 
