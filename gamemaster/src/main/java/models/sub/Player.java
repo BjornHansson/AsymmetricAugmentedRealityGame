@@ -1,4 +1,4 @@
-package models;
+package models.sub;
 
 public class Player {
 	private int id;

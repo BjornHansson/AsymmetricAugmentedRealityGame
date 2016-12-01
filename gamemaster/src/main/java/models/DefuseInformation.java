@@ -5,12 +5,15 @@ import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
+import models.sub.Action;
+import models.sub.AllActions;
+
 /**
  * Contains information when using GET on /games/:gameid/defuses URL.
  */
 public class DefuseInformation {
 	private List<Boolean> attempts = new ArrayList<Boolean>();
-	private Actions actions = new Actions();
+	private AllActions actions = new AllActions();
 
 	public DefuseInformation(int currentGameId) {
 		Action information = new Action();

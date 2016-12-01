@@ -1,6 +1,6 @@
-package models;
+package models.sub;
 
-public class Actions {
+public class AllActions {
 	private Action currentGame;
 	private Action registration;
 	private Action information;

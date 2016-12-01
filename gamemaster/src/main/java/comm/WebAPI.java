@@ -10,12 +10,17 @@ import static spark.Spark.post;
 import java.net.HttpURLConnection;
 import java.util.List;
 
+import javax.ws.rs.HttpMethod;
+
 import com.google.gson.Gson;
 
+import models.AllGamesInfo;
 import models.DefuseInformation;
-import models.GamesInformation;
-import models.Player;
-import models.SpecificGameInformation;
+import models.GameInfo;
+import models.sub.Action;
+import models.sub.AllActions;
+import models.sub.GameName;
+import models.sub.Player;
 
 public class WebAPI {
 	private static final Gson myGson = new Gson();
@@ -56,7 +61,7 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			GamesInformation gi = myGamesHolder.getGamesInfo();
+			AllGamesInfo gi = myGamesHolder.getGamesInfo();
 			return myGson.toJson(gi);
 		});
 
@@ -66,8 +71,27 @@ public class WebAPI {
 		post("/games", (request, response) -> {
 			System.out.println("Start a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
-			myGamesHolder.startGame();
-			return "";
+			String body = request.body();
+			GameName gameName = myGson.fromJson(body, GameName.class);
+
+			int gameId = myGamesHolder.startGame(gameName.getName());
+			GameInfo gi = myGamesHolder.getGameInfo(gameId);
+
+			Action registration = new Action();
+			registration.setMethod(HttpMethod.POST);
+			registration.setUrl("/games/" + gameId);
+			registration.addParameter("name");
+
+			Action information = new Action();
+			information.setMethod(HttpMethod.GET);
+			information.setUrl("/games/" + gameId);
+
+			AllActions actions = new AllActions();
+			actions.setRegistration(registration);
+			actions.setInformation(information);
+			gi.setActions(actions);
+
+			return myGson.toJson(gi);
 		});
 
 		/*
@@ -76,7 +100,7 @@ public class WebAPI {
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			SpecificGameInformation sgi = myGamesHolder.getGameInfo(gameId);
+			GameInfo sgi = myGamesHolder.getGameInfo(gameId);
 			return myGson.toJson(sgi);
 		});
 

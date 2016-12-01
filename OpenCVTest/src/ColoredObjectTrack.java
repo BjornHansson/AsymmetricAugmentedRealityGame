@@ -40,6 +40,7 @@ import org.bytedeco.javacpp.opencv_imgproc.CvMoments;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.helper.opencv_imgproc;
 import org.bytedeco.javacv.CanvasFrame;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
@@ -96,6 +97,9 @@ public class ColoredObjectTrack implements Runnable {
 	int ii = 0;
 
 	public static void ColoredObjectTrackcontrolinterface() {
+		CameraControll aCameraControll = new CameraControll();
+		canvas.addKeyListener(aCameraControll);
+		thresholdedCanvas.addKeyListener(aCameraControll);
 		canvas2.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 
 		JPanel panel = new JPanel();
@@ -217,9 +221,9 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void run() {
 		try {
-			// FrameGrabber grabber = new
-			// FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
-			FrameGrabber grabber = FrameGrabber.createDefault(0);
+			FrameGrabber grabber = new FFmpegFrameGrabber(
+					"http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
+			// FrameGrabber grabber = FrameGrabber.createDefault(0);
 			OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 			grabber.start();
 			IplImage img;
