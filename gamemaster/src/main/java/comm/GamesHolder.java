@@ -2,6 +2,8 @@ package comm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import models.DefuseInformation;
 import models.GameInfo;
@@ -12,8 +14,10 @@ import models.AllGamesInfo;
  * Holds all the games
  */
 public class GamesHolder {
-	private List<Game> myGames = new ArrayList<Game>();
-	private int gameIdsCounter = 0;
+	private List<GameInfo> myGames = new ArrayList<GameInfo>();
+	private int myGameIdsCounter = 0;
+	private int myCurrentGameId = 0;
+	private int myPlayersIdsCounter = 0;
 
 	/**
 	 * Get specific information about a game
@@ -24,8 +28,8 @@ public class GamesHolder {
 	 */
 	public GameInfo getGameInfo(int gameId) {
 		for (int i = 0; i < myGames.size(); i++) {
-			if (myGames.get(i).getId() == gameId) {
-				return myGames.get(i).getGameInfo();
+			if (myGames.get(i).getGameId() == gameId) {
+				return myGames.get(i);
 			}
 		}
 		// TODO Do not return null
@@ -39,26 +43,25 @@ public class GamesHolder {
 	 *            The new name of the game
 	 */
 	public int startGame(String gameName) {
-		gameIdsCounter++;
-		Game newGame = new Game();
-		newGame.setId(gameIdsCounter);
+		myGameIdsCounter++;
+		GameInfo newGame = new GameInfo();
+		newGame.setGameId(myGameIdsCounter);
 		newGame.setName(gameName);
 		myGames.add(newGame);
-		return gameIdsCounter;
+		myCurrentGameId  = myGameIdsCounter;
+		return myGameIdsCounter;
 	}
 
 	/**
-	 * Get information about all games (historical and current)
+	 * creates AllGameInfo model and adds myGames list to the model 
+	 * @return AllGamesInfo with list of myGames
 	 */
 	public AllGamesInfo getGamesInfo() {
-		//maybe move currentgame logic to this class 
-		// fullfill test goals
-//		AllGameInfo agi = new AllGamesInfo();
-//		for (int i = 0; i < myGames.size(); i++) {
-//			games.addGame();
-//		}
-		
-		return null;
+		AllGamesInfo agi = new AllGamesInfo(myCurrentGameId);
+		for (int i = 0; i < myGames.size(); i++) {
+			agi.addGame(myGames.get(i));
+		}
+		return agi;
 	}
 
 	/**
@@ -67,7 +70,7 @@ public class GamesHolder {
 	 * @param game
 	 *            The game ID to get defuse information about
 	 */
-	public DefuseInformation getDefuseInfo(int game) {
+	public DefuseInformation getDefuseInfo(int gameId) {
 		return null;
 	}
 
@@ -79,7 +82,18 @@ public class GamesHolder {
 	 * @param player
 	 *            The players ID
 	 */
-	public void joinGame(int game, int player) {
+	public int joinGame(int gameId, String playerName) {
+		myPlayersIdsCounter++;
+		Player newPlayer = new Player(); 
+		newPlayer.setName(playerName);
+		newPlayer.setId(myPlayersIdsCounter);
+		
+		for (int i = 0; i < myGames.size(); i++) {
+			if (myGames.get(i).getGameId() == gameId) {
+				myGames.get(i).addPlayer(newPlayer);
+			}
+		}
+		return myPlayersIdsCounter;
 	}
 
 	/**
@@ -90,7 +104,7 @@ public class GamesHolder {
 	 * @param player
 	 *            The players ID
 	 */
-	public void leaveGame(int game, int player) {
+	public void leaveGame(int gameId, int player) {
 	}
 
 	/**
@@ -101,7 +115,7 @@ public class GamesHolder {
 	 * @param player
 	 *            The players ID
 	 */
-	public void defuseBomb(int game, int player) {
+	public void defuseBomb(int gameId, int player) {
 	}
 
 	/**
@@ -113,5 +127,9 @@ public class GamesHolder {
 	 */
 	public List<Player> listPlayers(int gameId) {
 		return null;
+	}
+
+	public int getCurrentGameId() {
+		return myCurrentGameId;
 	}
 }

@@ -82,7 +82,7 @@ public class TestWebAPI {
 	}
 
 	@Test
-	public void testGetInformationAboutGame() {
+	public void testGetInformationAboutAllGames() {
 		Response response = client.target(URL + "games").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
@@ -92,6 +92,8 @@ public class TestWebAPI {
 		assertEquals(gameIdToTest, gi.getGames().get(0).getGameId());
 		assertEquals(gameNameToTest, gi.getGames().get(0).getName());
 		assertEquals(HttpMethod.GET, gi.getActions().getCurrentgame().getMethod());
+		assertEquals("/games/" + gameIdToTest , gi.getActions().getCurrentgame().getUrl());
+
 	}
 
 	@Test
