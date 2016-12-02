@@ -14,7 +14,7 @@ import models.sub.AllActions;
 public class AllGamesInfo {
 	private List<GameInfo> games = new ArrayList<GameInfo>();
 	private AllActions actions = new AllActions();
-
+	
 	public AllGamesInfo(int currentGameId) {
 		Action currentGame = new Action();
 		currentGame.setUrl("/games/" + currentGameId);

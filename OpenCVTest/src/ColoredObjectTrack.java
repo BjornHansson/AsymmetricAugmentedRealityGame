@@ -17,10 +17,14 @@ import static org.bytedeco.javacpp.opencv_imgproc.CV_MEDIAN;
 import static org.bytedeco.javacpp.opencv_imgproc.cvCvtColor;
 import static org.bytedeco.javacpp.opencv_imgproc.cvEqualizeHist;
 import static org.bytedeco.javacpp.opencv_imgproc.cvSmooth;
+import static org.bytedeco.javacpp.opencv_imgproc.*;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JLabel;
@@ -32,14 +36,22 @@ import javax.swing.event.ChangeListener;
 
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
+import org.bytedeco.javacpp.opencv_imgproc.CvMoments;
+import org.bytedeco.javacpp.opencv_core;
+import org.bytedeco.javacpp.helper.opencv_imgproc;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
+
+
 public class ColoredObjectTrack implements Runnable {
 
+	
+	
+	
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
@@ -60,9 +72,33 @@ public class ColoredObjectTrack implements Runnable {
 	CvScalar rgba_max = cvScalar(100, 255, 255, 0);
 
 	IplImage image;
+<<<<<<< HEAD
 	CanvasFrame canvas = new CanvasFrame("Original");
 	CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
 	CanvasFrame canvas2 = new CanvasFrame("Controller");
+=======
+	//static TransparentPanel trackedPosition = new TransparentPanel();
+	static CanvasFrame canvas = new CanvasFrame("Original");
+	static CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
+	static CanvasFrame canvas2 = new CanvasFrame("Controller");
+	
+	public ColoredObjectTrack(){
+		
+//		trackedPosition.setSize(500, 500);
+//		
+//		
+//		trackedPosition.setBackground(new Color(255,255,255,0));
+//		trackedPosition.setOpaque(false);
+//		trackedPosition.setLayout( null ) ;
+		
+		//canvas.add(trackedPosition);
+		
+		//canvas.setGlassPane(trackedPosition);
+		//canvas.image
+		//canvas.setComponentZOrder(trackedPosition, 0);
+
+	}
+>>>>>>> 466ea237e35a03a6dd3d0396e5b93b905274fbdd
 
 	int ii = 0;
 
@@ -107,6 +143,7 @@ public class ColoredObjectTrack implements Runnable {
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
 				a = slider.getValue();
+				updatergbvalues();
 			}
 		});
 
@@ -203,21 +240,28 @@ public class ColoredObjectTrack implements Runnable {
 				if (img != null) {
 					// show image on window
 					cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
-					canvas.showImage(converter.convert(img));
+					
+					
+					
+					//canvas.showImage(converter.convert(img));
 					IplImage detectThrs = getThresholdImage(img);
 					thresholdedCanvas.showImage(converter.convert(detectThrs));
 
-					// CvMoments moments = new CvMoments();
-					// cvMoments(detectThrs, moments, 1);
-					// double mom10 = cvGetSpatialMoment(moments, 1, 0);
-					// double mom01 = cvGetSpatialMoment(moments, 0, 1);
-					// double area = cvGetCentralMoment(moments, 0, 0);
-					// posX = (int) (mom10 / area);
-					// posY = (int) (mom01 / area);
-					// // only if its a valid position
-					// if (posX > 0 && posY > 0) {
-					// paint(img, posX, posY);
-					// }
+					 CvMoments moments = new CvMoments();
+					 cvMoments(detectThrs, moments, 1);
+					 double mom10 = cvGetSpatialMoment(moments, 1, 0);
+					 double mom01 = cvGetSpatialMoment(moments, 0, 1);
+					 double area = cvGetCentralMoment(moments, 0, 0);
+					 posX = (int) (mom10 / area);
+					 posY = (int) (mom01 / area);
+					 // only if its a valid position
+					 if (posX > 0 && posY > 0) {
+					 //paint(posX, posY);
+						IplImage imgAnnotated = cvCreateImage(cvGetSize(img), 8, 1);
+						imgAnnotated = img.clone();
+						cvCircle(imgAnnotated, new int[]{posX,posY}, 5, new CvScalar(255,0,0,0));
+						canvas.showImage(converter.convert(imgAnnotated));
+					 }
 				}
 				// Thread.sleep(INTERVAL);
 			}
@@ -225,24 +269,51 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
-	// private void paint(IplImage img, int posX, int posY) {
-	// Graphics g = jp.getGraphics();
-	// thresholdedCanvas.setSize(img.width(), img.height());
-	// // g.clearRect(0, 0, img.width(), img.height());
-	// g.setColor(Color.RED);
-	// // g.fillOval(posX, posY, 20, 20);
-	// g.drawOval(posX, posY, 20, 20);
-	// System.out.println(posX + " , " + posY);
-	//
-	// }
+	 private void paint(int posX, int posY) {
+		 
+//		 trackedPosition.x = posX;
+//		 trackedPosition.y = posY;
+//		 trackedPosition.repaint();
+		 
+//	 Graphics g = trackedPosition.getGraphics();
+//	 
+//	 g.clearRect(0, 0, 500, 500);
+//	 g.setColor(Color.RED);
+//	 // g.fillOval(posX, posY, 20, 20);
+//	 g.drawOval(posX, posY, 20, 20);
+	 
+	 
+	 //System.out.println(posX + " , " + posY);
+	
+	 }
 
 	private IplImage getThresholdImage(IplImage orgImg) {
+		
+		//IplImage imgThreshold = orgImg.clone();
 		IplImage imgThreshold = cvCreateImage(cvGetSize(orgImg), 8, 1);
+		
+		
+		IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 1);
+		//imgHSV = cvCreateImage(orgImg);
+		imgHSV = orgImg.clone();
+		
+		
+		//COLOR_BGR2HSV
+		
+		cvCvtColor(orgImg, imgHSV, org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV);
+		//org.bytedeco.javacpp.opencv_imgproc.cvtColor(orgImg.asCvMat(), dst, code);
+		
+		//cvtColor(orgImg, imgHSV,); 
 		//
-		cvInRangeS(orgImg, rgba_min, rgba_max, imgThreshold);// red
+		cvInRangeS(imgHSV, rgba_min, rgba_max, imgThreshold);// red
 
 		cvSmooth(imgThreshold, imgThreshold, CV_MEDIAN, 15, 0, 0, 0);
 		// cvSaveImage(++ii + "dsmthreshold.jpg", imgThreshold);
+		
+		//org.bytedeco.javacpp.opencv_imgproc.cvcreatestr
+		//org.bytedeco.javacpp.opencv_imgproc.cvErode(imgThreshold, imgThreshold, org.bytedeco.javacpp.opencv_imgproc.getStructuringElement(org.bytedeco.javacpp.opencv_imgproc.MORPH_ELLIPSE, new org.bytedeco.javacpp.opencv_core.Size(5,5)));
+		
+		
 		return imgThreshold;
 	}
 
