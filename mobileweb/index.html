@@ -25,15 +25,57 @@
     <![endif]-->
 </head>
 <body>
+  <div id="welcome_view" class="jumbotron text-center">
+    <h1>Welcome to AARG!</h1>
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="name">Name:</label> <input type="text"
+          class="form-control" id="name">
+      </div>
+      <button type="button" class="btn btn-default">Join game!</button>
+    </form>
+  </div>
+  <div id="create_game_view" class="jumbotron text-center">
+    <h1>No active game found!</h1>
+    <p>You'd better create one</p>
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="game_name">Game name:</label> <input type="text"
+          class="form-control" id="game_name">
+      </div>
+      <button type="button" class="btn btn-default">Create game</button>
+    </form>
+  </div>
   <div id="defuse_view">
     <div class="jumbotron text-center">
       <h1>Oh, shit!</h1>
+      <p>
+        A bomb will go off in <strong id="countdown">n</strong> seconds.
+      </p>
       <button type="button" class="btn btn-danger btn-lg">DISARM
         THAT BOMB!</button>
     </div>
     <div class="container text-center">
-      Defusal attempts: <strong id="defusal_attempt_label"></strong>
+      Number of active bombs: <strong id="active_bombs_label">x</strong>
     </div>
+    <div class="container text-center">
+      Defusal attempts: <strong id="defusal_attempt_label">y</strong>
+    </div>
+    <div class="container text-center">
+      Points: <strong id="points_counter_label">z</strong>
+    </div>
+  </div>
+  <div id="game_over_view" class="jumbotron text-center">
+    <h1>GAME OVER</h1>
+    <p>
+      You lost the game, but managed to score <strong id="final_points">n</strong>
+      points. Not bad.
+    </p>
+    <p>
+      <img src="assets/images/explosion.gif">
+    </p>
+    <button type="button" class="btn btn-primary btn-lg">Start
+      over</button>
   </div>
 </body>
 </html>
