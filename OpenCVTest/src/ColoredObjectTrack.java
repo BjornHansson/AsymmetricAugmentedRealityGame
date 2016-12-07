@@ -26,6 +26,8 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,6 +51,9 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 
 public class ColoredObjectTrack implements Runnable {
 
+	private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
+	private Random random = new Random();
+	CameraControll aCameraControll;
 	
 	
 	
@@ -72,17 +77,19 @@ public class ColoredObjectTrack implements Runnable {
 	CvScalar rgba_max = cvScalar(100, 255, 255, 0);
 
 	IplImage image;
-<<<<<<< HEAD
-	CanvasFrame canvas = new CanvasFrame("Original");
-	CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
-	CanvasFrame canvas2 = new CanvasFrame("Controller");
-=======
+
 	//static TransparentPanel trackedPosition = new TransparentPanel();
 	static CanvasFrame canvas = new CanvasFrame("Original");
 	static CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
 	
+	public void SpawnBomb(){
+		bombs.add(new Bomb(random.nextFloat() * 360, 20));
+	}
+	
 	public ColoredObjectTrack(){
+		
+		SpawnBomb();
 		
 //		trackedPosition.setSize(500, 500);
 //		
@@ -98,12 +105,11 @@ public class ColoredObjectTrack implements Runnable {
 		//canvas.setComponentZOrder(trackedPosition, 0);
 
 	}
->>>>>>> 466ea237e35a03a6dd3d0396e5b93b905274fbdd
 
 	int ii = 0;
 
 	public void ColoredObjectTrackcontrolinterface() {
-		CameraControll aCameraControll = new CameraControll();
+		aCameraControll = new CameraControll();
 		canvas.addKeyListener(aCameraControll);
 		thresholdedCanvas.addKeyListener(aCameraControll);
 		canvas2.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
@@ -227,9 +233,8 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void run() {
 		try {
-			FrameGrabber grabber = new FFmpegFrameGrabber(
-					"http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
-			// FrameGrabber grabber = FrameGrabber.createDefault(0);
+			//FrameGrabber grabber = new FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
+			FrameGrabber grabber = FrameGrabber.createDefault(0);
 			OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 			grabber.start();
 			IplImage img;
@@ -260,9 +265,29 @@ public class ColoredObjectTrack implements Runnable {
 						IplImage imgAnnotated = cvCreateImage(cvGetSize(img), 8, 1);
 						imgAnnotated = img.clone();
 						cvCircle(imgAnnotated, new int[]{posX,posY}, 5, new CvScalar(255,0,0,0));
+						
+						//DRAW SOME BOMBS!
+						for(int i = 0; i < bombs.size(); i++){
+							// for each bomb:
+							// if it is within the view angle,
+							// calculate position in image and draw a dot
+							if(Math.abs(aCameraControll.getPan() - bombs.get(i).getBearing()) < CameraControll.VIEW_ANGLE / 2.0f){
+								int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
+								cvCircle(imgAnnotated, new int[]{xPos,imgAnnotated.height()/2},10, new CvScalar(255,255,255,0));
+								
+								//TODO: Base radius on position!
+							}
+							
+						}
+						
+						
 						canvas.showImage(converter.convert(imgAnnotated));
+						imgAnnotated.release();
 					 }
+					 //img.release();
+					 detectThrs.release();
 				}
+				
 				// Thread.sleep(INTERVAL);
 			}
 		} catch (Exception e) {
@@ -313,7 +338,7 @@ public class ColoredObjectTrack implements Runnable {
 		//org.bytedeco.javacpp.opencv_imgproc.cvcreatestr
 		//org.bytedeco.javacpp.opencv_imgproc.cvErode(imgThreshold, imgThreshold, org.bytedeco.javacpp.opencv_imgproc.getStructuringElement(org.bytedeco.javacpp.opencv_imgproc.MORPH_ELLIPSE, new org.bytedeco.javacpp.opencv_core.Size(5,5)));
 		
-		
+		imgHSV.release();
 		return imgThreshold;
 	}
 

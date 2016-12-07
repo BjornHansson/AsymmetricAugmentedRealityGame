@@ -6,6 +6,15 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class CameraControll implements KeyListener {
 
+	private float pan = 0;
+	public static final float VIEW_ANGLE = 62.8f;
+	
+	private float deltaPan = 10;
+	
+	public float getPan(){
+		return pan;
+	}
+	
 	public CameraControll() {
 		try {
 			Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("autofocus", "on")
@@ -39,7 +48,8 @@ class CameraControll implements KeyListener {
 		case KeyEvent.VK_LEFT:
 			try {
 				System.out.println("LEFT");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", 10).asString();
+				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", deltaPan).asString();
+				pan += deltaPan;
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -48,7 +58,8 @@ class CameraControll implements KeyListener {
 		case KeyEvent.VK_RIGHT:
 			try {
 				System.out.println("RIGHT");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", -10).asString();
+				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", -deltaPan).asString();
+				pan -= deltaPan;
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
