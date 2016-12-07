@@ -58,7 +58,7 @@ public class ColoredObjectTrack implements Runnable {
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
-		ColoredObjectTrackcontrolinterface();
+		cot.ColoredObjectTrackcontrolinterface();
 		th.start();
 	}
 
@@ -69,12 +69,17 @@ public class ColoredObjectTrack implements Runnable {
 	 * Correct the color range- it depends upon the object, camera quality,
 	 * environment.
 	 */
-	static int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
+	int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
 
-	static CvScalar rgba_min = cvScalar(0, 0, 0, 0);
-	static CvScalar rgba_max = cvScalar(100, 255, 255, 0);
+	CvScalar rgba_min = cvScalar(0, 0, 0, 0);
+	CvScalar rgba_max = cvScalar(100, 255, 255, 0);
 
 	IplImage image;
+<<<<<<< HEAD
+	CanvasFrame canvas = new CanvasFrame("Original");
+	CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
+	CanvasFrame canvas2 = new CanvasFrame("Controller");
+=======
 	//static TransparentPanel trackedPosition = new TransparentPanel();
 	static CanvasFrame canvas = new CanvasFrame("Original");
 	static CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
@@ -102,10 +107,11 @@ public class ColoredObjectTrack implements Runnable {
 		//canvas.setComponentZOrder(trackedPosition, 0);
 
 	}
+>>>>>>> 466ea237e35a03a6dd3d0396e5b93b905274fbdd
 
 	int ii = 0;
 
-	public static void ColoredObjectTrackcontrolinterface() {
+	public void ColoredObjectTrackcontrolinterface() {
 		CameraControll aCameraControll = new CameraControll();
 		canvas.addKeyListener(aCameraControll);
 		thresholdedCanvas.addKeyListener(aCameraControll);
@@ -223,7 +229,7 @@ public class ColoredObjectTrack implements Runnable {
 		canvas2.pack();
 	}
 
-	public static void updatergbvalues() {
+	public void updatergbvalues() {
 		rgba_min = cvScalar(a, b, c, 0);
 		rgba_max = cvScalar(d, e, f, 0);
 	}

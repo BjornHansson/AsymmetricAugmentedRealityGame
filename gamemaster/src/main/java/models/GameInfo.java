@@ -1,6 +1,10 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import models.sub.AllActions;
+import models.sub.Player;
 
 /**
  * Contains information when using GET on /games/:id URL.
@@ -11,6 +15,7 @@ public class GameInfo {
 	private boolean status;
 	private int defuses;
 	private AllActions actions = new AllActions();
+	private List<Player> allPlayers = new ArrayList<Player>();
 
 	public int getGameId() {
 		return gameId;
@@ -50,5 +55,17 @@ public class GameInfo {
 
 	public void setActions(AllActions actions) {
 		this.actions = actions;
+	}
+
+	public void addPlayer(Player newPlayer) {
+		allPlayers.add(newPlayer);
+	}
+	
+	public void removePlayer(int playerId){
+		for (int j = 0; j < allPlayers.size(); j++) {
+			if (playerId == allPlayers.get(j).getId()) {
+				allPlayers.remove(j);				
+			}
+		}
 	}
 }

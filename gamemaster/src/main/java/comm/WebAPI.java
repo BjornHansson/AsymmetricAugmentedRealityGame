@@ -123,8 +123,24 @@ public class WebAPI {
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
 			Player player = myGson.fromJson(body, Player.class);
-			myGamesHolder.joinGame(gameId, player.getId());
-			return "";
+			int playerId = myGamesHolder.joinGame(gameId, player.getName());
+			player.setId(playerId);
+			
+			Action defuse = new Action();
+			defuse.setMethod(HttpMethod.POST);
+			defuse.setUrl("/games/" + gameId);
+			defuse.addParameter("playerid");
+
+			Action leave = new Action();
+			leave.setMethod(HttpMethod.DELETE);
+			leave.setUrl("/games/" + gameId + "/" + playerId);
+
+			AllActions actions = new AllActions();
+			actions.setDefuse(defuse);
+			actions.setLeaveGame(leave);
+			player.setActions(actions);
+			
+			return myGson.toJson(player);
 		});
 
 		/*
