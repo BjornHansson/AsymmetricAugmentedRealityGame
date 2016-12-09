@@ -33,6 +33,10 @@ import models.StartGame;
 import models.sub.GamesCollectionSub;
 import models.sub.Player;
 
+/**
+ * Test the web API and the response structure, e.g. response can be converted
+ * from JSON to Java.
+ */
 public class TestWebAPI {
 	private static final String URL = "http://localhost:8080/";
 	private static final Client client = ClientBuilder.newClient();
@@ -97,8 +101,6 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		// Test the structure, e.g. response can be converted from JSON to Java,
-		// and values
 		GamesCollection gi = gson.fromJson(actualBody, GamesCollection.class);
 		assertEquals(gameIdToTest, gi.getGames().get(0).getGameId());
 		assertEquals(gameNameToTest, gi.getGames().get(0).getName());

@@ -97,6 +97,14 @@ public class GamesHolder {
 			sub.setName(myGames.get(i).getName());
 			gamesCollection.addGame(sub);
 		}
+
+		AllActions actions = new AllActions();
+		Action action = new Action();
+		action.setUrl("/games/" + myCurrentGameId);
+		action.setMethod(HttpMethod.GET);
+		actions.setCurrentGame(action);
+		gamesCollection.setActions(actions);
+
 		return gamesCollection;
 	}
 

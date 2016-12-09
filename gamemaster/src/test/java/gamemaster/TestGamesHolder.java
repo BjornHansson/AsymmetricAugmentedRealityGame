@@ -6,6 +6,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import javax.ws.rs.HttpMethod;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +26,7 @@ public class TestGamesHolder {
 	}
 
 	@Test
-	public void testGetSpecificGameInfo() {
+	public void testGetInformationSpecificGame() {
 		String nameOfTheGame = "Hodor";
 		boolean status = false;
 		int defuses = 0;
@@ -47,11 +49,12 @@ public class TestGamesHolder {
 		assertEquals(createdGameSecond.getGameId(), gamesHolderToTest.getCurrentGameId());
 		assertThat(createdGameFirst, not(equalTo(createdGameSecond)));
 
-		GamesCollection returned = gamesHolderToTest.getGamesCollection();
-		assertEquals(2, returned.getGames().size());
-		assertEquals(firstNameOfTheGame, returned.getGames().get(0).getName());
-		assertEquals(secondNameOfTheGame, returned.getGames().get(1).getName());
-
+		GamesCollection gc = gamesHolderToTest.getGamesCollection();
+		assertEquals(2, gc.getGames().size());
+		assertEquals(firstNameOfTheGame, gc.getGames().get(0).getName());
+		assertEquals(secondNameOfTheGame, gc.getGames().get(1).getName());
+		assertEquals(gc.getActions().getCurrentgame().getUrl(), "/games/2");
+		assertEquals(gc.getActions().getCurrentgame().getMethod(), HttpMethod.GET);
 	}
 
 	@Test
@@ -64,7 +67,22 @@ public class TestGamesHolder {
 
 	@Test
 	public void testJoinGame() {
+		// TODO: implement
+	}
+
+	@Test
+	public void testLeaveGame() {
 		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
 		gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
+	}
+
+	@Test
+	public void testListPlayers() {
+		// TODO: implement
+	}
+
+	@Test
+	public void testStartGame() {
+		// TODO: implement
 	}
 }
