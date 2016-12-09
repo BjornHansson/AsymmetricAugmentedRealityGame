@@ -1,4 +1,3 @@
-
 package gamemaster;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -83,6 +82,14 @@ public class TestGamesHolder {
 
 	@Test
 	public void testStartGame() {
-		// TODO: implement
+		String nameOfTheGame = "PieIsNice";
+		StartGame createdGame = gamesHolderToTest.startGame(nameOfTheGame);
+		assertEquals(1, createdGame.getGameId());
+		assertEquals(nameOfTheGame, createdGame.getName());
+		assertEquals("/games/1", createdGame.getActions().getRegistration().getUrl());
+		assertEquals(HttpMethod.POST, createdGame.getActions().getRegistration().getMethod());
+		assertEquals("string", createdGame.getActions().getRegistration().getParameters().get(0).getName());
+		assertEquals("/games/1", createdGame.getActions().getInformation().getUrl());
+		assertEquals(HttpMethod.GET, createdGame.getActions().getInformation().getMethod());
 	}
 }
