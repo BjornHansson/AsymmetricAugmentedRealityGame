@@ -13,9 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import comm.GamesHolder;
-import models.DefuseInformation;
+import models.BombsInGame;
 import models.GamesCollection;
-import models.InformationSpecificGame;
+import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Player;
 
@@ -35,7 +35,7 @@ public class TestGamesHolder {
 		StartGameInformation sg = gamesHolderToTest.startGame(nameOfTheGame);
 		gamesHolderToTest.joinGame(1, "Player name");
 
-		InformationSpecificGame isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
+		SpecificGameInformation isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
 		assertEquals(1, isg.getGameId());
 		assertEquals(nameOfTheGame, isg.getName());
 		assertEquals(status, isg.getStatus());
@@ -68,7 +68,7 @@ public class TestGamesHolder {
 	@Test
 	public void testGetDefuseInfo() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
-		DefuseInformation di = gamesHolderToTest.getDefuseInfo(createdGame.getGameId());
+		BombsInGame di = gamesHolderToTest.listAllBombs(createdGame.getGameId());
 		// TODO: Implement
 		// assertTrue(di.getAttempts().get(0));
 	}

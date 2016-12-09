@@ -4,7 +4,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,9 +25,9 @@ import com.google.gson.reflect.TypeToken;
 
 import comm.GamesHolder;
 import comm.WebAPI;
-import models.DefuseInformation;
+import models.BombsInGame;
 import models.GamesCollection;
-import models.InformationSpecificGame;
+import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.GamesCollectionSub;
 import models.sub.Player;
@@ -59,7 +58,7 @@ public class TestWebAPI {
 		sg.setGameId(gameIdToTest);
 		sg.setName(gameNameToTest);
 
-		InformationSpecificGame isg = new InformationSpecificGame();
+		SpecificGameInformation isg = new SpecificGameInformation();
 		isg.setGameId(gameIdToTest);
 
 		Player player = new Player();
@@ -68,14 +67,13 @@ public class TestWebAPI {
 		List<Player> players = new ArrayList<Player>();
 		players.add(player);
 
-		DefuseInformation di = new DefuseInformation(gameIdToTest);
-		di.addAttempt(true);
+		BombsInGame bombs = new BombsInGame();
 
 		GamesHolder mockedGame = mock(GamesHolder.class);
 		when(mockedGame.getGamesCollection()).thenReturn(gc);
 		when(mockedGame.getInformationSpecificGame(gameIdToTest)).thenReturn(isg);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);
-		when(mockedGame.getDefuseInfo(gameIdToTest)).thenReturn(di);
+		when(mockedGame.listAllBombs(gameIdToTest)).thenReturn(bombs);
 		when(mockedGame.startGame(gameNameToTest)).thenReturn(sg);
 		when(mockedGame.joinGame(gameIdToTest, playerNameToTest)).thenReturn(player);
 
@@ -122,7 +120,7 @@ public class TestWebAPI {
 		Response responseToTest = client.target(URL + "games/" + gameIdToTest).request(APPLICATION_JSON).get();
 		assertEquals(HttpURLConnection.HTTP_OK, responseToTest.getStatus());
 		String actualBodyToTest = responseToTest.readEntity(String.class);
-		InformationSpecificGame giToTest = gson.fromJson(actualBodyToTest, InformationSpecificGame.class);
+		SpecificGameInformation giToTest = gson.fromJson(actualBodyToTest, SpecificGameInformation.class);
 		assertEquals(gameIdToTest, giToTest.getGameId());
 	}
 
@@ -147,19 +145,18 @@ public class TestWebAPI {
 	@Test
 	public void testPostDefuseBomb() {
 		Entity<String> payload = Entity.json("{'playerid': " + playerIdToTest + "}");
-		Response response = client.target(URL + "games/" + gameIdToTest + "/defuses").request(APPLICATION_JSON)
-				.post(payload);
+		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs").request(APPLICATION_JSON)
+				.put(payload);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
 	}
 
 	@Test
-	public void testGetDefusalAttempts() {
-		Response response = client.target(URL + "games/" + gameIdToTest + "/defuses").request(APPLICATION_JSON).get();
+	public void testGetListAllBombs() {
+		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		DefuseInformation di = gson.fromJson(actualBody, DefuseInformation.class);
-		assertEquals(1, di.getAttempts().size());
-		assertTrue(di.getAttempts().get(0));
+		BombsInGame di = gson.fromJson(actualBody, BombsInGame.class);
+		// TODO: assert
 	}
 
 	@Test

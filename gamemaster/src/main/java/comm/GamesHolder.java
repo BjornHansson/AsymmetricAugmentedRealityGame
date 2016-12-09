@@ -5,9 +5,10 @@ import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
-import models.DefuseInformation;
+import models.BombInformation;
+import models.BombsInGame;
 import models.GamesCollection;
-import models.InformationSpecificGame;
+import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Action;
 import models.sub.AllActions;
@@ -21,7 +22,7 @@ import models.sub.Player;
 public class GamesHolder {
 	private int myCurrentGameId = 0;
 	private int myPlayersIdsCounter = 0;
-	private List<InformationSpecificGame> myGames = new ArrayList<InformationSpecificGame>();
+	private List<SpecificGameInformation> myGames = new ArrayList<SpecificGameInformation>();
 
 	/**
 	 * Get specific information about a game
@@ -30,8 +31,8 @@ public class GamesHolder {
 	 *            the game ID to get information about
 	 * @return the found game info if found, else return null
 	 */
-	public InformationSpecificGame getInformationSpecificGame(int gameId) {
-		InformationSpecificGame isg = new InformationSpecificGame();
+	public SpecificGameInformation getInformationSpecificGame(int gameId) {
+		SpecificGameInformation isg = new SpecificGameInformation();
 		for (int i = 0; i < myGames.size(); i++) {
 			if (myGames.get(i).getGameId() == gameId) {
 				isg = myGames.get(i);
@@ -68,7 +69,7 @@ public class GamesHolder {
 	public StartGameInformation startGame(String gameName) {
 		myCurrentGameId++;
 
-		InformationSpecificGame game = new InformationSpecificGame();
+		SpecificGameInformation game = new SpecificGameInformation();
 		game.setGameId(myCurrentGameId);
 		game.setName(gameName);
 		myGames.add(game);
@@ -130,12 +131,12 @@ public class GamesHolder {
 	}
 
 	/**
-	 * Get information about defuse attempt
+	 * Get information about all bombs in a game
 	 * 
 	 * @param game
-	 *            The game ID to get defuse information about
+	 *            The game ID
 	 */
-	public DefuseInformation getDefuseInfo(int gameId) {
+	public BombsInGame listAllBombs(int gameId) {
 		return null;
 	}
 
@@ -197,8 +198,10 @@ public class GamesHolder {
 	 *            The game ID
 	 * @param player
 	 *            The player ID
+	 * @return
 	 */
-	public void defuseBomb(int gameId, int player) {
+	public BombInformation defuseBomb(int gameId, int player) {
+		return null;
 	}
 
 	/**

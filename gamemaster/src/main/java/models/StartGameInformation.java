@@ -2,6 +2,13 @@ package models;
 
 import models.sub.AllActions;
 
+/**
+ * Contains information when using POST on /games URL.
+ * 
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/games-collection/start-a-game">Apiary
+ *      link</a>
+ */
 public class StartGameInformation {
 	private int gameId;
 	private String name;
