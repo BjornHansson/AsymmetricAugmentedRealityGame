@@ -84,11 +84,17 @@ public class ColoredObjectTrack implements Runnable {
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
 	
 	public void SpawnBomb(){
-		bombs.add(new Bomb(random.nextFloat() * 360, 20));
+		bombs.add(new Bomb(-180 + random.nextFloat() * 360, 20));
+		//bombs.add(new Bomb(20.3f, 20));
+		System.out.println("Bomb spawned at " + bombs.get(bombs.size()-1).getBearing());
 	}
 	
 	public ColoredObjectTrack(){
 		
+		SpawnBomb();
+		SpawnBomb();
+		SpawnBomb();
+		SpawnBomb();
 		SpawnBomb();
 		
 //		trackedPosition.setSize(500, 500);
@@ -230,11 +236,20 @@ public class ColoredObjectTrack implements Runnable {
 		rgba_min = cvScalar(a, b, c, 0);
 		rgba_max = cvScalar(d, e, f, 0);
 	}
+	
+	private float angleDifference(float a, float b){
+		float diff = a - b;
+		if(diff < -180)
+			diff += 360;
+		if(diff > 180)
+			diff -= 360;
+		return diff;
+	}
 
 	public void run() {
 		try {
-			//FrameGrabber grabber = new FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
-			FrameGrabber grabber = FrameGrabber.createDefault(0);
+			FrameGrabber grabber = new FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
+			//FrameGrabber grabber = FrameGrabber.createDefault(0);
 			OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 			grabber.start();
 			IplImage img;
@@ -244,7 +259,7 @@ public class ColoredObjectTrack implements Runnable {
 				img = converter.convert(grabber.grab());
 				if (img != null) {
 					// show image on window
-					cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
+					//cvFlip(img, img, 1);// l-r = 90_degrees_steps_anti_clockwise
 					
 					
 					
@@ -266,13 +281,27 @@ public class ColoredObjectTrack implements Runnable {
 						imgAnnotated = img.clone();
 						cvCircle(imgAnnotated, new int[]{posX,posY}, 5, new CvScalar(255,0,0,0));
 						
+						System.out.println("Camera pan = " + aCameraControll.getPan());
+						
 						//DRAW SOME BOMBS!
 						for(int i = 0; i < bombs.size(); i++){
 							// for each bomb:
 							// if it is within the view angle,
 							// calculate position in image and draw a dot
-							if(Math.abs(aCameraControll.getPan() - bombs.get(i).getBearing()) < CameraControll.VIEW_ANGLE / 2.0f){
-								int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
+							if(Math.abs(angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan())) < CameraControll.VIEW_ANGLE / 2.0f){
+								
+								
+								float diff = angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan());
+								//System.out.println("diff = " + diff);
+								int w = imgAnnotated.width();
+								//System.out.println("w = " + w);
+								int xPos = w/2 + (int)(diff / CameraControll.VIEW_ANGLE * w);
+								//System.out.println("xPos = " + xPos);
+								
+										
+										
+								
+								//int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
 								cvCircle(imgAnnotated, new int[]{xPos,imgAnnotated.height()/2},10, new CvScalar(255,255,255,0));
 								
 								//TODO: Base radius on position!

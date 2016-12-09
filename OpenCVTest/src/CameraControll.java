@@ -9,7 +9,7 @@ class CameraControll implements KeyListener {
 	private float pan = 0;
 	public static final float VIEW_ANGLE = 62.8f;
 	
-	private float deltaPan = 10;
+	private float deltaPan = 5;
 	
 	public float getPan(){
 		return pan;
@@ -48,8 +48,7 @@ class CameraControll implements KeyListener {
 		case KeyEvent.VK_LEFT:
 			try {
 				System.out.println("LEFT");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", deltaPan).asString();
-				pan += deltaPan;
+				pan(-deltaPan);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -58,8 +57,7 @@ class CameraControll implements KeyListener {
 		case KeyEvent.VK_RIGHT:
 			try {
 				System.out.println("RIGHT");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", -deltaPan).asString();
-				pan -= deltaPan;
+				pan(deltaPan);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -94,5 +92,16 @@ class CameraControll implements KeyListener {
 
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
+	}
+	
+	private void pan(float amount) throws UnirestException{
+		Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", amount).asString();
+		pan += amount;
+		if(pan > 180){
+			pan -= 360;
+		}
+		if(pan < -180){
+			pan += 360;
+		}
 	}
 }
