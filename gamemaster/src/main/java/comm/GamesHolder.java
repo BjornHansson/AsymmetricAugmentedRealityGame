@@ -2,22 +2,25 @@ package comm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+
+import javax.ws.rs.HttpMethod;
 
 import models.DefuseInformation;
-import models.GameInfo;
+import models.GamesCollection;
+import models.InformationSpecificGame;
+import models.StartGame;
+import models.sub.Action;
+import models.sub.AllActions;
+import models.sub.GamesCollectionSub;
 import models.sub.Player;
-import models.AllGamesInfo;
 
 /**
- * Holds all the games
+ * Holds a game
  */
 public class GamesHolder {
-	private List<GameInfo> myGames = new ArrayList<GameInfo>();
-	private int myGameIdsCounter = 0;
 	private int myCurrentGameId = 0;
 	private int myPlayersIdsCounter = 0;
+	private List<InformationSpecificGame> myGames = new ArrayList<InformationSpecificGame>();
 
 	/**
 	 * Get specific information about a game
@@ -26,7 +29,7 @@ public class GamesHolder {
 	 *            the game ID to get information about
 	 * @return the found game info if found, else return null
 	 */
-	public GameInfo getGameInfo(int gameId) {
+	public InformationSpecificGame getInformationSpecificGame(int gameId) {
 		for (int i = 0; i < myGames.size(); i++) {
 			if (myGames.get(i).getGameId() == gameId) {
 				return myGames.get(i);
@@ -41,27 +44,60 @@ public class GamesHolder {
 	 * 
 	 * @param gameName
 	 *            The new name of the game
+	 * @return the representation of a started game
 	 */
-	public int startGame(String gameName) {
-		myGameIdsCounter++;
-		GameInfo newGame = new GameInfo();
-		newGame.setGameId(myGameIdsCounter);
-		newGame.setName(gameName);
-		myGames.add(newGame);
-		myCurrentGameId  = myGameIdsCounter;
-		return myGameIdsCounter;
+	public StartGame startGame(String gameName) {
+		myCurrentGameId++;
+
+		InformationSpecificGame game = new InformationSpecificGame();
+		game.setGameId(myCurrentGameId);
+		game.setName(gameName);
+		myGames.add(game);
+
+		GamesCollection gamesCollection = getGamesCollection();
+
+		Action currentGame = new Action();
+		currentGame.setMethod(HttpMethod.GET);
+		currentGame.setUrl("/games/" + myCurrentGameId);
+		AllActions actionsGc = new AllActions();
+		actionsGc.setCurrentGame(currentGame);
+		gamesCollection.setActions(actionsGc);
+
+		StartGame sg = new StartGame();
+		sg.setGameId(myCurrentGameId);
+		sg.setName(gameName);
+
+		Action registration = new Action();
+		registration.setMethod(HttpMethod.POST);
+		registration.setUrl("/games/" + myCurrentGameId);
+		registration.addParameter("name");
+
+		Action information = new Action();
+		information.setMethod(HttpMethod.GET);
+		information.setUrl("/games/" + myCurrentGameId);
+
+		AllActions actions = new AllActions();
+		actions.setRegistration(registration);
+		actions.setInformation(information);
+		sg.setActions(actions);
+
+		return sg;
 	}
 
 	/**
-	 * creates AllGameInfo model and adds myGames list to the model 
-	 * @return AllGamesInfo with list of myGames
+	 * Get a collection of all games
+	 * 
+	 * @return
 	 */
-	public AllGamesInfo getGamesInfo() {
-		AllGamesInfo agi = new AllGamesInfo(myCurrentGameId);
+	public GamesCollection getGamesCollection() {
+		GamesCollection gamesCollection = new GamesCollection();
 		for (int i = 0; i < myGames.size(); i++) {
-			agi.addGame(myGames.get(i));
+			GamesCollectionSub sub = new GamesCollectionSub();
+			sub.setGameId(myGames.get(i).getGameId());
+			sub.setName(myGames.get(i).getName());
+			gamesCollection.addGame(sub);
 		}
-		return agi;
+		return gamesCollection;
 	}
 
 	/**
@@ -77,34 +113,52 @@ public class GamesHolder {
 	/**
 	 * Join a game
 	 * 
-	 * @param game
-	 *            The game ID to join
-	 * @param player
-	 *            The players ID
+	 * @param gameId
+	 * @param playerName
+	 * @return
 	 */
-	public int joinGame(int gameId, String playerName) {
+	public Player joinGame(int gameId, String playerName) {
 		myPlayersIdsCounter++;
-		Player newPlayer = new Player(); 
+		Player newPlayer = new Player();
 		newPlayer.setName(playerName);
 		newPlayer.setId(myPlayersIdsCounter);
-		
+
+		Action defuse = new Action();
+		defuse.setMethod(HttpMethod.POST);
+		defuse.setUrl("/games/" + gameId);
+		defuse.addParameter("playerid");
+
+		Action leave = new Action();
+		leave.setMethod(HttpMethod.DELETE);
+		leave.setUrl("/games/" + gameId + "/" + newPlayer.getId());
+
+		AllActions actions = new AllActions();
+		actions.setDefuse(defuse);
+		actions.setLeaveGame(leave);
+		newPlayer.setActions(actions);
+
 		for (int i = 0; i < myGames.size(); i++) {
 			if (myGames.get(i).getGameId() == gameId) {
 				myGames.get(i).addPlayer(newPlayer);
 			}
 		}
-		return myPlayersIdsCounter;
+		return newPlayer;
 	}
 
 	/**
 	 * Leave a game
 	 * 
-	 * @param game
+	 * @param gameId
 	 *            The game ID to leave
-	 * @param player
+	 * @param playerId
 	 *            The players ID
 	 */
-	public void leaveGame(int gameId, int player) {
+	public void leaveGame(int gameId, int playerId) {
+		for (int i = 0; i < myGames.size(); i++) {
+			if (myGames.get(i).getGameId() == gameId) {
+				myGames.get(i).removePlayer(playerId);
+			}
+		}
 	}
 
 	/**

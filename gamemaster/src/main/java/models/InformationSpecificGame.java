@@ -6,14 +6,11 @@ import java.util.List;
 import models.sub.AllActions;
 import models.sub.Player;
 
-/**
- * Contains information when using GET on /games/:id URL.
- */
-public class GameInfo {
+public class InformationSpecificGame {
 	private int gameId;
 	private String name;
-	private boolean status;
-	private int defuses;
+	private boolean status = false;
+	private int defuses = 0;
 	private AllActions actions = new AllActions();
 	private List<Player> allPlayers = new ArrayList<Player>();
 
@@ -57,15 +54,21 @@ public class GameInfo {
 		this.actions = actions;
 	}
 
-	public void addPlayer(Player newPlayer) {
-		allPlayers.add(newPlayer);
+	public List<Player> getAllPlayers() {
+		return allPlayers;
 	}
-	
-	public void removePlayer(int playerId){
-		for (int j = 0; j < allPlayers.size(); j++) {
-			if (playerId == allPlayers.get(j).getId()) {
-				allPlayers.remove(j);				
-			}
-		}
+
+	public void setAllPlayers(List<Player> allPlayers) {
+		this.allPlayers = allPlayers;
+	}
+
+	public void removePlayer(int playerId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void addPlayer(Player newPlayer) {
+		// TODO Auto-generated method stub
+
 	}
 }

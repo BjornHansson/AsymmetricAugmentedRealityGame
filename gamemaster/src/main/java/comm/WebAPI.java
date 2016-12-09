@@ -10,15 +10,12 @@ import static spark.Spark.post;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import javax.ws.rs.HttpMethod;
-
 import com.google.gson.Gson;
 
-import models.AllGamesInfo;
 import models.DefuseInformation;
-import models.GameInfo;
-import models.sub.Action;
-import models.sub.AllActions;
+import models.GamesCollection;
+import models.InformationSpecificGame;
+import models.StartGame;
 import models.sub.GameName;
 import models.sub.Player;
 
@@ -61,8 +58,8 @@ public class WebAPI {
 		 */
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
-			AllGamesInfo gi = myGamesHolder.getGamesInfo();
-			return myGson.toJson(gi);
+			GamesCollection gc = myGamesHolder.getGamesCollection();
+			return myGson.toJson(gc);
 		});
 
 		/*
@@ -73,25 +70,8 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			String body = request.body();
 			GameName gameName = myGson.fromJson(body, GameName.class);
-
-			int gameId = myGamesHolder.startGame(gameName.getName());
-			GameInfo gi = myGamesHolder.getGameInfo(gameId);
-
-			Action registration = new Action();
-			registration.setMethod(HttpMethod.POST);
-			registration.setUrl("/games/" + gameId);
-			registration.addParameter("name");
-
-			Action information = new Action();
-			information.setMethod(HttpMethod.GET);
-			information.setUrl("/games/" + gameId);
-
-			AllActions actions = new AllActions();
-			actions.setRegistration(registration);
-			actions.setInformation(information);
-			gi.setActions(actions);
-
-			return myGson.toJson(gi);
+			StartGame sg = myGamesHolder.startGame(gameName.getName());
+			return myGson.toJson(sg);
 		});
 
 		/*
@@ -100,8 +80,8 @@ public class WebAPI {
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			GameInfo sgi = myGamesHolder.getGameInfo(gameId);
-			return myGson.toJson(sgi);
+			InformationSpecificGame isg = myGamesHolder.getInformationSpecificGame(gameId);
+			return myGson.toJson(isg);
 		});
 
 		/*
@@ -122,25 +102,10 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = myGson.fromJson(body, Player.class);
-			int playerId = myGamesHolder.joinGame(gameId, player.getName());
-			player.setId(playerId);
-			
-			Action defuse = new Action();
-			defuse.setMethod(HttpMethod.POST);
-			defuse.setUrl("/games/" + gameId);
-			defuse.addParameter("playerid");
+			Player postedPlayer = myGson.fromJson(body, Player.class);
+			Player createdPlayer = myGamesHolder.joinGame(gameId, postedPlayer.getName());
 
-			Action leave = new Action();
-			leave.setMethod(HttpMethod.DELETE);
-			leave.setUrl("/games/" + gameId + "/" + playerId);
-
-			AllActions actions = new AllActions();
-			actions.setDefuse(defuse);
-			actions.setLeaveGame(leave);
-			player.setActions(actions);
-			
-			return myGson.toJson(player);
+			return myGson.toJson(createdPlayer);
 		});
 
 		/*
