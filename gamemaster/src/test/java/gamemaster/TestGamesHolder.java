@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
 import javax.ws.rs.HttpMethod;
 
 import org.junit.Before;
@@ -14,7 +16,8 @@ import comm.GamesHolder;
 import models.DefuseInformation;
 import models.GamesCollection;
 import models.InformationSpecificGame;
-import models.StartGame;
+import models.StartGameInformation;
+import models.sub.Player;
 
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
@@ -29,7 +32,7 @@ public class TestGamesHolder {
 		String nameOfTheGame = "Hodor";
 		boolean status = false;
 		int defuses = 0;
-		StartGame sg = gamesHolderToTest.startGame(nameOfTheGame);
+		StartGameInformation sg = gamesHolderToTest.startGame(nameOfTheGame);
 		gamesHolderToTest.joinGame(1, "Player name");
 
 		InformationSpecificGame isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
@@ -48,9 +51,9 @@ public class TestGamesHolder {
 	public void testGetGamesCollection() {
 		String firstNameOfTheGame = "Hodor";
 		String secondNameOfTheGame = "Simon";
-		StartGame createdGameFirst = gamesHolderToTest.startGame(firstNameOfTheGame);
+		StartGameInformation createdGameFirst = gamesHolderToTest.startGame(firstNameOfTheGame);
 		assertEquals(createdGameFirst.getGameId(), gamesHolderToTest.getCurrentGameId());
-		StartGame createdGameSecond = gamesHolderToTest.startGame(secondNameOfTheGame);
+		StartGameInformation createdGameSecond = gamesHolderToTest.startGame(secondNameOfTheGame);
 		assertEquals(createdGameSecond.getGameId(), gamesHolderToTest.getCurrentGameId());
 		assertThat(createdGameFirst, not(equalTo(createdGameSecond)));
 
@@ -64,7 +67,7 @@ public class TestGamesHolder {
 
 	@Test
 	public void testGetDefuseInfo() {
-		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
 		DefuseInformation di = gamesHolderToTest.getDefuseInfo(createdGame.getGameId());
 		// TODO: Implement
 		// assertTrue(di.getAttempts().get(0));
@@ -72,14 +75,24 @@ public class TestGamesHolder {
 
 	@Test
 	public void testJoinGame() {
-		// TODO: implement
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		int createdGameId = createdGame.getGameId();
+		Player joinedPlayer = gamesHolderToTest.joinGame(createdGameId, "Hodor");
+
+		assertEquals(1, joinedPlayer.getId());
+		assertEquals("/games/1/defuse", joinedPlayer.getActions().getDefuse().getUrl());
+		assertEquals(HttpMethod.POST, joinedPlayer.getActions().getDefuse().getMethod());
+		assertEquals("number", joinedPlayer.getActions().getDefuse().getParameters().get(0).getPlayerId());
+		assertEquals("/games/1/1", joinedPlayer.getActions().getLeaveGame().getUrl());
+		assertEquals(HttpMethod.DELETE, joinedPlayer.getActions().getLeaveGame().getMethod());
 	}
 
 	@Test
 	public void testLeaveGame() {
-		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
 		int createdGameId = createdGame.getGameId();
 		gamesHolderToTest.joinGame(createdGameId, "Hodor");
+
 		assertEquals(1, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
 		gamesHolderToTest.leaveGame(createdGameId, 1);
 		assertEquals(0, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
@@ -87,13 +100,22 @@ public class TestGamesHolder {
 
 	@Test
 	public void testListPlayers() {
-		// TODO: implement
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		int createdGameId = createdGame.getGameId();
+		gamesHolderToTest.joinGame(createdGameId, "Hodor");
+		gamesHolderToTest.joinGame(createdGameId, "Jon Snow");
+		gamesHolderToTest.joinGame(createdGameId, "Tyrion Lannister");
+		List<Player> players = gamesHolderToTest.listPlayers(createdGameId);
+		assertEquals(3, players.size());
+		assertEquals(players.get(2).getId(), 3);
+		assertEquals(players.get(2).getName(), "Tyrion Lannister");
 	}
 
 	@Test
 	public void testStartGame() {
 		String nameOfTheGame = "PieIsNice";
-		StartGame createdGame = gamesHolderToTest.startGame(nameOfTheGame);
+		StartGameInformation createdGame = gamesHolderToTest.startGame(nameOfTheGame);
+
 		assertEquals(1, createdGame.getGameId());
 		assertEquals(nameOfTheGame, createdGame.getName());
 		assertEquals("/games/1", createdGame.getActions().getRegistration().getUrl());

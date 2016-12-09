@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import models.DefuseInformation;
 import models.GamesCollection;
 import models.InformationSpecificGame;
-import models.StartGame;
+import models.StartGameInformation;
 import models.sub.GameName;
 import models.sub.Player;
 
@@ -70,7 +70,7 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			String body = request.body();
 			GameName gameName = myGson.fromJson(body, GameName.class);
-			StartGame sg = myGamesHolder.startGame(gameName.getName());
+			StartGameInformation sg = myGamesHolder.startGame(gameName.getName());
 			return myGson.toJson(sg);
 		});
 

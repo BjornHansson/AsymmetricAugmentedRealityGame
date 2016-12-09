@@ -8,7 +8,7 @@ import javax.ws.rs.HttpMethod;
 import models.DefuseInformation;
 import models.GamesCollection;
 import models.InformationSpecificGame;
-import models.StartGame;
+import models.StartGameInformation;
 import models.sub.Action;
 import models.sub.AllActions;
 import models.sub.GamesCollectionSub;
@@ -65,7 +65,7 @@ public class GamesHolder {
 	 *            The new name of the game
 	 * @return the representation of a started game
 	 */
-	public StartGame startGame(String gameName) {
+	public StartGameInformation startGame(String gameName) {
 		myCurrentGameId++;
 
 		InformationSpecificGame game = new InformationSpecificGame();
@@ -82,7 +82,7 @@ public class GamesHolder {
 		actionsGc.setCurrentGame(currentGame);
 		gamesCollection.setActions(actionsGc);
 
-		StartGame sg = new StartGame();
+		StartGameInformation sg = new StartGameInformation();
 		sg.setGameId(myCurrentGameId);
 		sg.setName(gameName);
 
@@ -144,7 +144,7 @@ public class GamesHolder {
 	 * 
 	 * @param gameId
 	 * @param playerName
-	 * @return
+	 * @return the player which joined the game
 	 */
 	public Player joinGame(int gameId, String playerName) {
 		myPlayersIdsCounter++;
@@ -154,7 +154,7 @@ public class GamesHolder {
 
 		Action defuse = new Action();
 		defuse.setMethod(HttpMethod.POST);
-		defuse.setUrl("/games/" + gameId);
+		defuse.setUrl("/games/" + gameId + "/defuse");
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
@@ -180,7 +180,7 @@ public class GamesHolder {
 	 * @param gameId
 	 *            The game ID to leave
 	 * @param playerId
-	 *            The players ID
+	 *            The player ID
 	 */
 	public void leaveGame(int gameId, int playerId) {
 		for (int i = 0; i < myGames.size(); i++) {
@@ -196,7 +196,7 @@ public class GamesHolder {
 	 * @param game
 	 *            The game ID
 	 * @param player
-	 *            The players ID
+	 *            The player ID
 	 */
 	public void defuseBomb(int gameId, int player) {
 	}
@@ -209,6 +209,12 @@ public class GamesHolder {
 	 * @return list of players
 	 */
 	public List<Player> listPlayers(int gameId) {
+		for (int i = 0; i < myGames.size(); i++) {
+			if (myGames.get(i).getGameId() == gameId) {
+				return myGames.get(i).getAllPlayers();
+			}
+		}
+		// TODO: Do not return null
 		return null;
 	}
 

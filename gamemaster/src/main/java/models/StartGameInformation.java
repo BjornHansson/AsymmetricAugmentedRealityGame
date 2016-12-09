@@ -2,7 +2,7 @@ package models;
 
 import models.sub.AllActions;
 
-public class StartGame {
+public class StartGameInformation {
 	private int gameId;
 	private String name;
 	private AllActions actions;

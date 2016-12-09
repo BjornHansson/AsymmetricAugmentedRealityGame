@@ -29,7 +29,7 @@ import comm.WebAPI;
 import models.DefuseInformation;
 import models.GamesCollection;
 import models.InformationSpecificGame;
-import models.StartGame;
+import models.StartGameInformation;
 import models.sub.GamesCollectionSub;
 import models.sub.Player;
 
@@ -55,7 +55,7 @@ public class TestWebAPI {
 		g.setName(gameNameToTest);
 		gc.addGame(g);
 
-		StartGame sg = new StartGame();
+		StartGameInformation sg = new StartGameInformation();
 		sg.setGameId(gameIdToTest);
 		sg.setName(gameNameToTest);
 
@@ -112,7 +112,7 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games").request(APPLICATION_JSON).post(payload);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
 		String actualBody = response.readEntity(String.class);
-		StartGame sg = gson.fromJson(actualBody, StartGame.class);
+		StartGameInformation sg = gson.fromJson(actualBody, StartGameInformation.class);
 		assertEquals(gameIdToTest, sg.getGameId());
 		assertEquals(gameNameToTest, sg.getName());
 	}
