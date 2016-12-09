@@ -12,6 +12,7 @@ import models.StartGame;
 import models.sub.Action;
 import models.sub.AllActions;
 import models.sub.GamesCollectionSub;
+import models.sub.Parameter;
 import models.sub.Player;
 
 /**
@@ -30,13 +31,29 @@ public class GamesHolder {
 	 * @return the found game info if found, else return null
 	 */
 	public InformationSpecificGame getInformationSpecificGame(int gameId) {
+		InformationSpecificGame isg = new InformationSpecificGame();
 		for (int i = 0; i < myGames.size(); i++) {
 			if (myGames.get(i).getGameId() == gameId) {
-				return myGames.get(i);
+				isg = myGames.get(i);
 			}
 		}
-		// TODO Do not return null
-		return null;
+
+		AllActions actions = new AllActions();
+		Action defuse = new Action();
+		defuse.setUrl("/games/" + isg.getGameId() + "/defuse");
+		defuse.setMethod(HttpMethod.POST);
+		Parameter param = new Parameter();
+		param.setPlayerId("number");
+		defuse.addParameter(param);
+		Action leave = new Action();
+		// Only support for one player
+		leave.setUrl("/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
+		leave.setMethod(HttpMethod.DELETE);
+		actions.setDefuse(defuse);
+		actions.setLeaveGame(leave);
+		isg.setActions(actions);
+
+		return isg;
 	}
 
 	/**
@@ -70,7 +87,9 @@ public class GamesHolder {
 		Action registration = new Action();
 		registration.setMethod(HttpMethod.POST);
 		registration.setUrl("/games/" + myCurrentGameId);
-		registration.addParameter("name");
+		Parameter param = new Parameter();
+		param.setName("string");
+		registration.addParameter(param);
 
 		Action information = new Action();
 		information.setMethod(HttpMethod.GET);
@@ -134,12 +153,12 @@ public class GamesHolder {
 		Action defuse = new Action();
 		defuse.setMethod(HttpMethod.POST);
 		defuse.setUrl("/games/" + gameId);
-		defuse.addParameter("playerid");
-
+		Parameter param = new Parameter();
+		param.setPlayerId("number");
+		defuse.addParameter(param);
 		Action leave = new Action();
 		leave.setMethod(HttpMethod.DELETE);
 		leave.setUrl("/games/" + gameId + "/" + newPlayer.getId());
-
 		AllActions actions = new AllActions();
 		actions.setDefuse(defuse);
 		actions.setLeaveGame(leave);

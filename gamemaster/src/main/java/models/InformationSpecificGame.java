@@ -68,7 +68,6 @@ public class InformationSpecificGame {
 	}
 
 	public void addPlayer(Player newPlayer) {
-		// TODO Auto-generated method stub
-
+		allPlayers.add(newPlayer);
 	}
 }

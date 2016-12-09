@@ -1,4 +1,3 @@
-
 package gamemaster;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -31,12 +30,18 @@ public class TestGamesHolder {
 		boolean status = false;
 		int defuses = 0;
 		StartGame sg = gamesHolderToTest.startGame(nameOfTheGame);
+		gamesHolderToTest.joinGame(1, "Player name");
 
 		InformationSpecificGame isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
 		assertEquals(1, isg.getGameId());
 		assertEquals(nameOfTheGame, isg.getName());
 		assertEquals(status, isg.getStatus());
 		assertEquals(defuses, isg.getDefuses());
+		assertEquals("/games/1/defuse", isg.getActions().getDefuse().getUrl());
+		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
+		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
+		assertEquals("/games/1/1", isg.getActions().getLeaveGame().getUrl());
+		assertEquals(HttpMethod.DELETE, isg.getActions().getLeaveGame().getMethod());
 	}
 
 	@Test
@@ -53,8 +58,8 @@ public class TestGamesHolder {
 		assertEquals(2, gc.getGames().size());
 		assertEquals(firstNameOfTheGame, gc.getGames().get(0).getName());
 		assertEquals(secondNameOfTheGame, gc.getGames().get(1).getName());
-		assertEquals(gc.getActions().getCurrentgame().getUrl(), "/games/2");
-		assertEquals(gc.getActions().getCurrentgame().getMethod(), HttpMethod.GET);
+		assertEquals("/games/2", gc.getActions().getCurrentgame().getUrl());
+		assertEquals(HttpMethod.GET, gc.getActions().getCurrentgame().getMethod());
 	}
 
 	@Test
@@ -83,6 +88,14 @@ public class TestGamesHolder {
 
 	@Test
 	public void testStartGame() {
-		// TODO: implement
+		String nameOfTheGame = "PieIsNice";
+		StartGame createdGame = gamesHolderToTest.startGame(nameOfTheGame);
+		assertEquals(1, createdGame.getGameId());
+		assertEquals(nameOfTheGame, createdGame.getName());
+		assertEquals("/games/1", createdGame.getActions().getRegistration().getUrl());
+		assertEquals(HttpMethod.POST, createdGame.getActions().getRegistration().getMethod());
+		assertEquals("string", createdGame.getActions().getRegistration().getParameters().get(0).getName());
+		assertEquals("/games/1", createdGame.getActions().getInformation().getUrl());
+		assertEquals(HttpMethod.GET, createdGame.getActions().getInformation().getMethod());
 	}
 }
