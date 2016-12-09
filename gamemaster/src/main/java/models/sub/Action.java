@@ -6,7 +6,7 @@ import java.util.List;
 public class Action {
 	private String url;
 	private String method;
-	private List<String> parameters = new ArrayList<String>();
+	private List<Parameter> parameters = new ArrayList<Parameter>();
 
 	public String getUrl() {
 		return url;
@@ -24,11 +24,11 @@ public class Action {
 		this.method = method;
 	}
 
-	public void addParameter(String param) {
+	public void addParameter(Parameter param) {
 		parameters.add(param);
 	}
 
-	public List<String> getParameters() {
+	public List<Parameter> getParameters() {
 		return parameters;
 	}
 }

@@ -63,12 +63,14 @@ public class InformationSpecificGame {
 	}
 
 	public void removePlayer(int playerId) {
-		// TODO Auto-generated method stub
-
+		for (int i = 0; i < allPlayers.size(); i++) {
+			if (allPlayers.get(i).getId() == playerId) {
+				allPlayers.remove(i);
+			}
+		}
 	}
 
 	public void addPlayer(Player newPlayer) {
-		// TODO Auto-generated method stub
-
+		allPlayers.add(newPlayer);
 	}
 }
