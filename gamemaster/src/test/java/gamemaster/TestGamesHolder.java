@@ -78,7 +78,11 @@ public class TestGamesHolder {
 	@Test
 	public void testLeaveGame() {
 		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
-		gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
+		int createdGameId = createdGame.getGameId();
+		gamesHolderToTest.joinGame(createdGameId, "Hodor");
+		assertEquals(1, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
+		gamesHolderToTest.leaveGame(createdGameId, 1);
+		assertEquals(0, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
 	}
 
 	@Test
