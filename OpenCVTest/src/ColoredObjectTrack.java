@@ -20,28 +20,10 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvGetCentralMoment;
 import static org.bytedeco.javacpp.opencv_imgproc.cvGetSpatialMoment;
 import static org.bytedeco.javacpp.opencv_imgproc.cvMoments;
 import static org.bytedeco.javacpp.opencv_imgproc.cvSmooth;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Random;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
@@ -51,26 +33,29 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import javax.swing.JButton;
 
 public class ColoredObjectTrack implements Runnable {
 
 	private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
 	private Random random = new Random();
-	CameraControll aCameraControll;
+	private CameraControll aCameraControll;
 
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
-		cot.ColoredObjectTrackcontrolinterface();
 		th.start();
+		cot.setupInterface();
+
+		ColorValueControlInterface colorinterface = new ColorValueControlInterface();
+		colorinterface.initInterface();
+		
 	}
 
 	// final int INTERVAL = 10;// 1sec
 	// final int CAMERA_NUM = 0; // Default camera for this time
+
+
 
 	/**
 	 * Correct the color range- it depends upon the object, camera quality,
@@ -87,8 +72,7 @@ public class ColoredObjectTrack implements Runnable {
 	// static TransparentPanel trackedPosition = new TransparentPanel();
 	static CanvasFrame canvas = new CanvasFrame("Original");
 	static CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
-	static CanvasFrame canvas2 = new CanvasFrame("Controller");
-
+	
 	public void SpawnBomb() {
 		bombs.add(new Bomb(-180 + random.nextFloat() * 360, 20));
 		// bombs.add(new Bomb(20.3f, 20));
@@ -119,190 +103,27 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	int ii = 0;
+	
 
-	public void ColoredObjectTrackcontrolinterface() {
-		
-		a = 150;
-		b = 50;
-		c = 0;
-		d = 100;
-		e = 255;
-		f = 255;
-
+	public void setupInterface() {
 		aCameraControll = new CameraControll();
 		canvas.addKeyListener(aCameraControll);
 		thresholdedCanvas.addKeyListener(aCameraControll);
-		canvas2.addKeyListener(aCameraControll);
-		canvas2.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-
-		JPanel panel = new JPanel();
-		canvas2.getContentPane().add(panel, BorderLayout.WEST);
-		panel.setLayout(new GridLayout(7, 1, 0, 0));
-
-		JLabel lblRedMinimum = new JLabel("Red minimum");
-		panel.add(lblRedMinimum);
-
-		JPanel panel_1 = new JPanel();
-		canvas2.getContentPane().add(panel_1, BorderLayout.EAST);
-		panel_1.setLayout(new GridLayout(7, 1, 0, 0));
-
-		JLabel lblRedMaximum = new JLabel("Red maximum");
-		panel.add(lblRedMaximum);
-
-		JLabel lblGreenMinimum = new JLabel("Green minimum");
-		panel.add(lblGreenMinimum);
-
-		JLabel lblGreenMaximum = new JLabel("Green maximum");
-		panel.add(lblGreenMaximum);
-
-		JLabel lblBlueMinimum = new JLabel("Blue minimum");
-		panel.add(lblBlueMinimum);
-
-		JLabel lblBlueMaximum = new JLabel("Blue maximum");
-		panel.add(lblBlueMaximum);
-
-		final JSlider slider = new JSlider();
-		slider.setMaximum(255);
-		lblRedMinimum.setLabelFor(slider);
-		panel_1.add(slider);
-		slider.setValue(a);
-		slider.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				a = slider.getValue();
-				updatergbvalues();
-			}
-		});
-
-		final JSlider slider_1 = new JSlider();
-		slider_1.setMaximum(255);
-		lblRedMaximum.setLabelFor(slider_1);
-		panel_1.add(slider_1);
-		slider_1.setValue(d);
-		slider_1.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				d = slider_1.getValue();
-				updatergbvalues();
-			}
-		});
-
-		final JSlider slider_2 = new JSlider();
-		slider_2.setMaximum(255);
-		lblGreenMinimum.setLabelFor(slider_2);
-		panel_1.add(slider_2);
-		slider_2.setValue(b);
-		slider_2.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				b = slider_2.getValue();
-				updatergbvalues();
-			}
-		});
-
-		final JSlider slider_3 = new JSlider();
-		slider_3.setMaximum(255);
-		lblGreenMaximum.setLabelFor(slider_3);
-		panel_1.add(slider_3);
-		slider_3.setValue(e);
-		slider_3.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent event) {
-				// TODO Auto-generated method stub
-				e = slider_3.getValue();
-				updatergbvalues();
-			}
-		});
-
-		final JSlider slider_4 = new JSlider();
-		slider_4.setMaximum(255);
-		lblBlueMinimum.setLabelFor(slider_4);
-		panel_1.add(slider_4);
-		slider_4.setValue(c);
-		slider_4.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				c = slider_4.getValue();
-				updatergbvalues();
-			}
-		});
-
-		final JSlider slider_5 = new JSlider();
-		slider_5.setMaximum(255);
-		slider_5.setBorder(new EmptyBorder(0, 4, 0, 0));
-		lblBlueMaximum.setLabelFor(slider_5);
-		
-		JButton btnSaveState = new JButton("Save state");
-		btnSaveState.setToolTipText("Save the current slider value state");
-		panel.add(btnSaveState);
-		btnSaveState.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent event) {
-				// TODO Auto-generated method stub
-				JSONObject obj = new JSONObject();
-				obj.put("a", a);
-				obj.put("d", d);
-				obj.put("b", b);
-				obj.put("e", e);
-				obj.put("c", c);
-				obj.put("f", f);
-
-				System.out.println("obj in string:   " + obj.toString());
-				
-				
-				
-//				 try-with-resources statement based on post comment below :)
-				try {
-					File file = new File("/home/simon/file1.txt");
-					file.createNewFile();
-					//FileWriter wfile = new FileWriter("~/Documents/file1.txt");
-					System.out.println(file);
-					
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-					System.out.println("Problem");
-				}
-//				FileReader readFile = new FileReader();
-				
-//					try {
-//						file.write(obj.toString());
-//						System.out.println("Successfully Copied JSON Object to File...");
-//						System.out.println("\nJSON Object: " + obj);
-//					} catch (IOException e2) {
-//						e2.printStackTrace();
-//					
-//					} finally {
-//						file.flush();
-//						file.close();
-//					}
-				
-			}
-		});
-
-		panel_1.add(slider_5);
-		slider_5.setValue(f);
-		slider_5.addChangeListener(new ChangeListener() {
-
-			public void stateChanged(ChangeEvent e) {
-				// TODO Auto-generated method stub
-				f = slider_5.getValue();
-				updatergbvalues();
-			}
-		});
-
 		thresholdedCanvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-		canvas2.setVisible(true);
-		canvas2.setPreferredSize(new Dimension(400, 300));
-		canvas2.setMinimumSize(new Dimension(400, 300));
-		canvas2.pack();
 	}
-
+	
 	public void updatergbvalues() {
+		rgba_min = cvScalar(a, b, c, 0);
+		rgba_max = cvScalar(d, e, f, 0);
+	}
+	
+	public void updatergbvaluesFromFile(int a2, int b2, int c2, int d2, int e2, int f2) {
+		this.a = a2;
+		this.b = b2;
+		this.c = c2;
+		this.d = d2;
+		this.e = e2;
+		this.f = f2;
 		rgba_min = cvScalar(a, b, c, 0);
 		rgba_max = cvScalar(d, e, f, 0);
 	}
@@ -452,4 +273,6 @@ public class ColoredObjectTrack implements Runnable {
 		cvEqualizeHist(srcimg, destimg);
 		return destimg;
 	}
+
+	
 }
