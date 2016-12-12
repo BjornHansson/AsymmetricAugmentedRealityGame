@@ -155,8 +155,9 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		BombsInGame di = gson.fromJson(actualBody, BombsInGame.class);
-		// TODO: assert
+		BombsInGame bombs = gson.fromJson(actualBody, BombsInGame.class);
+		// TODO: implement
+		// assertEquals(expected, bombs.getActive().get(0).);
 	}
 
 	@Test
