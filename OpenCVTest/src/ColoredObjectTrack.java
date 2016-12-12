@@ -47,7 +47,7 @@ public class ColoredObjectTrack implements Runnable {
 		th.start();
 		cot.setupInterface();
 
-		ColorValueControlInterface colorinterface = new ColorValueControlInterface();
+		ColorValueControlInterface colorinterface = new ColorValueControlInterface(cot);
 		colorinterface.initInterface();
 		
 	}
@@ -118,12 +118,12 @@ public class ColoredObjectTrack implements Runnable {
 	}
 	
 	public void updatergbvaluesFromFile(int a2, int b2, int c2, int d2, int e2, int f2) {
-		this.a = a2;
-		this.b = b2;
-		this.c = c2;
-		this.d = d2;
-		this.e = e2;
-		this.f = f2;
+//		this.a = a2;
+//		this.b = b2;
+//		this.c = c2;
+//		this.d = d2;
+//		this.e = e2;
+//		this.f = f2;
 		rgba_min = cvScalar(a, b, c, 0);
 		rgba_max = cvScalar(d, e, f, 0);
 	}

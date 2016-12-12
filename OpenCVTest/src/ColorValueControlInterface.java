@@ -31,6 +31,10 @@ public class ColorValueControlInterface extends JFrame {
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
 	ColoredObjectTrack cot;
 	CameraControll aCameraControll;
+	
+	public ColorValueControlInterface(	ColoredObjectTrack cot) {
+		this.cot = cot;
+	}
 		
 	public void initInterface() {
 		//control camera even tho color control interface is in focus
