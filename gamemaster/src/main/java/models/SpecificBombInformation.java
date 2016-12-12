@@ -6,12 +6,14 @@ import com.google.gson.annotations.SerializedName;
 
 import models.sub.AllActions;
 
-public class BombInformation {
+public class SpecificBombInformation {
 	private int id;
 	private String name;
 	private boolean defused;
 	@SerializedName("explosion_at")
 	private DateTime explosionAt;
+	// TODO: Check that transient hides the field
+	private transient int gameId;
 	private AllActions actions = new AllActions();
 
 	public int getId() {
@@ -52,5 +54,9 @@ public class BombInformation {
 
 	public void setActions(AllActions actions) {
 		this.actions = actions;
+	}
+
+	public int getGameId() {
+		return gameId;
 	}
 }

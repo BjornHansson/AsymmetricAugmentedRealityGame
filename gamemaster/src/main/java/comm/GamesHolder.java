@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
-import models.BombInformation;
 import models.BombsInGame;
 import models.GamesCollection;
+import models.SpecificBombInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Action;
@@ -23,6 +23,7 @@ public class GamesHolder {
 	private int myCurrentGameId = 0;
 	private int myPlayersIdsCounter = 0;
 	private List<SpecificGameInformation> myGames = new ArrayList<SpecificGameInformation>();
+	private List<SpecificBombInformation> myBombs = new ArrayList<SpecificBombInformation>();
 
 	/**
 	 * Get specific information about a game
@@ -137,13 +138,49 @@ public class GamesHolder {
 	 *            The game ID
 	 */
 	public BombsInGame listAllBombs(int gameId) {
-		// TODO: implement
-		return null;
+		BombsInGame bombs = new BombsInGame();
+		for (int i = 0; i < myBombs.size(); i++) {
+			if (myBombs.get(i).getGameId() == gameId) {
+				if (myBombs.get(i).isDefused()) {
+					bombs.addDefused(myBombs.get(i));
+				} else if (!myBombs.get(i).isDefused()) {
+					bombs.addActive(myBombs.get(i));
+				}
+			}
+		}
+		return bombs;
 	}
 
-	public BombInformation getBombInformation(int gameId, int bombId) {
-		// TODO: implement
-		return null;
+	public SpecificBombInformation getBombInformation(int gameId, int bombId) {
+		for (int i = 0; i < myBombs.size(); i++) {
+			if (myBombs.get(i).getGameId() == gameId && myBombs.get(i).getId() == bombId) {
+				return myBombs.get(i);
+			}
+		}
+		return new SpecificBombInformation();
+	}
+
+	/**
+	 * Defuse a bomb
+	 * 
+	 * @param gameId
+	 * @param bombId
+	 * @param playerId
+	 * @return
+	 */
+	public SpecificBombInformation defuseBomb(int gameId, int bombId, int playerId) {
+		List<Player> playersInTheGame = getInformationSpecificGame(gameId).getAllPlayers();
+
+		for (int bombsIndex = 0; bombsIndex < myBombs.size(); bombsIndex++) {
+			if (myBombs.get(bombsIndex).getGameId() == gameId && myBombs.get(bombsIndex).getId() == bombId) {
+				for (int playerIndex = 0; playerIndex < playersInTheGame.size(); playerIndex++) {
+					if (playersInTheGame.get(playerIndex).getId() == playerId) {
+						return myBombs.get(bombsIndex);
+					}
+				}
+			}
+		}
+		return new SpecificBombInformation();
 	}
 
 	/**
@@ -198,18 +235,6 @@ public class GamesHolder {
 	}
 
 	/**
-	 * Defuse a bomb
-	 * 
-	 * @param gameId
-	 * @param bombId
-	 * @param playerId
-	 * @return
-	 */
-	public BombInformation defuseBomb(int gameId, int bombId, int playerId) {
-		return null;
-	}
-
-	/**
 	 * List all the players in a given game
 	 * 
 	 * @param gameId
@@ -222,8 +247,7 @@ public class GamesHolder {
 				return myGames.get(i).getAllPlayers();
 			}
 		}
-		// TODO: Do not return null
-		return null;
+		return new ArrayList<Player>();
 	}
 
 	public int getCurrentGameId() {

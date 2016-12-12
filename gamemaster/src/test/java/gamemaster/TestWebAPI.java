@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 import comm.GamesHolder;
 import comm.WebAPI;
-import models.BombInformation;
+import models.SpecificBombInformation;
 import models.BombsInGame;
 import models.GamesCollection;
 import models.SpecificGameInformation;
@@ -70,7 +70,7 @@ public class TestWebAPI {
 		players.add(player);
 
 		BombsInGame bombs = new BombsInGame();
-		BombInformation bomb = new BombInformation();
+		SpecificBombInformation bomb = new SpecificBombInformation();
 		bomb.setName("Active bomb");
 		bombs.addActive(bomb);
 
@@ -163,7 +163,7 @@ public class TestWebAPI {
 		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs/1").request(APPLICATION_JSON).get();
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
-		BombInformation bomb = gson.fromJson(actualBody, BombInformation.class);
+		SpecificBombInformation bomb = gson.fromJson(actualBody, SpecificBombInformation.class);
 		assertEquals("Active bomb", bomb.getName());
 	}
 
@@ -174,7 +174,7 @@ public class TestWebAPI {
 				.put(payload);
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
-		BombInformation bomb = gson.fromJson(actualBody, BombInformation.class);
+		SpecificBombInformation bomb = gson.fromJson(actualBody, SpecificBombInformation.class);
 		assertEquals("Active bomb", bomb.getName());
 	}
 
