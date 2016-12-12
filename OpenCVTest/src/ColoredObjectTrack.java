@@ -30,39 +30,25 @@ public class ColoredObjectTrack implements Runnable {
 
 	private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
 	private Random random = new Random();
-	private CameraControll aCameraControll;
+	private CameraController cameraController;
+	
+	//int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
+	CvScalar rgba_min = cvScalar(0, 0, 0, 0);
+	CvScalar rgba_max = cvScalar(100, 255, 255, 0);
+
+	static CanvasFrame videoFrame = new CanvasFrame("Original");
+	static CanvasFrame thresholdedVideoFrame = new CanvasFrame("Thresholded");
 
 	public static void main(String[] args) {
+		
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
 		th.start();
 		cot.setupInterface();
-
 		ColorValueControlInterface colorinterface = new ColorValueControlInterface(cot);
 		colorinterface.initInterface();
-		
+
 	}
-
-	// final int INTERVAL = 10;// 1sec
-	// final int CAMERA_NUM = 0; // Default camera for this time
-
-
-
-	/**
-	 * Correct the color range- it depends upon the object, camera quality,
-	 * environment.
-	 */
-	
-	int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
-
-	CvScalar rgba_min = cvScalar(0, 0, 0, 0);
-	CvScalar rgba_max = cvScalar(100, 255, 255, 0);
-
-	IplImage image;
-
-	//static TransparentPanel trackedPosition = new TransparentPanel();
-	static CanvasFrame videoFrame = new CanvasFrame("Original");
-	static CanvasFrame thresholdedVideoFrame = new CanvasFrame("Thresholded");
 	
 	public void SpawnBomb() {
 		bombs.add(new Bomb(-180 + random.nextFloat() * 360, 20));
@@ -71,31 +57,28 @@ public class ColoredObjectTrack implements Runnable {
 	}
 	
 	public ColoredObjectTrack(){
-
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
-
 	}
-
-	int ii = 0;
 	
 
 	public void setupInterface() {
-		aCameraControll = new CameraControll();
-		videoFrame.addKeyListener(aCameraControll);
-		thresholdedVideoFrame.addKeyListener(aCameraControll);
+		cameraController = new CameraController(false);
+		videoFrame.addKeyListener(cameraController);
+		videoFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+		thresholdedVideoFrame.addKeyListener(cameraController);
 		thresholdedVideoFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 	}
 	
-	public void updatergbvalues() {
+	public void updatergbvalues(int a, int b, int c, int d, int e, int f) {
 		rgba_min = cvScalar(a, b, c, 0);
 		rgba_max = cvScalar(d, e, f, 0);
 	}
 	
-	public void updatergbvaluesFromFile(int a2, int b2, int c2, int d2, int e2, int f2) {
+	public void updatergbvaluesFromFile(int a, int b, int c, int d, int e, int f) {
 //		this.a = a2;
 //		this.b = b2;
 //		this.c = c2;
@@ -117,22 +100,29 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void run() {
 		try {
-			FrameGrabber grabber = new FFmpegFrameGrabber(
-					"http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
-			// FrameGrabber grabber = FrameGrabber.createDefault(0);
+			//FrameGrabber grabber = new FFmpegFrameGrabber("http://root:pass@192.168.20.253/axis-cgi/mjpg/video.cgi?resolution=640x480&fps=25");
+			FrameGrabber grabber = FrameGrabber.createDefault(0);
 			OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 			grabber.start();
 			IplImage img;
 			int posX = 0;
 			int posY = 0;
-			while (true) {
+			long lastLoopTime = System.nanoTime();
+			final int TARGET_FPS = 60;
+			final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
+			boolean gameRunning = true;
+			
+			while (gameRunning) {
+				long now = System.nanoTime();
+			    long updateLength = now - lastLoopTime;
+			    double updateLengthSeconds = (double)updateLength / 1000000000.0;
+			    lastLoopTime = now;
+			    
+			    //double delta = updateLength / ((double)OPTIMAL_TIME);
+
 				img = converter.convert(grabber.grab());
 				if (img != null) {
-					// show image on window
-					// cvFlip(img, img, 1);// l-r =
-					// 90_degrees_steps_anti_clockwise
 
-					// canvas.showImage(converter.convert(img));
 					IplImage detectThrs = getThresholdImage(img);
 					thresholdedVideoFrame.showImage(converter.convert(detectThrs));
 
@@ -145,12 +135,11 @@ public class ColoredObjectTrack implements Runnable {
 					posY = (int) (mom01 / area);
 					// only if its a valid position
 					if (posX > 0 && posY > 0) {
-						// paint(posX, posY);
 						IplImage imgAnnotated = cvCreateImage(cvGetSize(img), 8, 1);
 						imgAnnotated = img.clone();
 						cvCircle(imgAnnotated, new int[] { posX, posY }, 5, new CvScalar(255, 0, 0, 0));
 
-						System.out.println("Camera pan = " + aCameraControll.getPan());
+						//System.out.println("Camera pan = " + cameraController.getPan());
 
 						//DRAW SOME BOMBS!
 						drawBombs(imgAnnotated);
@@ -159,13 +148,19 @@ public class ColoredObjectTrack implements Runnable {
 						videoFrame.showImage(converter.convert(imgAnnotated));
 						imgAnnotated.release();
 					}
-					// img.release();
 					detectThrs.release();
 				}
-
-				// Thread.sleep(INTERVAL);
+				
+				Update(updateLengthSeconds);
+				// Thread.sleep(INTERVAL);;
 			}
 		} catch (Exception e) {
+		}
+	}
+	
+	private void Update(double time){
+		for(int i = 0; i < bombs.size(); i++){
+			bombs.get(i).Update(time);
 		}
 	}
 
@@ -174,28 +169,23 @@ public class ColoredObjectTrack implements Runnable {
 			// for each bomb:
 			// if it is within the view angle,
 			// calculate position in image and draw a dot
-			if(Math.abs(angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan())) < CameraControll.VIEW_ANGLE / 2.0f){
+			if(Math.abs(angleDifference(bombs.get(i).getBearing(),cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f){
 				
 				
-				float diff = angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan());
+				float diff = angleDifference(bombs.get(i).getBearing(),cameraController.getPan());
 				//System.out.println("diff = " + diff);
 				int w = imgAnnotated.width();
 				//System.out.println("w = " + w);
-				int xPos = w/2 + (int)(diff / CameraControll.VIEW_ANGLE * w);
+				int xPos = w/2 + (int)(diff / CameraController.VIEW_ANGLE * w);
 				//System.out.println("xPos = " + xPos);
 
-				//int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
 				cvCircle(imgAnnotated, new int[]{xPos,imgAnnotated.height()/2},10, new CvScalar(255,255,255,0));
 				
-				//TODO: Base radius on position!
 			}
 			
 		}
 	}
 
-//	 private void paint(int posX, int posY) {
-//
-//	 }
 
 	private IplImage getThresholdImage(IplImage orgImg) {
 		
@@ -214,6 +204,7 @@ public class ColoredObjectTrack implements Runnable {
 		return imgThreshold;
 	}
 
+//Not sure what this was supposed to be for, but we aren't using it!
 //	public IplImage Equalize(BufferedImage bufferedimg) {
 //		Java2DFrameConverter converter1 = new Java2DFrameConverter();
 //		OpenCVFrameConverter.ToIplImage converter2 = new OpenCVFrameConverter.ToIplImage();

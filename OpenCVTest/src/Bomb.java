@@ -2,7 +2,7 @@
 public class Bomb {
 
 	private float bearing;
-	private float timer;
+	private double timer;
 	
 	public float getBearing(){
 		return bearing;
@@ -14,7 +14,11 @@ public class Bomb {
 	}
 	
 	//Update the timer here
-	public void Update(){
-		
+	public void Update(double time){
+		timer -= time;
+	}
+	
+	public boolean hasExploded(){
+		return timer < 0;		
 	}
 }

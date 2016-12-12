@@ -4,24 +4,34 @@ import java.awt.event.KeyListener;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class CameraControll implements KeyListener {
+class CameraController implements KeyListener {
 
 	private float pan = 0;
+	private float tilt = 0;
 	public static final float VIEW_ANGLE = 62.8f;
 
 	private float deltaPan = 5;
+	private float deltaTilt = 5;
+	
+	private boolean enabled;
 
 	public float getPan() {
 		return pan;
 	}
 
-	public CameraControll() {
-		try {
-			Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("autofocus", "on")
-					.asString();
-		} catch (UnirestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public CameraController(){
+		this(true);
+	}
+	
+	public CameraController(boolean enabled) {
+		this.enabled = enabled;
+		if(enabled){
+			try {
+				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("autofocus", "on")
+						.asString();
+			} catch (UnirestException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -29,22 +39,21 @@ class CameraControll implements KeyListener {
 	}
 
 	public void keyReleased(KeyEvent e) {
+		if(!enabled) 
+			return;
 		int keyCode = e.getKeyCode();
 		switch (keyCode) {
 		case KeyEvent.VK_UP:
 			try {
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rtilt", 10).asString();
+				tilt(deltaTilt);
 			} catch (UnirestException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			break;
 		case KeyEvent.VK_DOWN:
 			try {
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rtilt", -10)
-						.asString();
+				tilt(-deltaTilt);
 			} catch (UnirestException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			break;
@@ -101,6 +110,17 @@ class CameraControll implements KeyListener {
 		}
 		if (pan < -180) {
 			pan += 360;
+		}
+	}
+	
+	private void tilt(float amount) throws UnirestException {
+		Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rtilt", amount).asString();
+		tilt += amount;
+		if (tilt > 180) {
+			tilt -= 360;
+		}
+		if (tilt < -180) {
+			tilt += 360;
 		}
 	}
 }

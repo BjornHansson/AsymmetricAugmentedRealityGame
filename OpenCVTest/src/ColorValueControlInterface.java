@@ -30,7 +30,7 @@ public class ColorValueControlInterface extends JFrame {
 	int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
 	ColoredObjectTrack cot;
-	CameraControll aCameraControll;
+	CameraController aCameraControll;
 	
 	public ColorValueControlInterface(	ColoredObjectTrack cot) {
 		this.cot = cot;
@@ -78,10 +78,10 @@ public class ColorValueControlInterface extends JFrame {
 		slider.setValue(a);
 		slider.addChangeListener(new ChangeListener() {
 
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				a = slider.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 
@@ -92,10 +92,10 @@ public class ColorValueControlInterface extends JFrame {
 		slider_1.setValue(d);
 		slider_1.addChangeListener(new ChangeListener() {
 
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				d = slider_1.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 
@@ -106,10 +106,10 @@ public class ColorValueControlInterface extends JFrame {
 		slider_2.setValue(b);
 		slider_2.addChangeListener(new ChangeListener() {
 
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				b = slider_2.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 
@@ -123,7 +123,7 @@ public class ColorValueControlInterface extends JFrame {
 			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				e = slider_3.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 
@@ -134,10 +134,10 @@ public class ColorValueControlInterface extends JFrame {
 		slider_4.setValue(c);
 		slider_4.addChangeListener(new ChangeListener() {
 
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				c = slider_4.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 
@@ -150,10 +150,10 @@ public class ColorValueControlInterface extends JFrame {
 		slider_5.setValue(f);
 		slider_5.addChangeListener(new ChangeListener() {
 
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent event) {
 				// TODO Auto-generated method stub
 				f = slider_5.getValue();
-				cot.updatergbvalues();
+				cot.updatergbvalues(a,b,c,d,e,f);
 			}
 		});
 		
