@@ -113,7 +113,7 @@ public class WebAPI {
 		/*
 		 * Leave a game
 		 */
-		delete("/games/:gameid/:playerid", (request, response) -> {
+		delete("/games/:gameid/players/:playerid", (request, response) -> {
 			System.out.println("Leave a game");
 			response.status(HttpURLConnection.HTTP_NO_CONTENT);
 			int gameId = Integer.parseInt(request.params("gameid"));
@@ -125,13 +125,14 @@ public class WebAPI {
 		/*
 		 * Defuse a bomb
 		 */
-		put("/games/:gameid/bombs", (request, response) -> {
-			System.out.println("Defuse a bomb");
+		put("/games/:gameid/bombs/:bombid", (request, response) -> {
+			System.out.println("Try to defuse a bomb");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
+			int bombId = Integer.parseInt(request.params("bombid"));
 			String body = request.body();
 			Player player = myGson.fromJson(body, Player.class);
-			BombInformation bomb = myGamesHolder.defuseBomb(gameId, player.getId());
+			BombInformation bomb = myGamesHolder.defuseBomb(gameId, bombId, player.getId());
 			return myGson.toJson(bomb);
 		});
 
@@ -143,6 +144,17 @@ public class WebAPI {
 			int gameId = Integer.parseInt(request.params("gameid"));
 			BombsInGame bombs = myGamesHolder.listAllBombs(gameId);
 			return myGson.toJson(bombs);
+		});
+
+		/*
+		 * Get information about a specific bomb in a game
+		 */
+		get("/games/:gameid/bombs/:bombid", (request, response) -> {
+			System.out.println("Get information on all bombs");
+			int gameId = Integer.parseInt(request.params("gameid"));
+			int bombId = Integer.parseInt(request.params("bombid"));
+			BombInformation bomb = myGamesHolder.getBombInformation(gameId, bombId);
+			return myGson.toJson(bomb);
 		});
 	}
 

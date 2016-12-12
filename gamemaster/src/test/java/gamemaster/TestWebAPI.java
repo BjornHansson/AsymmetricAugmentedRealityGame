@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 
 import comm.GamesHolder;
 import comm.WebAPI;
+import models.BombInformation;
 import models.BombsInGame;
 import models.GamesCollection;
 import models.SpecificGameInformation;
@@ -44,6 +45,7 @@ public class TestWebAPI {
 	private static final String gameNameToTest = "Björn and his merry bomb squad";
 	private static final int playerIdToTest = 42;
 	private static final String playerNameToTest = "Hodor";
+	private static final int bombIdToTest = 1;
 
 	@BeforeClass
 	public static void onlyOnce() {
@@ -68,12 +70,17 @@ public class TestWebAPI {
 		players.add(player);
 
 		BombsInGame bombs = new BombsInGame();
+		BombInformation bomb = new BombInformation();
+		bomb.setName("Active bomb");
+		bombs.addActive(bomb);
 
 		GamesHolder mockedGame = mock(GamesHolder.class);
 		when(mockedGame.getGamesCollection()).thenReturn(gc);
 		when(mockedGame.getInformationSpecificGame(gameIdToTest)).thenReturn(isg);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);
 		when(mockedGame.listAllBombs(gameIdToTest)).thenReturn(bombs);
+		when(mockedGame.getBombInformation(gameIdToTest, bombIdToTest)).thenReturn(bomb);
+		when(mockedGame.defuseBomb(gameIdToTest, bombIdToTest, playerIdToTest)).thenReturn(bomb);
 		when(mockedGame.startGame(gameNameToTest)).thenReturn(sg);
 		when(mockedGame.joinGame(gameIdToTest, playerNameToTest)).thenReturn(player);
 
@@ -137,17 +144,9 @@ public class TestWebAPI {
 
 	@Test
 	public void testDeleteLeaveGame() {
-		Response response = client.target(URL + "games/" + gameIdToTest + "/" + playerIdToTest)
+		Response response = client.target(URL + "games/" + gameIdToTest + "/players/" + playerIdToTest)
 				.request(APPLICATION_JSON).delete();
 		assertEquals(HttpURLConnection.HTTP_NO_CONTENT, response.getStatus());
-	}
-
-	@Test
-	public void testPostDefuseBomb() {
-		Entity<String> payload = Entity.json("{'playerid': " + playerIdToTest + "}");
-		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs").request(APPLICATION_JSON)
-				.put(payload);
-		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
 	}
 
 	@Test
@@ -156,8 +155,27 @@ public class TestWebAPI {
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
 		BombsInGame bombs = gson.fromJson(actualBody, BombsInGame.class);
-		// TODO: implement
-		// assertEquals(expected, bombs.getActive().get(0).);
+		assertEquals("Active bomb", bombs.getActive().get(0).getName());
+	}
+
+	@Test
+	public void testGetBombInformation() {
+		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs/1").request(APPLICATION_JSON).get();
+		String actualBody = response.readEntity(String.class);
+		assertEquals(HttpURLConnection.HTTP_OK, response.getStatus());
+		BombInformation bomb = gson.fromJson(actualBody, BombInformation.class);
+		assertEquals("Active bomb", bomb.getName());
+	}
+
+	@Test
+	public void testPutDefuseBomb() {
+		Entity<String> payload = Entity.json("{'id': '" + playerIdToTest + "'}");
+		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs/1").request(APPLICATION_JSON)
+				.put(payload);
+		String actualBody = response.readEntity(String.class);
+		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
+		BombInformation bomb = gson.fromJson(actualBody, BombInformation.class);
+		assertEquals("Active bomb", bomb.getName());
 	}
 
 	@Test

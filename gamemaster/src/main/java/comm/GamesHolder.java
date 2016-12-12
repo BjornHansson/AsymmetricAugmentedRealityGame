@@ -137,6 +137,12 @@ public class GamesHolder {
 	 *            The game ID
 	 */
 	public BombsInGame listAllBombs(int gameId) {
+		// TODO: implement
+		return null;
+	}
+
+	public BombInformation getBombInformation(int gameId, int bombId) {
+		// TODO: implement
 		return null;
 	}
 
@@ -194,13 +200,12 @@ public class GamesHolder {
 	/**
 	 * Defuse a bomb
 	 * 
-	 * @param game
-	 *            The game ID
-	 * @param player
-	 *            The player ID
+	 * @param gameId
+	 * @param bombId
+	 * @param playerId
 	 * @return
 	 */
-	public BombInformation defuseBomb(int gameId, int player) {
+	public BombInformation defuseBomb(int gameId, int bombId, int playerId) {
 		return null;
 	}
 
