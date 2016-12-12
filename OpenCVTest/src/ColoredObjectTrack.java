@@ -1,11 +1,3 @@
-
-/*
- * Just an example using the opencv to make a colored object tracking,
- * i adpted this code to bytedeco/javacv, i think this will help some people.
- *
- * Waldemar <waldemarnt@outlook.com>
- */
-
 import static org.bytedeco.javacpp.opencv_core.IPL_DEPTH_8U;
 import static org.bytedeco.javacpp.opencv_core.cvCreateImage;
 import static org.bytedeco.javacpp.opencv_core.cvFlip;
@@ -47,15 +39,11 @@ import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 
-
-
 public class ColoredObjectTrack implements Runnable {
 
 	private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
 	private Random random = new Random();
 	CameraControll aCameraControll;
-	
-	
 	
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
@@ -79,8 +67,8 @@ public class ColoredObjectTrack implements Runnable {
 	IplImage image;
 
 	//static TransparentPanel trackedPosition = new TransparentPanel();
-	static CanvasFrame canvas = new CanvasFrame("Original");
-	static CanvasFrame thresholdedCanvas = new CanvasFrame("Thresholded");
+	static CanvasFrame videoFrame = new CanvasFrame("Original");
+	static CanvasFrame thresholdedVideoFrame = new CanvasFrame("Thresholded");
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
 	
 	public void SpawnBomb(){
@@ -90,34 +78,19 @@ public class ColoredObjectTrack implements Runnable {
 	}
 	
 	public ColoredObjectTrack(){
-		
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
 		SpawnBomb();
-		
-//		trackedPosition.setSize(500, 500);
-//		
-//		
-//		trackedPosition.setBackground(new Color(255,255,255,0));
-//		trackedPosition.setOpaque(false);
-//		trackedPosition.setLayout( null ) ;
-		
-		//canvas.add(trackedPosition);
-		
-		//canvas.setGlassPane(trackedPosition);
-		//canvas.image
-		//canvas.setComponentZOrder(trackedPosition, 0);
-
 	}
 
 	int ii = 0;
 
 	public void ColoredObjectTrackcontrolinterface() {
 		aCameraControll = new CameraControll();
-		canvas.addKeyListener(aCameraControll);
-		thresholdedCanvas.addKeyListener(aCameraControll);
+		videoFrame.addKeyListener(aCameraControll);
+		thresholdedVideoFrame.addKeyListener(aCameraControll);
 		canvas2.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 
 		JPanel panel = new JPanel();
@@ -225,7 +198,7 @@ public class ColoredObjectTrack implements Runnable {
 			}
 		});
 
-		thresholdedCanvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+		thresholdedVideoFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		canvas2.setVisible(true);
 		canvas2.setPreferredSize(new Dimension(400, 300));
 		canvas2.setMinimumSize(new Dimension(400, 300));
@@ -265,7 +238,7 @@ public class ColoredObjectTrack implements Runnable {
 					
 					//canvas.showImage(converter.convert(img));
 					IplImage detectThrs = getThresholdImage(img);
-					thresholdedCanvas.showImage(converter.convert(detectThrs));
+					thresholdedVideoFrame.showImage(converter.convert(detectThrs));
 
 					 CvMoments moments = new CvMoments();
 					 cvMoments(detectThrs, moments, 1);
@@ -284,33 +257,10 @@ public class ColoredObjectTrack implements Runnable {
 						System.out.println("Camera pan = " + aCameraControll.getPan());
 						
 						//DRAW SOME BOMBS!
-						for(int i = 0; i < bombs.size(); i++){
-							// for each bomb:
-							// if it is within the view angle,
-							// calculate position in image and draw a dot
-							if(Math.abs(angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan())) < CameraControll.VIEW_ANGLE / 2.0f){
-								
-								
-								float diff = angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan());
-								//System.out.println("diff = " + diff);
-								int w = imgAnnotated.width();
-								//System.out.println("w = " + w);
-								int xPos = w/2 + (int)(diff / CameraControll.VIEW_ANGLE * w);
-								//System.out.println("xPos = " + xPos);
-								
-										
-										
-								
-								//int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
-								cvCircle(imgAnnotated, new int[]{xPos,imgAnnotated.height()/2},10, new CvScalar(255,255,255,0));
-								
-								//TODO: Base radius on position!
-							}
-							
-						}
+						drawBombs(imgAnnotated);
 						
-						
-						canvas.showImage(converter.convert(imgAnnotated));
+						//Show the annotated image
+						videoFrame.showImage(converter.convert(imgAnnotated));
 						imgAnnotated.release();
 					 }
 					 //img.release();
@@ -323,62 +273,59 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
+	private void drawBombs(IplImage imgAnnotated) {
+		for(int i = 0; i < bombs.size(); i++){
+			// for each bomb:
+			// if it is within the view angle,
+			// calculate position in image and draw a dot
+			if(Math.abs(angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan())) < CameraControll.VIEW_ANGLE / 2.0f){
+				
+				
+				float diff = angleDifference(bombs.get(i).getBearing(),aCameraControll.getPan());
+				//System.out.println("diff = " + diff);
+				int w = imgAnnotated.width();
+				//System.out.println("w = " + w);
+				int xPos = w/2 + (int)(diff / CameraControll.VIEW_ANGLE * w);
+				//System.out.println("xPos = " + xPos);
+
+				//int xPos = -(int)((aCameraControll.getPan() - bombs.get(i).getBearing())/ (CameraControll.VIEW_ANGLE / 2.0f) * imgAnnotated.width());
+				cvCircle(imgAnnotated, new int[]{xPos,imgAnnotated.height()/2},10, new CvScalar(255,255,255,0));
+				
+				//TODO: Base radius on position!
+			}
+			
+		}
+	}
+
 	 private void paint(int posX, int posY) {
-		 
-//		 trackedPosition.x = posX;
-//		 trackedPosition.y = posY;
-//		 trackedPosition.repaint();
-		 
-//	 Graphics g = trackedPosition.getGraphics();
-//	 
-//	 g.clearRect(0, 0, 500, 500);
-//	 g.setColor(Color.RED);
-//	 // g.fillOval(posX, posY, 20, 20);
-//	 g.drawOval(posX, posY, 20, 20);
-	 
-	 
-	 //System.out.println(posX + " , " + posY);
-	
+
 	 }
 
 	private IplImage getThresholdImage(IplImage orgImg) {
 		
-		//IplImage imgThreshold = orgImg.clone();
 		IplImage imgThreshold = cvCreateImage(cvGetSize(orgImg), 8, 1);
-		
-		
 		IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 1);
-		//imgHSV = cvCreateImage(orgImg);
 		imgHSV = orgImg.clone();
-		
-		
-		//COLOR_BGR2HSV
-		
-		cvCvtColor(orgImg, imgHSV, org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV);
-		//org.bytedeco.javacpp.opencv_imgproc.cvtColor(orgImg.asCvMat(), dst, code);
-		
-		//cvtColor(orgImg, imgHSV,); 
-		//
-		cvInRangeS(imgHSV, rgba_min, rgba_max, imgThreshold);// red
 
+		//Change image color format from BGR to HSV
+		cvCvtColor(orgImg, imgHSV, org.bytedeco.javacpp.opencv_imgproc.CV_BGR2HSV);
+		//Threshold the image according to the calibrated values
+		cvInRangeS(imgHSV, rgba_min, rgba_max, imgThreshold);
+		//Smooth out noise
 		cvSmooth(imgThreshold, imgThreshold, CV_MEDIAN, 15, 0, 0, 0);
-		// cvSaveImage(++ii + "dsmthreshold.jpg", imgThreshold);
-		
-		//org.bytedeco.javacpp.opencv_imgproc.cvcreatestr
-		//org.bytedeco.javacpp.opencv_imgproc.cvErode(imgThreshold, imgThreshold, org.bytedeco.javacpp.opencv_imgproc.getStructuringElement(org.bytedeco.javacpp.opencv_imgproc.MORPH_ELLIPSE, new org.bytedeco.javacpp.opencv_core.Size(5,5)));
-		
+
 		imgHSV.release();
 		return imgThreshold;
 	}
 
-	public IplImage Equalize(BufferedImage bufferedimg) {
-		Java2DFrameConverter converter1 = new Java2DFrameConverter();
-		OpenCVFrameConverter.ToIplImage converter2 = new OpenCVFrameConverter.ToIplImage();
-		IplImage iploriginal = converter2.convert(converter1.convert(bufferedimg));
-		IplImage srcimg = IplImage.create(iploriginal.width(), iploriginal.height(), IPL_DEPTH_8U, 1);
-		IplImage destimg = IplImage.create(iploriginal.width(), iploriginal.height(), IPL_DEPTH_8U, 1);
-		cvCvtColor(iploriginal, srcimg, CV_BGR2GRAY);
-		cvEqualizeHist(srcimg, destimg);
-		return destimg;
-	}
+//	public IplImage Equalize(BufferedImage bufferedimg) {
+//		Java2DFrameConverter converter1 = new Java2DFrameConverter();
+//		OpenCVFrameConverter.ToIplImage converter2 = new OpenCVFrameConverter.ToIplImage();
+//		IplImage iploriginal = converter2.convert(converter1.convert(bufferedimg));
+//		IplImage srcimg = IplImage.create(iploriginal.width(), iploriginal.height(), IPL_DEPTH_8U, 1);
+//		IplImage destimg = IplImage.create(iploriginal.width(), iploriginal.height(), IPL_DEPTH_8U, 1);
+//		cvCvtColor(iploriginal, srcimg, CV_BGR2GRAY);
+//		cvEqualizeHist(srcimg, destimg);
+//		return destimg;
+//	}
 }
