@@ -6,16 +6,18 @@ import static spark.Spark.get;
 import static spark.Spark.options;
 import static spark.Spark.port;
 import static spark.Spark.post;
+import static spark.Spark.put;
 
 import java.net.HttpURLConnection;
 import java.util.List;
 
 import com.google.gson.Gson;
 
-import models.DefuseInformation;
+import models.BombInformation;
+import models.BombsInGame;
 import models.GamesCollection;
-import models.InformationSpecificGame;
-import models.StartGame;
+import models.SpecificGameInformation;
+import models.StartGameInformation;
 import models.sub.GameName;
 import models.sub.Player;
 
@@ -70,7 +72,7 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			String body = request.body();
 			GameName gameName = myGson.fromJson(body, GameName.class);
-			StartGame sg = myGamesHolder.startGame(gameName.getName());
+			StartGameInformation sg = myGamesHolder.startGame(gameName.getName());
 			return myGson.toJson(sg);
 		});
 
@@ -80,7 +82,7 @@ public class WebAPI {
 		get("/games/:gameid", (request, response) -> {
 			System.out.println("Get information on a specific game");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			InformationSpecificGame isg = myGamesHolder.getInformationSpecificGame(gameId);
+			SpecificGameInformation isg = myGamesHolder.getInformationSpecificGame(gameId);
 			return myGson.toJson(isg);
 		});
 
@@ -123,24 +125,24 @@ public class WebAPI {
 		/*
 		 * Defuse a bomb
 		 */
-		post("/games/:gameid/defuses", (request, response) -> {
+		put("/games/:gameid/bombs", (request, response) -> {
 			System.out.println("Defuse a bomb");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
 			Player player = myGson.fromJson(body, Player.class);
-			myGamesHolder.defuseBomb(gameId, player.getId());
-			return "";
+			BombInformation bomb = myGamesHolder.defuseBomb(gameId, player.getId());
+			return myGson.toJson(bomb);
 		});
 
 		/*
-		 * Get information on defusal attempts
+		 * Get information about all bombs in a game
 		 */
-		get("/games/:gameid/defuses", (request, response) -> {
-			System.out.println("Get information on defusal attempts");
+		get("/games/:gameid/bombs", (request, response) -> {
+			System.out.println("Get information on all bombs");
 			int gameId = Integer.parseInt(request.params("gameid"));
-			DefuseInformation di = myGamesHolder.getDefuseInfo(gameId);
-			return myGson.toJson(di);
+			BombsInGame bombs = myGamesHolder.listAllBombs(gameId);
+			return myGson.toJson(bombs);
 		});
 	}
 

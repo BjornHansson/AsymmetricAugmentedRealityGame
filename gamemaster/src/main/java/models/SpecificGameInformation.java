@@ -6,7 +6,14 @@ import java.util.List;
 import models.sub.AllActions;
 import models.sub.Player;
 
-public class InformationSpecificGame {
+/**
+ * Contains information when using GET on /games/:gameid URL.
+ * 
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/specific-games/get-information-about-a-game">Apiary
+ *      link</a>
+ */
+public class SpecificGameInformation {
 	private int gameId;
 	private String name;
 	private boolean status = false;
@@ -63,12 +70,14 @@ public class InformationSpecificGame {
 	}
 
 	public void removePlayer(int playerId) {
-		// TODO Auto-generated method stub
-
+		for (int i = 0; i < allPlayers.size(); i++) {
+			if (allPlayers.get(i).getId() == playerId) {
+				allPlayers.remove(i);
+			}
+		}
 	}
 
 	public void addPlayer(Player newPlayer) {
-		// TODO Auto-generated method stub
-
+		allPlayers.add(newPlayer);
 	}
 }

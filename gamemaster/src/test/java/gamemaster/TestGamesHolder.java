@@ -1,4 +1,3 @@
-
 package gamemaster;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -6,16 +5,19 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
 import javax.ws.rs.HttpMethod;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import comm.GamesHolder;
-import models.DefuseInformation;
+import models.BombsInGame;
 import models.GamesCollection;
-import models.InformationSpecificGame;
-import models.StartGame;
+import models.SpecificGameInformation;
+import models.StartGameInformation;
+import models.sub.Player;
 
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
@@ -30,22 +32,28 @@ public class TestGamesHolder {
 		String nameOfTheGame = "Hodor";
 		boolean status = false;
 		int defuses = 0;
-		StartGame sg = gamesHolderToTest.startGame(nameOfTheGame);
+		StartGameInformation sg = gamesHolderToTest.startGame(nameOfTheGame);
+		gamesHolderToTest.joinGame(1, "Player name");
 
-		InformationSpecificGame isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
+		SpecificGameInformation isg = gamesHolderToTest.getInformationSpecificGame(sg.getGameId());
 		assertEquals(1, isg.getGameId());
 		assertEquals(nameOfTheGame, isg.getName());
 		assertEquals(status, isg.getStatus());
 		assertEquals(defuses, isg.getDefuses());
+		assertEquals("/games/1/defuse", isg.getActions().getDefuse().getUrl());
+		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
+		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
+		assertEquals("/games/1/1", isg.getActions().getLeaveGame().getUrl());
+		assertEquals(HttpMethod.DELETE, isg.getActions().getLeaveGame().getMethod());
 	}
 
 	@Test
 	public void testGetGamesCollection() {
 		String firstNameOfTheGame = "Hodor";
 		String secondNameOfTheGame = "Simon";
-		StartGame createdGameFirst = gamesHolderToTest.startGame(firstNameOfTheGame);
+		StartGameInformation createdGameFirst = gamesHolderToTest.startGame(firstNameOfTheGame);
 		assertEquals(createdGameFirst.getGameId(), gamesHolderToTest.getCurrentGameId());
-		StartGame createdGameSecond = gamesHolderToTest.startGame(secondNameOfTheGame);
+		StartGameInformation createdGameSecond = gamesHolderToTest.startGame(secondNameOfTheGame);
 		assertEquals(createdGameSecond.getGameId(), gamesHolderToTest.getCurrentGameId());
 		assertThat(createdGameFirst, not(equalTo(createdGameSecond)));
 
@@ -53,36 +61,67 @@ public class TestGamesHolder {
 		assertEquals(2, gc.getGames().size());
 		assertEquals(firstNameOfTheGame, gc.getGames().get(0).getName());
 		assertEquals(secondNameOfTheGame, gc.getGames().get(1).getName());
-		assertEquals(gc.getActions().getCurrentgame().getUrl(), "/games/2");
-		assertEquals(gc.getActions().getCurrentgame().getMethod(), HttpMethod.GET);
+		assertEquals("/games/2", gc.getActions().getCurrentgame().getUrl());
+		assertEquals(HttpMethod.GET, gc.getActions().getCurrentgame().getMethod());
 	}
 
 	@Test
 	public void testGetDefuseInfo() {
-		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
-		DefuseInformation di = gamesHolderToTest.getDefuseInfo(createdGame.getGameId());
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		BombsInGame di = gamesHolderToTest.listAllBombs(createdGame.getGameId());
 		// TODO: Implement
 		// assertTrue(di.getAttempts().get(0));
 	}
 
 	@Test
 	public void testJoinGame() {
-		// TODO: implement
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		int createdGameId = createdGame.getGameId();
+		Player joinedPlayer = gamesHolderToTest.joinGame(createdGameId, "Hodor");
+
+		assertEquals(1, joinedPlayer.getId());
+		assertEquals("/games/1/defuse", joinedPlayer.getActions().getDefuse().getUrl());
+		assertEquals(HttpMethod.POST, joinedPlayer.getActions().getDefuse().getMethod());
+		assertEquals("number", joinedPlayer.getActions().getDefuse().getParameters().get(0).getPlayerId());
+		assertEquals("/games/1/1", joinedPlayer.getActions().getLeaveGame().getUrl());
+		assertEquals(HttpMethod.DELETE, joinedPlayer.getActions().getLeaveGame().getMethod());
 	}
 
 	@Test
 	public void testLeaveGame() {
-		StartGame createdGame = gamesHolderToTest.startGame("PieIsNice");
-		gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		int createdGameId = createdGame.getGameId();
+		gamesHolderToTest.joinGame(createdGameId, "Hodor");
+
+		assertEquals(1, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
+		gamesHolderToTest.leaveGame(createdGameId, 1);
+		assertEquals(0, gamesHolderToTest.getInformationSpecificGame(createdGameId).getAllPlayers().size());
 	}
 
 	@Test
 	public void testListPlayers() {
-		// TODO: implement
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		int createdGameId = createdGame.getGameId();
+		gamesHolderToTest.joinGame(createdGameId, "Hodor");
+		gamesHolderToTest.joinGame(createdGameId, "Jon Snow");
+		gamesHolderToTest.joinGame(createdGameId, "Tyrion Lannister");
+		List<Player> players = gamesHolderToTest.listPlayers(createdGameId);
+		assertEquals(3, players.size());
+		assertEquals(players.get(2).getId(), 3);
+		assertEquals(players.get(2).getName(), "Tyrion Lannister");
 	}
 
 	@Test
 	public void testStartGame() {
-		// TODO: implement
+		String nameOfTheGame = "PieIsNice";
+		StartGameInformation createdGame = gamesHolderToTest.startGame(nameOfTheGame);
+
+		assertEquals(1, createdGame.getGameId());
+		assertEquals(nameOfTheGame, createdGame.getName());
+		assertEquals("/games/1", createdGame.getActions().getRegistration().getUrl());
+		assertEquals(HttpMethod.POST, createdGame.getActions().getRegistration().getMethod());
+		assertEquals("string", createdGame.getActions().getRegistration().getParameters().get(0).getName());
+		assertEquals("/games/1", createdGame.getActions().getInformation().getUrl());
+		assertEquals(HttpMethod.GET, createdGame.getActions().getInformation().getMethod());
 	}
 }
