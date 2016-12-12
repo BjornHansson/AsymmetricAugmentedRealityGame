@@ -36,4 +36,8 @@ public class BombsInGame {
 	public void setActions(AllActions actions) {
 		this.actions = actions;
 	}
+
+	public void addActive(BombInformation bomb) {
+		active.add(bomb);
+	}
 }
