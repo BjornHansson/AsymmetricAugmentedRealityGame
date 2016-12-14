@@ -9,24 +9,24 @@ import models.sub.AllActions;
  * Contains information when using GET on /games/:gameid/bombs URL.
  */
 public class BombsInGame {
-	private List<BombInformation> active = new ArrayList<BombInformation>();
-	private List<BombInformation> defused = new ArrayList<BombInformation>();
+	private List<SpecificBombInformation> active = new ArrayList<SpecificBombInformation>();
+	private List<SpecificBombInformation> defused = new ArrayList<SpecificBombInformation>();
 	private AllActions actions = new AllActions();
 
-	public List<BombInformation> getActive() {
+	public List<SpecificBombInformation> getActive() {
 		return active;
 	}
 
-	public void setActive(List<BombInformation> active) {
+	public void setActive(List<SpecificBombInformation> active) {
 		this.active = active;
 	}
 
-	public List<BombInformation> getDefused() {
+	public List<SpecificBombInformation> getDefused() {
 		return defused;
 	}
 
-	public void setDefused(List<BombInformation> defused) {
-		this.defused = defused;
+	public void addDefused(SpecificBombInformation bomb) {
+		defused.add(bomb);
 	}
 
 	public AllActions getActions() {
@@ -37,7 +37,7 @@ public class BombsInGame {
 		this.actions = actions;
 	}
 
-	public void addActive(BombInformation bomb) {
+	public void addActive(SpecificBombInformation bomb) {
 		active.add(bomb);
 	}
 }

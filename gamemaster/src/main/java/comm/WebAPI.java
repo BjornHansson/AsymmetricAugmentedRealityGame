@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
-import models.BombInformation;
+import models.SpecificBombInformation;
 import models.BombsInGame;
 import models.GamesCollection;
 import models.SpecificGameInformation;
@@ -132,7 +132,7 @@ public class WebAPI {
 			int bombId = Integer.parseInt(request.params("bombid"));
 			String body = request.body();
 			Player player = myGson.fromJson(body, Player.class);
-			BombInformation bomb = myGamesHolder.defuseBomb(gameId, bombId, player.getId());
+			SpecificBombInformation bomb = myGamesHolder.defuseBomb(gameId, bombId, player.getId());
 			return myGson.toJson(bomb);
 		});
 
@@ -153,7 +153,7 @@ public class WebAPI {
 			System.out.println("Get information on all bombs");
 			int gameId = Integer.parseInt(request.params("gameid"));
 			int bombId = Integer.parseInt(request.params("bombid"));
-			BombInformation bomb = myGamesHolder.getBombInformation(gameId, bombId);
+			SpecificBombInformation bomb = myGamesHolder.getBombInformation(gameId, bombId);
 			return myGson.toJson(bomb);
 		});
 	}

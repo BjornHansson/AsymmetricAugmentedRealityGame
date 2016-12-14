@@ -66,11 +66,28 @@ public class TestGamesHolder {
 	}
 
 	@Test
-	public void testGetDefuseInfo() {
+	public void testListAllBombs() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
-		BombsInGame di = gamesHolderToTest.listAllBombs(createdGame.getGameId());
-		// TODO: Implement
-		// assertTrue(di.getAttempts().get(0));
+		BombsInGame bombs = gamesHolderToTest.listAllBombs(createdGame.getGameId());
+		assertEquals(0, bombs.getActive().size());
+		assertEquals(0, bombs.getDefused().size());
+		// TODO: How to add bombs?
+	}
+
+	@Test
+	public void testGetBombInformation() {
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		// BombInformation bomb = gamesHolderToTest.getBombInformation(gameId,
+		// bombId);
+		// TODO: Implement. Logic to add bombs
+	}
+
+	@Test
+	public void testDefuseBomb() {
+		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		// BombInformation bomb = gamesHolderToTest.defuseBomb(gameId, bombId,
+		// playerId);
+		// TODO: Implement. Logic to add bombs
 	}
 
 	@Test
