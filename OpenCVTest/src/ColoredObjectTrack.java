@@ -161,6 +161,11 @@ public class ColoredObjectTrack implements Runnable {
 	private void Update(double time){
 		for(int i = 0; i < bombs.size(); i++){
 			bombs.get(i).Update(time);
+			if(bombs.get(i).hasExploded()){
+				System.out.println("BOOM!");
+				bombs.remove(i);
+				i--;
+			}
 		}
 	}
 
