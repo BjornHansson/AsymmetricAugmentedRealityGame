@@ -6,7 +6,7 @@ requirejs.config({
         effects: 'view_logic/effects',
         game: 'game_logic/game',
         player: 'game_logic/player',
-        game_control: 'game_logic/game_control'
+        game_control: 'game_logic/game_controls'
     },
     waitSeconds: 2
 });
