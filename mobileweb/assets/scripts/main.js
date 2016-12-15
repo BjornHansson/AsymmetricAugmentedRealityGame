@@ -6,6 +6,7 @@ requirejs.config({
     },
     waitSeconds: 2,
     bundles: {
-        'game_logic': ['../game_logic/game_control', '../game_logic/game', '../game_logic/player']
+        'game_logic': ['../game_logic/game_control', '../game_logic/game', '../game_logic/player'],
+        'view_logic': ['../view_logic/effects']
     }
 });
