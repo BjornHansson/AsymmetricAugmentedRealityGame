@@ -5,6 +5,7 @@
 	<artifactId>gamemaster</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>AARG Game Master</name>
+	<!-- Server dependencies -->
 	<dependencies>
 		<dependency>
 			<groupId>com.sparkjava</groupId>
@@ -63,7 +64,17 @@
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
-
+		<!-- Open CV dependencies -->
+		<dependency>
+			<groupId>com.mashape.unirest</groupId>
+			<artifactId>unirest-java</artifactId>
+			<version>1.4.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

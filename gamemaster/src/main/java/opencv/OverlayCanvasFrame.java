@@ -1,3 +1,4 @@
+package opencv;
 import java.awt.DisplayMode;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;

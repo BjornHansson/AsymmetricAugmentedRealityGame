@@ -1,3 +1,4 @@
+package opencv;
 
 public class Bomb {
 

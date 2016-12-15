@@ -1,3 +1,4 @@
+package opencv;
 import static org.bytedeco.javacpp.opencv_core.cvScalar;
 
 import java.awt.BorderLayout;
