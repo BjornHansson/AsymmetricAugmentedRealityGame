@@ -1,12 +1,12 @@
 requirejs.config({
-    baseUrl: 'assets/scripts/lib',
+    baseUrl: 'assets/scripts',
     paths: {
-        jquery: 'jquery-3.1.1.min',
-        bootstrap: 'bootstrap-3.3.7.min'
+        jquery: 'lib/jquery-3.1.1.min',
+        bootstrap: 'lib/bootstrap-3.3.7.min',
+        effects: 'view_logic/effects',
+        game: 'game_logic/game',
+        player: 'game_logic/player',
+        game_control: 'game_logic/game_control'
     },
-    waitSeconds: 2,
-    bundles: {
-        'game_logic': ['../game_logic/game_control', '../game_logic/game', '../game_logic/player'],
-        'view_logic': ['../view_logic/effects']
-    }
+    waitSeconds: 2
 });
