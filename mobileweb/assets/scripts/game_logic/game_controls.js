@@ -1,4 +1,4 @@
-define(['jquery'], function($) {
+define(['jquery', 'game'], function($, game) {
     var instance = null;
 
     /**
@@ -11,11 +11,7 @@ define(['jquery'], function($) {
     var GameControls = function(controller) {
         instance = this;
         instance.controller = controller; // The controller peer's IP address
-        instance.currentGame = {
-                name: null,
-                id: null,
-                url: null
-        };
+        instance.currentGame = new game(controller);
     };
 
     /**
