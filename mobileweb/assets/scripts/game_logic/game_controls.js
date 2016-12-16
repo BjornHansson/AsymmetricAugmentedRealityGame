@@ -7,7 +7,7 @@ define(function() {
      * {string} controller - The controller's IP address. 
      */
     var GameControls = function(controller) {
-        this.controller; // The controller peer's IP address
+        this.controller = controller; // The controller peer's IP address
     };
 
     /**
