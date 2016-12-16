@@ -2,19 +2,16 @@ package models;
 
 import org.joda.time.DateTime;
 
-import com.google.gson.annotations.SerializedName;
-
 import models.sub.AllActions;
 
-public class SpecificBombInformation {
+public class SpecificDefuseInformation {
 	private int id;
-	private String name;
-	private boolean defused;
-	@SerializedName("explosion_at")
-	private DateTime explosionAt;
+	private int player;
+	private boolean defused = false;
+	private DateTime when;
+	private AllActions actions = new AllActions();
 	// TODO: Check that transient hides the field
 	private transient int gameId;
-	private AllActions actions = new AllActions();
 
 	public int getId() {
 		return id;
@@ -24,12 +21,12 @@ public class SpecificBombInformation {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public int getPlayer() {
+		return player;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setPlayer(int player) {
+		this.player = player;
 	}
 
 	public boolean isDefused() {
@@ -40,12 +37,12 @@ public class SpecificBombInformation {
 		this.defused = defused;
 	}
 
-	public DateTime getExplosionAt() {
-		return explosionAt;
+	public DateTime getWhen() {
+		return when;
 	}
 
-	public void setExplosionAt(DateTime explosionAt) {
-		this.explosionAt = explosionAt;
+	public void setWhen(DateTime when) {
+		this.when = when;
 	}
 
 	public AllActions getActions() {

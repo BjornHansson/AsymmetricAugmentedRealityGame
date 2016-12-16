@@ -8,8 +8,10 @@ import javax.ws.rs.HttpMethod;
 import org.joda.time.DateTime;
 
 import models.BombsInGame;
+import models.DefusesInformation;
 import models.GamesCollection;
 import models.SpecificBombInformation;
+import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Action;
@@ -20,13 +22,15 @@ import models.sub.Player;
 import opencv.ColoredObjectTrack;
 
 /**
- * Holds a game
+ * Holds current game and history of games
  */
 public class GamesHolder {
 	private int myCurrentGameId = 0;
 	private int myPlayersIdsCounter = 0;
+	private int myDefusesIdsCounter = 0;
 	private List<SpecificGameInformation> myGames = new ArrayList<SpecificGameInformation>();
 	private List<SpecificBombInformation> myBombs = new ArrayList<SpecificBombInformation>();
+	private List<SpecificDefuseInformation> myDefuseAttempts = new ArrayList<SpecificDefuseInformation>();
 	private ColoredObjectTrack coloredObjectTrack;
 
 	public GamesHolder(ColoredObjectTrack coloredObjectTrack) {
@@ -172,30 +176,42 @@ public class GamesHolder {
 	 * Defuse a bomb
 	 * 
 	 * @param gameId
-	 * @param bombId
 	 * @param playerId
 	 * @return
 	 */
-	public SpecificBombInformation defuseBomb(int gameId, int bombId, int playerId) {
-		SpecificBombInformation bomb = new SpecificBombInformation();
+	public SpecificDefuseInformation defuseBomb(int gameId, int playerId) {
+		SpecificDefuseInformation defuse = new SpecificDefuseInformation();
+		SpecificBombInformation bomb = null;
 
 		List<Player> playersInTheGame = getInformationSpecificGame(gameId).getAllPlayers();
 		for (int bombsIndex = 0; bombsIndex < myBombs.size(); bombsIndex++) {
-			if (myBombs.get(bombsIndex).getGameId() == gameId && myBombs.get(bombsIndex).getId() == bombId) {
-				for (int playerIndex = 0; playerIndex < playersInTheGame.size(); playerIndex++) {
-					if (playersInTheGame.get(playerIndex).getId() == playerId) {
-						bomb = myBombs.get(bombsIndex);
+			for (int playerIndex = 0; playerIndex < playersInTheGame.size(); playerIndex++) {
+				if (playersInTheGame.get(playerIndex).getId() == playerId) {
+					bomb = myBombs.get(bombsIndex);
+					if (coloredObjectTrack.canDefuseBomb(bomb.getId())) {
+						coloredObjectTrack.defuseBomb(bomb.getId());
+						bomb.setDefused(true);
 					}
+					myDefusesIdsCounter++;
+					defuse.setId(myDefusesIdsCounter);
+					defuse.setDefused(bomb.isDefused());
+					defuse.setPlayer(playerId);
+					defuse.setWhen(bomb.getExplosionAt());
+					defuse.setGameId(gameId);
+
+					Action information = new Action();
+					information.setMethod(HttpMethod.GET);
+					information.setUrl("/games/" + gameId + "/bombs/" + bomb.getId());
+					AllActions actions = new AllActions();
+					actions.setInformation(information);
+					defuse.setActions(actions);
+
+					myDefuseAttempts.add(defuse);
 				}
 			}
 		}
 
-		if (coloredObjectTrack.canDefuseBomb(bombId)) {
-			coloredObjectTrack.defuseBomb(bombId);
-			bomb.setDefused(true);
-		}
-
-		return bomb;
+		return defuse;
 	}
 
 	/**
@@ -265,14 +281,36 @@ public class GamesHolder {
 		return new ArrayList<Player>();
 	}
 
+	/**
+	 * Get the current running game ID
+	 * 
+	 * @return
+	 */
 	public int getCurrentGameId() {
 		return myCurrentGameId;
 	}
 
-	public void addBomb(int bombIdCounter, DateTime dateTime) {
+	/**
+	 * Add a bomb
+	 * 
+	 * @param bombId
+	 * @param dateTime
+	 */
+	public void addBomb(int bombId, DateTime dateTime) {
 		SpecificBombInformation bomb = new SpecificBombInformation();
-		bomb.setId(bombIdCounter);
+		bomb.setId(bombId);
 		bomb.setExplosionAt(dateTime);
+		bomb.setGameId(myCurrentGameId);
 		myBombs.add(bomb);
+	}
+
+	public DefusesInformation getDefuses(int gameId) {
+		DefusesInformation defuses = new DefusesInformation();
+		for (int i = 0; i < myDefuseAttempts.size(); i++) {
+			if (myDefuseAttempts.get(i).getGameId() == gameId) {
+				defuses.addDefuses(myDefuseAttempts.get(i));
+			}
+		}
+		return defuses;
 	}
 }
