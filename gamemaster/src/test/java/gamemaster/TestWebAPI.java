@@ -23,8 +23,8 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import comm.GamesHolder;
 import comm.WebAPI;
+import logic.GamesHolder;
 import models.BombsInGame;
 import models.DefusesInformation;
 import models.GamesCollection;

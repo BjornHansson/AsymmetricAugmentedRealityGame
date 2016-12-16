@@ -4,15 +4,15 @@ package models.sub;
  * Represents a list of games.
  */
 public class GamesCollectionSub {
-	private int gameId;
+	private int id;
 	private String name;
 
 	public int getGameId() {
-		return gameId;
+		return id;
 	}
 
 	public void setGameId(int gameId) {
-		this.gameId = gameId;
+		this.id = gameId;
 	}
 
 	public String getName() {

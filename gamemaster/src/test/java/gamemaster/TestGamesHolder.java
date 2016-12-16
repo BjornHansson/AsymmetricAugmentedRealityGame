@@ -18,7 +18,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import comm.GamesHolder;
+import logic.GamesHolder;
 import models.BombsInGame;
 import models.GamesCollection;
 import models.SpecificBombInformation;

@@ -23,8 +23,8 @@ import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.joda.time.DateTime;
 
-import comm.GamesHolder;
 import comm.WebAPI;
+import logic.GamesHolder;
 
 public class ColoredObjectTrack implements Runnable {
 

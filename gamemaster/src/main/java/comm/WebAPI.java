@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import logic.GamesHolder;
 import models.BombsInGame;
 import models.DefusesInformation;
 import models.GamesCollection;
