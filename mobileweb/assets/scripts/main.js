@@ -1,6 +1,7 @@
 requirejs.config({
     baseUrl: 'assets/scripts',
     paths: {
+        config: 'config',
         jquery: 'lib/jquery-3.1.1.min',
         bootstrap: 'lib/bootstrap-3.3.7.min',
         effects: 'view_logic/effects',
