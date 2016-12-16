@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
+import org.joda.time.DateTime;
+
 import models.BombsInGame;
 import models.GamesCollection;
 import models.SpecificBombInformation;
@@ -15,6 +17,7 @@ import models.sub.AllActions;
 import models.sub.GamesCollectionSub;
 import models.sub.Parameter;
 import models.sub.Player;
+import opencv.ColoredObjectTrack;
 
 /**
  * Holds a game
@@ -24,6 +27,11 @@ public class GamesHolder {
 	private int myPlayersIdsCounter = 0;
 	private List<SpecificGameInformation> myGames = new ArrayList<SpecificGameInformation>();
 	private List<SpecificBombInformation> myBombs = new ArrayList<SpecificBombInformation>();
+	private ColoredObjectTrack coloredObjectTrack;
+
+	public GamesHolder(ColoredObjectTrack coloredObjectTrack) {
+		this.coloredObjectTrack = coloredObjectTrack;
+	}
 
 	/**
 	 * Get specific information about a game
@@ -169,18 +177,25 @@ public class GamesHolder {
 	 * @return
 	 */
 	public SpecificBombInformation defuseBomb(int gameId, int bombId, int playerId) {
-		List<Player> playersInTheGame = getInformationSpecificGame(gameId).getAllPlayers();
+		SpecificBombInformation bomb = new SpecificBombInformation();
 
+		List<Player> playersInTheGame = getInformationSpecificGame(gameId).getAllPlayers();
 		for (int bombsIndex = 0; bombsIndex < myBombs.size(); bombsIndex++) {
 			if (myBombs.get(bombsIndex).getGameId() == gameId && myBombs.get(bombsIndex).getId() == bombId) {
 				for (int playerIndex = 0; playerIndex < playersInTheGame.size(); playerIndex++) {
 					if (playersInTheGame.get(playerIndex).getId() == playerId) {
-						return myBombs.get(bombsIndex);
+						bomb = myBombs.get(bombsIndex);
 					}
 				}
 			}
 		}
-		return new SpecificBombInformation();
+
+		if (coloredObjectTrack.canDefuseBomb(bombId)) {
+			coloredObjectTrack.defuseBomb(bombId);
+			bomb.setDefused(true);
+		}
+
+		return bomb;
 	}
 
 	/**
@@ -252,5 +267,12 @@ public class GamesHolder {
 
 	public int getCurrentGameId() {
 		return myCurrentGameId;
+	}
+
+	public void addBomb(int bombIdCounter, DateTime dateTime) {
+		SpecificBombInformation bomb = new SpecificBombInformation();
+		bomb.setId(bombIdCounter);
+		bomb.setExplosionAt(dateTime);
+		myBombs.add(bomb);
 	}
 }

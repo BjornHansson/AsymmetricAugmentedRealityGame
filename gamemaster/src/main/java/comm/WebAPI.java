@@ -13,9 +13,9 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
-import models.SpecificBombInformation;
 import models.BombsInGame;
 import models.GamesCollection;
+import models.SpecificBombInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.GameName;
@@ -25,23 +25,8 @@ public class WebAPI {
 	private static final Gson myGson = new Gson();
 	private GamesHolder myGamesHolder;
 
-	public static void main(String[] args) {
-		new WebAPI();
-		while (true) {
-			// Infinitive loop to keep server alive
-		}
-	}
-
 	/**
-	 * Default constructor. Starts a new game
-	 */
-	public WebAPI() {
-		myGamesHolder = new GamesHolder();
-		init();
-	}
-
-	/**
-	 * Constructor that allows a game as parameter
+	 * Constructor that allows a games holder as parameter
 	 * 
 	 * @param game
 	 */

@@ -4,12 +4,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import comm.GamesHolder;
@@ -18,13 +21,22 @@ import models.GamesCollection;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Player;
+import opencv.ColoredObjectTrack;
 
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
+	private static ColoredObjectTrack track;
+
+	@BeforeClass
+	public static void onlyOnce() {
+		new ColoredObjectTrack();
+		track = mock(ColoredObjectTrack.class);
+		doNothing().when(track).SpawnBomb();
+	}
 
 	@Before
 	public void beforeEach() {
-		gamesHolderToTest = new GamesHolder();
+		gamesHolderToTest = new GamesHolder(track);
 	}
 
 	@Test
