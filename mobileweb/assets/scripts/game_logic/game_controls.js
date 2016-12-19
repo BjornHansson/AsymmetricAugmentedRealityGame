@@ -25,8 +25,7 @@ define(['jquery', 'game'], function($, game) {
             dataType: 'json'
         })
         .done(function(data) {
-            console.log(instance);
-            instance.currentGame.url = data.actions.currentgame.url;
+            instance.currentGame.actions.info = data.actions.currentgame.url;
             return data;
         })
         .fail(function() {
@@ -43,14 +42,17 @@ define(['jquery', 'game'], function($, game) {
         if (instance.currentGame.id === null) {
             return instance.listGames
             .done(function(data) {
-                instance.currentGame = data.actions.currentgame.url;
                 return $.get({
-                    url: instance.currentGame,
+                    url: instance.currentGame.actions.info,
                     dataType: 'json'
                 })
                 .done(function(data) {
                     instance.currentGame.id = data.gameid
                     instance.currentGame.name = data.name;
+                    instance.currentGame.actions.info = data.actions.information.url;
+                    instance.currentGame.actions.join = data.actions.join.url;
+                    instance.currentGame.actions.defuse = data.actions.defuse.url;
+                    instance.currentGame.actions.defuses = data.actions.defuses.url;
                     return instance.currentGame;
                 })
                 .fail(function() {
@@ -62,7 +64,7 @@ define(['jquery', 'game'], function($, game) {
             });
         } else {
             return $.get({
-                url: instance.currentGame.url,
+                url: instance.currentGame.actions.info,
                 dataType: 'json'
             })
             .done(function(data) {
@@ -90,7 +92,7 @@ define(['jquery', 'game'], function($, game) {
         .done(function(data) {
             instance.currentGame.id = data.gameid;
             instance.currentGame.name = data.name;
-            instance.currentGame.url = data.actions.information.url;
+            instance.currentGame.actions.info = data.actions.information.url;
             
             return instance.currentGame;
         })

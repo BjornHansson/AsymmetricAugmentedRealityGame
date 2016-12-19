@@ -12,6 +12,12 @@ define(function() {
         this.controller = controller;
         this.id = id;
         this.name = name;
+        this.actions = {
+                information: null,
+                join: null,
+                defuse: null,
+                defuses: null
+        };
     };
 
     /**
