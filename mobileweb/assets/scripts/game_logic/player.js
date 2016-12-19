@@ -1,4 +1,6 @@
 define(function() {
+    var instance = null;
+    
     /**
      * Represents a player.
      * 
@@ -9,10 +11,14 @@ define(function() {
      * @param {string} name - The player's name.
      */
     var Player = function(controller, id, name) {
-        this.controller = controller;
-        this.id = id;
-        this.name = name;
-        this.game = null;
+        instance = this;
+        instance.controller = controller;
+        instance.id = id;
+        instance.name = name;
+        instance.game = null;
+        instance.actions = {
+                
+        };
     };
     
     /**
@@ -21,16 +27,7 @@ define(function() {
      * @param {object} game - The game.
      */
     Player.prototype.setGame = function(game) {
-        this.game = game;
-    };
-
-    /**
-     * Try to defuse a bomb.
-     * 
-     * @return Something something...
-     */
-    Player.prototype.tryDefuse = function() {
-        return null;
+        instance.game = game;
     };
     
     return Player;
