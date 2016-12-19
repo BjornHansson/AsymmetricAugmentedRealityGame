@@ -6,34 +6,21 @@ import java.awt.event.KeyListener;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-class CameraController implements KeyListener {
+class CameraController implements KeyListener, Runnable {
 
 	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
 
 	public static final float VIEW_ANGLE = 62.8f;
 
-	private float deltaPan = 10;
-	private float deltaTilt = 10;
+	private float deltaPan = 20;
 	private float deltaPanStop = 0;
-	private float deltaTiltStop = 0;
+	private float pan = 0;
 
 	private boolean isMoving = false;
 	private boolean enabled;
 
-	public float getPan() {
-		float position = 0;
-		try {
-			String response = Unirest.get(HTTP_AXIS_URL).queryString("query", "position").asString().getBody();
-			// Will return multiple results in text format
-			int start = response.indexOf("pan=") + "pan=".length();
-			int end = response.indexOf("pan=") + response.indexOf("tilt=");
-			String resultString = response.substring(start, end);
-			position = Float.parseFloat(resultString);
-		} catch (UnirestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return position;
+	public synchronized float getPan() {
+		return pan;
 	}
 
 	public CameraController() {
@@ -50,6 +37,20 @@ class CameraController implements KeyListener {
 			} catch (UnirestException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	public synchronized void getPanFromCamera() {
+		try {
+			String response = Unirest.get(HTTP_AXIS_URL).queryString("query", "position").asString().getBody();
+			// Will return multiple results in text format
+			int start = response.indexOf("pan=") + "pan=".length();
+			int end = response.indexOf("pan=") + response.indexOf("tilt=");
+			String resultString = response.substring(start, end);
+			pan = Float.parseFloat(resultString);
+		} catch (UnirestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -113,5 +114,18 @@ class CameraController implements KeyListener {
 
 	private void pan(float amount) throws UnirestException {
 		Unirest.get(HTTP_AXIS_URL).queryString("continuouspantiltmove", amount + ",0").asString();
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			getPanFromCamera();
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
