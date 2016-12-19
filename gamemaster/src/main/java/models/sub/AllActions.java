@@ -6,6 +6,7 @@ public class AllActions {
 	private Action information;
 	private Action defuse;
 	private Action leaveGame;
+	private Action join;
 
 	public Action getLeaveGame() {
 		return leaveGame;
@@ -45,5 +46,14 @@ public class AllActions {
 
 	public void setInformation(Action information) {
 		this.information = information;
+	}
+	public Action getJoinGame(){
+		return join;
+	}
+
+	public void setJoinGame(Action join) {
+		this.join = join;
+		// TODO Auto-generated method stub
+		
 	}
 }

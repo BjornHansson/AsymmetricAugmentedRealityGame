@@ -53,6 +53,11 @@ public class GamesHolder {
 		}
 
 		AllActions actions = new AllActions();
+		Action information = new Action();
+		information.setUrl("/games/" + isg.getGameId());
+		information.setMethod(HttpMethod.GET);
+		actions.setInformation(information);
+		
 		Action defuse = new Action();
 		defuse.setUrl("/games/" + isg.getGameId() + "/defuse");
 		defuse.setMethod(HttpMethod.POST);
@@ -60,8 +65,17 @@ public class GamesHolder {
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
+				
 		// Only support for one player
 		if (!isg.getAllPlayers().isEmpty()) {
+			Action join = new Action();
+			join.setUrl("/games/" + isg.getGameId() + "/" +  isg.getAllPlayers().get(0).getId());
+			join.setMethod(HttpMethod.POST);
+			Parameter param2 = new Parameter();
+			param2.setName("string");
+			join.addParameter(param2);
+			actions.setJoinGame(join);
+			
 			Action leave = new Action();
 			leave.setUrl("/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
 			leave.setMethod(HttpMethod.DELETE);

@@ -59,11 +59,24 @@ public class TestGamesHolder {
 		assertEquals(nameOfTheGame, isg.getName());
 		assertEquals(status, isg.getStatus());
 		assertEquals(defuses, isg.getDefuses());
+		
+		//informations
+		assertEquals("/games/1", isg.getActions().getInformation().getUrl());
+		assertEquals(HttpMethod.GET, isg.getActions().getInformation().getMethod());
+		
+		//defuses
 		assertEquals("/games/1/defuse", isg.getActions().getDefuse().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
 		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
+		
+		//leave game
 		assertEquals("/games/1/1", isg.getActions().getLeaveGame().getUrl());
 		assertEquals(HttpMethod.DELETE, isg.getActions().getLeaveGame().getMethod());
+		
+		//join game
+		assertEquals("/games/1/1", isg.getActions().getJoinGame().getUrl());
+		assertEquals(HttpMethod.POST, isg.getActions().getJoinGame().getMethod());
+		assertEquals("string", isg.getActions().getJoinGame().getParameters().get(0).getName());
 	}
 
 	@Test
