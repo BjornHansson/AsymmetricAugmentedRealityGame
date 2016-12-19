@@ -158,6 +158,8 @@ public class ColorValueControlInterface extends JFrame {
 			}
 		});
 		
+		
+		
 		JButton btnSaveState = new JButton("Save state");
 		btnSaveState.setToolTipText("Save the current slider value state");
 		panel.add(btnSaveState);
@@ -166,10 +168,24 @@ public class ColorValueControlInterface extends JFrame {
 				writeColorValuesToFile();
 			}
 		});
+		
+		JButton btnPlay = new JButton("Play");
+		btnPlay.setToolTipText("Finalise calibration and play game");
+		panel.add(btnPlay);
+		btnPlay.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent event){
+				cot.play();
+			}
+		});
+		
 		canvas2.setVisible(true);
 		canvas2.setPreferredSize(new Dimension(400, 300));
 		canvas2.setMinimumSize(new Dimension(400, 300));
 		canvas2.pack();
+	}
+	
+	public void hide(){
+		canvas2.setVisible(false);
 	}
 		
 	public void readColorValuesFromFile () {
