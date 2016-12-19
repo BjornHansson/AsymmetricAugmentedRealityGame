@@ -1,4 +1,6 @@
 define(function() {
+    var instance = null;
+    
     /**
      * Represents a game.
      * 
@@ -9,6 +11,7 @@ define(function() {
      * @param {string} name - The game's name.
      */
     var Game = function(controller, id, name) {
+        instance = this;
         instance.controller = controller;
         instance.id = id;
         instance.name = name;
@@ -71,7 +74,7 @@ define(function() {
      * 
      * @return {number} - The ID of the bomb which was defused. If no bomb was defused, return 0. 
      */
-    Player.prototype.tryDefuse = function(player) {
+    Game.prototype.tryDefuse = function(player) {
         return $.post({
             url: instance.actions.defuse,
             data: {

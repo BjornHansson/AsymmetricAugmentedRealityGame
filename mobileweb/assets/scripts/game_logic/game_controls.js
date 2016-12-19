@@ -11,7 +11,7 @@ define(['jquery', 'game'], function($, game) {
     var GameControls = function(controller) {
         instance = this;
         instance.controller = controller; // The controller peer's IP address
-        instance.currentGame = new game(controller);
+        instance.currentGame = new game(controller, 0, null);
     };
 
     /**

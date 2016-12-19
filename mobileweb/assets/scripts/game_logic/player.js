@@ -11,6 +11,7 @@ define(function() {
      * @param {string} name - The player's name.
      */
     var Player = function(controller, id, name) {
+        instance = this;
         instance.controller = controller;
         instance.id = id;
         instance.name = name;
