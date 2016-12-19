@@ -4,6 +4,7 @@ import static org.bytedeco.javacpp.opencv_core.cvCreateImage;
 import static org.bytedeco.javacpp.opencv_core.cvGetSize;
 import static org.bytedeco.javacpp.opencv_core.cvInRangeS;
 import static org.bytedeco.javacpp.opencv_core.cvScalar;
+import static org.bytedeco.javacpp.opencv_imgcodecs.cvLoadImage;
 import static org.bytedeco.javacpp.opencv_imgproc.CV_MEDIAN;
 import static org.bytedeco.javacpp.opencv_imgproc.cvCircle;
 import static org.bytedeco.javacpp.opencv_imgproc.cvCvtColor;
@@ -12,7 +13,6 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvGetSpatialMoment;
 import static org.bytedeco.javacpp.opencv_imgproc.cvMoments;
 import static org.bytedeco.javacpp.opencv_imgproc.cvSmooth;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,22 +24,22 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FrameGrabber;
 import org.bytedeco.javacv.FrameGrabber.Exception;
 import org.bytedeco.javacv.OpenCVFrameConverter;
-import static org.bytedeco.javacpp.opencv_imgcodecs.cvLoadImage;
 import org.joda.time.DateTime;
 
 import comm.WebAPI;
 import logic.GamesHolder;
 
-
-
 public class ColoredObjectTrack implements Runnable {
 
-	enum GameState {Menu, Calibration, Playing, GameOver}
+	enum GameState {
+		Menu, Calibration, Playing, GameOver
+	}
+
 	private GameState gameState = GameState.Calibration;
-	
+
 	private ArrayList<Bomb> bombs = new ArrayList<Bomb>();
 	private Random random = new Random();
-	private CameraController cameraController;
+	public CameraController cameraController;
 	private GamesHolder gamesHolder;
 	private WebAPI webApi;
 	private int bombIdCounter = 1;
@@ -49,7 +49,6 @@ public class ColoredObjectTrack implements Runnable {
 	private IplImage annotatedImage;
 	private IplImage thresholdedImage;
 	private IplImage bombImage;
-	
 
 	// int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
 	CvScalar rgba_min = cvScalar(0, 0, 0, 0);
@@ -58,19 +57,23 @@ public class ColoredObjectTrack implements Runnable {
 	private OverlayCanvasFrame videoFrame;
 	private CanvasFrame thresholdedVideoFrame;
 	private ColorValueControlInterface colorinterface;
+	
+	private double spawnIntervalMin = 0.0;
+	private double spawnIntervalMax = 1.0;
+	private double spawnTimer = 0;
+	private double nextSpawn = 0;
 
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
 		th.start();
-
 	}
 
 	public void SpawnBomb() {
 		DateTime dateTime = new DateTime();
-		dateTime = dateTime.plusSeconds(10 + random.nextInt(10));
+		dateTime = dateTime.plusSeconds(20 + random.nextInt(10));
 		bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360, dateTime));
-		//gamesHolder.addBomb(bombIdCounter, dateTime);
+		// gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
 		// bombs.add(new Bomb(20.3f, 20));
 		System.out.println("Bomb spawned at " + bombs.get(bombs.size() - 1).getBearing());
@@ -78,6 +81,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public boolean canDefuseBomb(int bombId) {
 		return true;
+		//TODO: Fill this in!
 	}
 
 	public void defuseBomb(int bombId) {
@@ -92,13 +96,8 @@ public class ColoredObjectTrack implements Runnable {
 	public ColoredObjectTrack() {
 		//gamesHolder = new GamesHolder(this);
 		//webApi = new WebAPI(gamesHolder);
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
-	}
 
+	}
 
 	public void updatergbvalues(int a, int b, int c, int d, int e, int f) {
 		rgba_min = cvScalar(a, b, c, 0);
@@ -111,20 +110,20 @@ public class ColoredObjectTrack implements Runnable {
 		rgba_max = cvScalar(d, e, f, 0);
 	}
 
-	
-
 	public void run() {
 		System.out.println("Game loop");
 		GameLoop();
 	}
-	
-	private void GameLoop(){
-		
-		//setupCamera("192.168.20.253");
-		setupCamera(null);
+
+	private void GameLoop() {
+
+		setupCamera("192.168.20.253");
+		// setupCamera(null);
 		setupWindows();
+		Thread thPan = new Thread(cameraController);
+		thPan.start();
 		loadBombImage();
-		
+
 		long lastLoopTime = System.nanoTime();
 		boolean gameRunning = true;
 		while (gameRunning) {
@@ -134,41 +133,40 @@ public class ColoredObjectTrack implements Runnable {
 			lastLoopTime = now;
 
 			GrabFrame();
-			
-			switch(gameState){
-				case Calibration:
-					thresholdedVideoFrame.showImage(converter.convert(thresholdedImage));
-					break;
-				case Playing:
-					Update(updateLengthSeconds);
-					trackAndAnnotate();
-					videoFrame.showImage(converter.convert(annotatedImage));
-					break;
-				case GameOver:
-					break;
-				default:		
+
+			switch (gameState) {
+			case Calibration:
+				thresholdedVideoFrame.showImage(converter.convert(thresholdedImage));
+				break;
+			case Playing:
+				Update(updateLengthSeconds);
+				trackAndAnnotate();
+				videoFrame.showImage(converter.convert(annotatedImage));
+				break;
+			case GameOver:
+				break;
+			default:
 			}
 		}
 	}
-	
-	public void play(){
+
+	public void play() {
 		videoFrame.setVisible(true);
 		thresholdedVideoFrame.setVisible(false);
 		colorinterface.hide();
 		gameState = GameState.Playing;
-		
+
 	}
-	
-	private void loadBombImage(){
-		bombImage = cvLoadImage(System.getProperty("user.dir") + "\\bomb_small.png",-1);
-		if(bombImage == null)
+
+	private void loadBombImage() {
+		bombImage = cvLoadImage(System.getProperty("user.dir") + "\\bomb_small.png", -1);
+		if (bombImage == null)
 			System.out.println("Failed to load bomb image");
 	}
-	
-	
-	//Connect a frame grabber to a camera and set things up
-	private void setupCamera(String ip){
-		if(ip == null){
+
+	// Connect a frame grabber to a camera and set things up
+	private void setupCamera(String ip) {
+		if (ip == null) {
 			try {
 				grabber = FrameGrabber.createDefault(0);
 			} catch (org.bytedeco.javacv.FrameGrabber.Exception e) {
@@ -185,28 +183,30 @@ public class ColoredObjectTrack implements Runnable {
 		}
 		cameraController = new CameraController(ip == null ? false : true);
 	}
-	
-	private void setupWindows(){
-		videoFrame = new OverlayCanvasFrame("Original",cameraController, this);
+
+	private void setupWindows() {
+		videoFrame = new OverlayCanvasFrame("Original", cameraController, this);
 		videoFrame.addKeyListener(cameraController);
 		videoFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		videoFrame.setVisible(false);
-		
+
 		thresholdedVideoFrame = new CanvasFrame("Thresholded");
 		thresholdedVideoFrame.addKeyListener(cameraController);
 		thresholdedVideoFrame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-		
+
 		colorinterface = new ColorValueControlInterface(this);
 		colorinterface.initInterface();
 	}
-	
-	//Grab a frame
-	private void GrabFrame(){
+
+	// Grab a frame
+	private void GrabFrame() {
 		try {
 			grabbedImage = converter.convert(grabber.grab());
 			if (grabbedImage != null) {
-				if(annotatedImage == null)
+				if (annotatedImage == null)
 					annotatedImage = cvCreateImage(cvGetSize(grabbedImage), 8, 1);
+				else
+					annotatedImage.release();
 				annotatedImage = grabbedImage.clone();
 				getThresholdImage(grabbedImage);
 			}
@@ -214,8 +214,8 @@ public class ColoredObjectTrack implements Runnable {
 			System.out.println("Failed to grab frame.");
 		}
 	}
-	
-	private void trackAndAnnotate(){
+
+	private void trackAndAnnotate() {
 		CvMoments moments = new CvMoments();
 		cvMoments(thresholdedImage, moments, 1);
 		double mom10 = cvGetSpatialMoment(moments, 1, 0);
@@ -231,10 +231,19 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void Update(double time) {
+		spawnTimer += time;
+		if(spawnTimer >= nextSpawn){
+			SpawnBomb();
+			spawnTimer = 0;
+			nextSpawn = spawnIntervalMin + Math.random()*(spawnIntervalMax - spawnIntervalMin);
+		}
+		
 		for (int i = 0; i < bombs.size(); i++) {
 			bombs.get(i).Update(time);
 			if (bombs.get(i).hasExploded()) {
 				System.out.println("BOOM!");
+				//TODO: Tell the API that the game is over
+				//gameState = GameState.GameOver;
 				bombs.remove(i);
 				i--;
 			}
@@ -242,32 +251,35 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void drawBombs(IplImage imgAnnotated) {
-		
-		//This overlays a bomb, but is horrendously slow - find a better way
-//		for(int i = 0; i < bombImage.width(); i++)
-//			for(int j = 0; j < bombImage.height(); j++){
-//				CvScalar c1 = org.bytedeco.javacpp.opencv_core.cvGet2D(imgAnnotated, j, i);
-//				CvScalar c2 = org.bytedeco.javacpp.opencv_core.cvGet2D(bombImage, j, i);
-//				
-//				CvScalar m = new CvScalar();
-//				for(int k = 0; k < 4; k++)
-//				{
-//					if(c2.getVal(k) == 0)
-//						m.setVal(k, c1.getVal(k));
-//					else
-//						m.setVal(k, 0*c1.getVal(k) + 1*c2.getVal(k));
-//						
-//				}
-//				
-//				
-//				org.bytedeco.javacpp.opencv_core.cvSet2D(imgAnnotated, j, i, m);
-//			}
-		
+
+		// This overlays a bomb, but is horrendously slow - find a better way
+		// for(int i = 0; i < bombImage.width(); i++)
+		// for(int j = 0; j < bombImage.height(); j++){
+		// CvScalar c1 = org.bytedeco.javacpp.opencv_core.cvGet2D(imgAnnotated,
+		// j, i);
+		// CvScalar c2 = org.bytedeco.javacpp.opencv_core.cvGet2D(bombImage, j,
+		// i);
+		//
+		// CvScalar m = new CvScalar();
+		// for(int k = 0; k < 4; k++)
+		// {
+		// if(c2.getVal(k) == 0)
+		// m.setVal(k, c1.getVal(k));
+		// else
+		// m.setVal(k, 0*c1.getVal(k) + 1*c2.getVal(k));
+		//
+		// }
+		//
+		//
+		// org.bytedeco.javacpp.opencv_core.cvSet2D(imgAnnotated, j, i, m);
+		// }
+
 		for (int i = 0; i < bombs.size(); i++) {
 			// for each bomb:
 			// if it is within the view angle,
 			// calculate position in image and draw a dot
-			if (Math.abs( Utility.angleDifference(bombs.get(i).getBearing(), cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
+			if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
+					cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
 
 				float diff = Utility.angleDifference(bombs.get(i).getBearing(), cameraController.getPan());
 				// System.out.println("diff = " + diff);
@@ -278,20 +290,22 @@ public class ColoredObjectTrack implements Runnable {
 
 				cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 }, 10,
 						new CvScalar(255, 255, 255, 0));
-				
+
 			}
 
 		}
 	}
-	
-	public ArrayList<Bomb> getBombs(){
+
+	public ArrayList<Bomb> getBombs() {
 		return bombs;
 	}
 
 	private void getThresholdImage(IplImage orgImg) {
 
-		if(thresholdedImage == null)
+		if (thresholdedImage == null)
 			thresholdedImage = cvCreateImage(cvGetSize(orgImg), 8, 1);
+		else
+			thresholdedImage.release();
 		IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 1);
 		imgHSV = orgImg.clone();
 
@@ -303,7 +317,7 @@ public class ColoredObjectTrack implements Runnable {
 		cvSmooth(thresholdedImage, thresholdedImage, CV_MEDIAN, 15, 0, 0, 0);
 
 		imgHSV.release();
-		//return thresholdedImage;
+		// return thresholdedImage;
 	}
 
 }

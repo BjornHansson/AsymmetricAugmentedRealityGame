@@ -30,6 +30,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -71,6 +73,7 @@ public class OverlayCanvasFrame extends JFrame {
 
 	private CameraController cameraController;
 	private ColoredObjectTrack coloredObjectTrack;
+	private Font bombFont;
 
 	public static class Exception extends java.lang.Exception {
 		public Exception(String message) { super(message); }
@@ -135,6 +138,7 @@ public class OverlayCanvasFrame extends JFrame {
 		this(title, 0.0);
 		cameraController = cam;
 		coloredObjectTrack = cot;
+		bombFont = new Font("Arial", Font.BOLD, 36);
 	}
 
 	public OverlayCanvasFrame(String title) {
@@ -284,6 +288,15 @@ public class OverlayCanvasFrame extends JFrame {
 				// System.out.println("xPos = " + xPos);
 
 				g.drawImage(bombImage, xPos - bombImage.getTileWidth()/2, getHeight() / 2 - bombImage.getHeight()/2 - (int)bombs.get(i).getWobble(), null);
+
+				String timeLeft = "" + bombs.get(i).getSecondsRemaining();
+
+				g.setFont(bombFont);
+				FontMetrics metrics = g.getFontMetrics();
+				int strH = metrics.getHeight();
+				int strW = metrics.stringWidth(timeLeft);
+				g.setColor(color.WHITE);
+				g.drawString(timeLeft, xPos - strW/2 - 25, getHeight() / 2 - strH/2	+70 - (int)bombs.get(i).getWobble());
 
 			}
 
