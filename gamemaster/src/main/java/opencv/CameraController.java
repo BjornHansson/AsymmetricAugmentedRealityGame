@@ -11,7 +11,7 @@ class CameraController implements KeyListener {
 	private float tilt = 0;
 	public static final float VIEW_ANGLE = 62.8f;
 
-	private float deltaPan = 5;
+	private float deltaPan = 15;
 	private float deltaTilt = 5;
 	
 	private boolean enabled;

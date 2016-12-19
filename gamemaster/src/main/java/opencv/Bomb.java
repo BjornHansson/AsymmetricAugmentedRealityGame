@@ -1,6 +1,7 @@
 package opencv;
 
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 public class Bomb {
 
@@ -9,7 +10,9 @@ public class Bomb {
 	private DateTime timer;
 	private double wobble = 0;
 	private double wobbleLimit = 20;
-	private double wobbleSpeed = 5;
+	private double wobbleSpeedMin = 1;
+	private double wobbleSpeed = 0.1;
+	private double wobbleSpeedMax = 20;
 	private boolean wobbleUp = true;
 	
 	private double wobbleDobble = 0;
@@ -20,6 +23,10 @@ public class Bomb {
 	
 	public double getWobble(){
 		return wobble;
+	}
+	
+	public int getSecondsRemaining(){
+		return Seconds.secondsBetween(DateTime.now(), timer).getSeconds() + 1;
 	}
 
 	public Bomb(int id, float bearing, DateTime timer) {
@@ -39,6 +46,11 @@ public class Bomb {
 //			if(wobble <= 0)
 //				wobbleUp = true;
 //		}
+		Seconds diff = Seconds.secondsBetween(DateTime.now(), timer);
+		
+		double speedFactor = 1.0 - (double)Math.abs(diff.getSeconds())/30.0;
+		if(speedFactor < 0) speedFactor = 0;
+		wobbleSpeed = wobbleSpeedMin + (wobbleSpeedMax - wobbleSpeedMin) * speedFactor;
 		
 		wobbleDobble += time * wobbleSpeed;
 		if(wobbleDobble > Math.PI * 2){

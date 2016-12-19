@@ -58,6 +58,11 @@ public class ColoredObjectTrack implements Runnable {
 	private OverlayCanvasFrame videoFrame;
 	private CanvasFrame thresholdedVideoFrame;
 	private ColorValueControlInterface colorinterface;
+	
+	private double spawnIntervalMin = 0.0;
+	private double spawnIntervalMax = 1.0;
+	private double spawnTimer = 0;
+	private double nextSpawn = 0;
 
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
@@ -68,7 +73,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void SpawnBomb() {
 		DateTime dateTime = new DateTime();
-		dateTime = dateTime.plusSeconds(10 + random.nextInt(10));
+		dateTime = dateTime.plusSeconds(20 + random.nextInt(10));
 		bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360, dateTime));
 		//gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
@@ -78,6 +83,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public boolean canDefuseBomb(int bombId) {
 		return true;
+		//TODO: Fill this in!
 	}
 
 	public void defuseBomb(int bombId) {
@@ -92,11 +98,6 @@ public class ColoredObjectTrack implements Runnable {
 	public ColoredObjectTrack() {
 		//gamesHolder = new GamesHolder(this);
 		//webApi = new WebAPI(gamesHolder);
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
-		SpawnBomb();
 	}
 
 
@@ -120,8 +121,8 @@ public class ColoredObjectTrack implements Runnable {
 	
 	private void GameLoop(){
 		
-		//setupCamera("192.168.20.253");
-		setupCamera(null);
+		setupCamera("192.168.20.253");
+		//setupCamera(null);
 		setupWindows();
 		loadBombImage();
 		
@@ -207,6 +208,8 @@ public class ColoredObjectTrack implements Runnable {
 			if (grabbedImage != null) {
 				if(annotatedImage == null)
 					annotatedImage = cvCreateImage(cvGetSize(grabbedImage), 8, 1);
+				else
+					annotatedImage.release();
 				annotatedImage = grabbedImage.clone();
 				getThresholdImage(grabbedImage);
 			}
@@ -231,10 +234,19 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void Update(double time) {
+		spawnTimer += time;
+		if(spawnTimer >= nextSpawn){
+			SpawnBomb();
+			spawnTimer = 0;
+			nextSpawn = spawnIntervalMin + Math.random()*(spawnIntervalMax - spawnIntervalMin);
+		}
+		
 		for (int i = 0; i < bombs.size(); i++) {
 			bombs.get(i).Update(time);
 			if (bombs.get(i).hasExploded()) {
 				System.out.println("BOOM!");
+				//TODO: Tell the API that the game is over
+				//gameState = GameState.GameOver;
 				bombs.remove(i);
 				i--;
 			}
@@ -292,6 +304,8 @@ public class ColoredObjectTrack implements Runnable {
 
 		if(thresholdedImage == null)
 			thresholdedImage = cvCreateImage(cvGetSize(orgImg), 8, 1);
+		else
+			thresholdedImage.release();
 		IplImage imgHSV = cvCreateImage(cvGetSize(orgImg), 8, 1);
 		imgHSV = orgImg.clone();
 
