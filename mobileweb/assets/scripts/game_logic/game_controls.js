@@ -1,5 +1,6 @@
-define(['jquery', 'game'], function($, game) {
+define(['jquery', 'proxy', 'game'], function($, proxy, game) {
     var instance = null;
+    var p = new proxy();
 
     /**
      * Controls the list of games.
@@ -11,7 +12,7 @@ define(['jquery', 'game'], function($, game) {
     var GameControls = function(controller) {
         instance = this;
         instance.controller = controller; // The controller peer's IP address
-        instance.currentGame = new game(controller, 0, null);
+        instance.currentGame = null;
     };
 
     /**
@@ -22,10 +23,15 @@ define(['jquery', 'game'], function($, game) {
     GameControls.prototype.listGames = function() {
         return $.get({
             url: instance.controller + '/games',
+            crossDomain: true,
             dataType: 'json'
         })
         .done(function(data) {
-            instance.currentGame.actions.info = data.actions.currentgame.url;
+            if (data.actions.currentgame.url) {
+                instance.currentGame = new game(instance.controller, 0, null);
+                instance.currentGame.actions.info = p.proxy(data.actions.currentgame.url);
+            }
+
             return data;
         })
         .fail(function() {
@@ -39,25 +45,26 @@ define(['jquery', 'game'], function($, game) {
      * @return {object} - The current game.
      */
     GameControls.prototype.getCurrentGame = function() {
-        if (instance.currentGame.id === null) {
-            return instance.listGames
-            .done(function(data) {
+        if (!instance.currentGame || !instance.currentGame.id) {
+            return instance.listGames()
+            .then(function(data) {
                 return $.get({
                     url: instance.currentGame.actions.info,
                     dataType: 'json'
                 })
-                .done(function(data) {
-                    instance.currentGame.id = data.gameid
-                    instance.currentGame.name = data.name;
-                    instance.currentGame.actions.info = data.actions.information.url;
-                    instance.currentGame.actions.join = data.actions.join.url;
-                    instance.currentGame.actions.defuse = data.actions.defuse.url;
-                    instance.currentGame.actions.defuses = data.actions.defuses.url;
-                    return instance.currentGame;
-                })
-                .fail(function() {
-                    return null;
-                });
+            })
+            .then(function(data2) {
+                if (data2.gameid) {
+                    instance.currentGame = new game(instance.controller, data2.gameid, data2.name);
+                    instance.currentGame.actions.info = p.proxy(data2.actions.information.url);
+                    instance.currentGame.actions.join = p.proxy(data2.actions.join.url);
+                    instance.currentGame.actions.defuse = p.proxy(data2.actions.defuse.url);
+                    instance.currentGame.actions.defuses = p.proxy(data2.actions.defuses.url);
+                } else {
+                    instance.currentGame = null;
+                }
+
+                return instance.currentGame;
             })
             .fail(function() {
                 return null;
@@ -68,7 +75,14 @@ define(['jquery', 'game'], function($, game) {
                 dataType: 'json'
             })
             .done(function(data) {
-                return data;
+                console.log('let it go');
+                instance.currentGame = new game(instance.controller, data.gameid, data.name);;
+                instance.currentGame.actions.info = p.proxy(data.actions.information.url);
+                instance.currentGame.actions.join = p.proxy(data.actions.join.url);
+                instance.currentGame.actions.defuse = p.proxy(data.actions.defuse.url);
+                instance.currentGame.actions.defuses = p.proxy(data.actions.defuses.url);
+                
+                return instance.currentGame;
             })
             .fail(function() {
                 return null;
@@ -90,10 +104,9 @@ define(['jquery', 'game'], function($, game) {
             dataType: 'json'
         })
         .done(function(data) {
-            instance.currentGame.id = data.gameid;
-            instance.currentGame.name = data.name;
-            instance.currentGame.actions.info = data.actions.information.url;
-            
+            instance.currentGame = new game(instance.controller, data.gameid, data.name);
+            instance.currentGame.actions.info = p.proxy(data.actions.information.url);
+
             return instance.currentGame;
         })
         .fail(function() {

@@ -16,7 +16,7 @@ define(function() {
         instance.id = id;
         instance.name = name;
         instance.actions = {
-                information: null,
+                info: null,
                 join: null,
                 defuse: null,
                 defuses: null
@@ -33,11 +33,11 @@ define(function() {
      */
     Game.prototype.join = function(player) {
         return $.post({
-            url: '',
+            url: instance.actions.join,
             data: { name: player.name },
             dataType: 'json'
         })
-        .done(function(data) {
+        .then(function(data) {
             player.id = data.playerid;
 
             return player;
@@ -57,7 +57,7 @@ define(function() {
      */
     Game.prototype.leave = function(player) {
         return $.delete({
-            url: instance.actions.information + '/players/' + player.id
+            url: instance.actions.info + '/players/' + player.id
         })
         .done(function(data) {
             player.id = 0;
