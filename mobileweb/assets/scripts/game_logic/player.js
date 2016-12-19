@@ -14,9 +14,6 @@ define(function() {
         instance.id = id;
         instance.name = name;
         instance.game = null;
-        instance.actions = {
-                
-        };
     };
     
     /**
