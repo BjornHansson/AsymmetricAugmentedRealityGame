@@ -2,12 +2,21 @@ package opencv;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+
+import org.joda.time.DateTime;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import javafx.util.Pair;
+
 class CameraController implements KeyListener, Runnable {
 
+	
+	private ArrayList<Pair<Float,DateTime>> cachedPans = new ArrayList<Pair<Float,DateTime>>();
+	int delayMS = 700;
+	
 	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
 
 	public static final float VIEW_ANGLE = 62.8f;
@@ -48,10 +57,19 @@ class CameraController implements KeyListener, Runnable {
 			int start = response.indexOf("pan=") + "pan=".length();
 			int end = response.indexOf("pan=") + response.indexOf("tilt=");
 			String resultString = response.substring(start, end);
-			pan = Float.parseFloat(resultString);
+			cachedPans.add(new Pair<Float,DateTime>(Float.parseFloat(resultString),DateTime.now()));
 		} catch (UnirestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public synchronized void setPanDelayed(){
+		for(int i = 0; i < cachedPans.size(); i++){
+			if(DateTime.now().getMillis() - cachedPans.get(i).getValue().getMillis() >= delayMS){
+				pan = cachedPans.get(i).getKey();
+				cachedPans.remove(i--);
+			}
 		}
 	}
 
@@ -121,6 +139,7 @@ class CameraController implements KeyListener, Runnable {
 	public void run() {
 		while (true) {
 			getPanFromCamera();
+			setPanDelayed();
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
