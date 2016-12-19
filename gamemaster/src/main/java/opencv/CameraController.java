@@ -1,4 +1,5 @@
 package opencv;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -7,29 +8,45 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 class CameraController implements KeyListener {
 
-	private float pan = 0;
-	private float tilt = 0;
+	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
+
 	public static final float VIEW_ANGLE = 62.8f;
 
-	private float deltaPan = 5;
-	private float deltaTilt = 5;
-	
+	private float deltaPan = 10;
+	private float deltaTilt = 10;
+	private float deltaPanStop = 0;
+	private float deltaTiltStop = 0;
+
+	private boolean isMoving = false;
 	private boolean enabled;
 
 	public float getPan() {
-		return pan;
+		float position = 0;
+		try {
+			String response = Unirest.get(HTTP_AXIS_URL).queryString("query", "position").asString().getBody();
+			// Will return multiple results in text format
+			int start = response.indexOf("pan=") + "pan=".length();
+			int end = response.indexOf("pan=") + response.indexOf("tilt=");
+			String resultString = response.substring(start, end);
+			position = Float.parseFloat(resultString);
+		} catch (UnirestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return position;
 	}
 
-	public CameraController(){
+	public CameraController() {
 		this(true);
 	}
-	
+
 	public CameraController(boolean enabled) {
 		this.enabled = enabled;
-		if(enabled){
+		if (enabled) {
 			try {
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("autofocus", "on")
-						.asString();
+				Unirest.get(HTTP_AXIS_URL).queryString("autofocus", "on").asString();
+				Unirest.get(HTTP_AXIS_URL).queryString("tilt", "1").asString();
+				Unirest.get(HTTP_AXIS_URL).queryString("zoom", "1").asString();
 			} catch (UnirestException e) {
 				e.printStackTrace();
 			}
@@ -37,27 +54,11 @@ class CameraController implements KeyListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
-	}
-
-	public void keyReleased(KeyEvent e) {
-		if(!enabled) 
+		if (!enabled || isMoving)
 			return;
+		isMoving = true;
 		int keyCode = e.getKeyCode();
 		switch (keyCode) {
-		case KeyEvent.VK_UP:
-			try {
-				tilt(deltaTilt);
-			} catch (UnirestException e1) {
-				e1.printStackTrace();
-			}
-			break;
-		case KeyEvent.VK_DOWN:
-			try {
-				tilt(-deltaTilt);
-			} catch (UnirestException e1) {
-				e1.printStackTrace();
-			}
-			break;
 		case KeyEvent.VK_LEFT:
 			try {
 				System.out.println("LEFT");
@@ -76,21 +77,28 @@ class CameraController implements KeyListener {
 				e1.printStackTrace();
 			}
 			break;
-		case KeyEvent.VK_PAGE_UP:
+		}
+	}
+
+	public void keyReleased(KeyEvent e) {
+		if (!enabled)
+			return;
+		isMoving = false;
+		int keyCode = e.getKeyCode();
+		switch (keyCode) {
+		case KeyEvent.VK_LEFT:
 			try {
-				System.out.println("PAGE_UP");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rzoom", 200)
-						.asString();
+				System.out.println("LEFT");
+				pan(-deltaPanStop);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			break;
-		case KeyEvent.VK_PAGE_DOWN:
+		case KeyEvent.VK_RIGHT:
 			try {
-				System.out.println("PAGE_DOWN");
-				Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rzoom", -200)
-						.asString();
+				System.out.println("RIGHT");
+				pan(deltaPanStop);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -104,24 +112,6 @@ class CameraController implements KeyListener {
 	}
 
 	private void pan(float amount) throws UnirestException {
-		Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rpan", amount).asString();
-		pan += amount;
-		if (pan > 180) {
-			pan -= 360;
-		}
-		if (pan < -180) {
-			pan += 360;
-		}
-	}
-	
-	private void tilt(float amount) throws UnirestException {
-		Unirest.get("http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi").queryString("rtilt", amount).asString();
-		tilt += amount;
-		if (tilt > 180) {
-			tilt -= 360;
-		}
-		if (tilt < -180) {
-			tilt += 360;
-		}
+		Unirest.get(HTTP_AXIS_URL).queryString("continuouspantiltmove", amount + ",0").asString();
 	}
 }
