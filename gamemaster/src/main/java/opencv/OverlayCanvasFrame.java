@@ -169,8 +169,9 @@ public class OverlayCanvasFrame extends JFrame {
 
 	private void init(final boolean fullScreen, final DisplayMode displayMode, final double gamma) {
 		try {
-			ClassLoader classLoader = getClass().getClassLoader();
-			bombImage = ImageIO.read(new File(classLoader.getResource("graphics/bomb_small.png").getFile()));
+			//ClassLoader classLoader = getClass().getClassLoader();
+			//bombImage = ImageIO.read(new File(classLoader.getResource("graphics/bomb_small.png").getFile()));
+			bombImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\bomb_small.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

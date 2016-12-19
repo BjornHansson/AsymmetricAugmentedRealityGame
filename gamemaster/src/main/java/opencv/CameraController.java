@@ -15,7 +15,8 @@ class CameraController implements KeyListener, Runnable {
 
 	
 	private ArrayList<Pair<Float,DateTime>> cachedPans = new ArrayList<Pair<Float,DateTime>>();
-	int delayMS = 700;
+	
+	int delayMS = 700; //HACK
 	
 	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
 
@@ -28,16 +29,19 @@ class CameraController implements KeyListener, Runnable {
 
 	private boolean isMoving = false;
 	private boolean enabled;
+	
+	private ColoredObjectTrack cot;
 
 	public synchronized float getPan() {
 		return pan;
 	}
 
-	public CameraController() {
-		this(true);
+	public CameraController(ColoredObjectTrack cot) {
+		this(cot,true);
 	}
 
-	public CameraController(boolean enabled) {
+	public CameraController(ColoredObjectTrack cot, boolean enabled) {
+		this.cot = cot;
 		this.enabled = enabled;
 		if (enabled) {
 			try {
@@ -106,6 +110,8 @@ class CameraController implements KeyListener, Runnable {
 		isMoving = false;
 		int keyCode = e.getKeyCode();
 		switch (keyCode) {
+		case KeyEvent.VK_ENTER:
+			cot.tryDefuseAll();
 		case KeyEvent.VK_LEFT:
 			try {
 				System.out.println("LEFT");

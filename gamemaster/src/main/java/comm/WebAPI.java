@@ -39,7 +39,7 @@ public class WebAPI {
 
 	private void init() {
 		System.out.println("Listening to stuff");
-		port(8080);
+		port(8090);
 		enableCORS("*", "*", "*");
 
 		/*
@@ -153,6 +153,9 @@ public class WebAPI {
 			SpecificBombInformation bomb = myGamesHolder.getBombInformation(gameId, bombId);
 			return myGson.toJson(bomb);
 		});
+		
+		System.out.println("End of init");
+		
 	}
 
 	private static void enableCORS(final String origin, final String methods, final String headers) {

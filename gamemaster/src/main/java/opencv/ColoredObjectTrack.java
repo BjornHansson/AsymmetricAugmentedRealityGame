@@ -62,6 +62,10 @@ public class ColoredObjectTrack implements Runnable {
 	private double spawnIntervalMax = 1.0;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
+	
+	private double defuseDistance = 10;
+	private float playerBearing = 0;
+	private boolean playerDetected = false;
 
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
@@ -80,8 +84,15 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	public boolean canDefuseBomb(int bombId) {
-		return true;
-		//TODO: Fill this in!
+		for(int i = 0; i < bombs.size(); i++){
+			if(bombs.get(i).getId() == bombId){
+				if(Math.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance){
+					return true;
+					//TODO: Put in a nice animation (or at least a different image) for this
+				}
+			}	
+		}
+		return false;
 	}
 
 	public void defuseBomb(int bombId) {
@@ -93,9 +104,18 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
+	public void tryDefuseAll(){
+		for(int i = 0; i < bombs.size(); i++){
+			if(canDefuseBomb(bombs.get(i).getId())){
+				defuseBomb(bombs.get(i).getId());
+				break;
+			}
+		}
+	}
+	
 	public ColoredObjectTrack() {
-		//gamesHolder = new GamesHolder(this);
-		//webApi = new WebAPI(gamesHolder);
+		gamesHolder = new GamesHolder(this);
+		webApi = new WebAPI(gamesHolder);
 
 	}
 
@@ -111,13 +131,12 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	public void run() {
-		System.out.println("Game loop");
 		GameLoop();
 	}
 
 	private void GameLoop() {
-
 		setupCamera("192.168.20.253");
+		System.out.println("1");
 		// setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
@@ -127,6 +146,7 @@ public class ColoredObjectTrack implements Runnable {
 		long lastLoopTime = System.nanoTime();
 		boolean gameRunning = true;
 		while (gameRunning) {
+			
 			long now = System.nanoTime();
 			long updateLength = now - lastLoopTime;
 			double updateLengthSeconds = (double) updateLength / 1000000000.0;
@@ -181,7 +201,7 @@ public class ColoredObjectTrack implements Runnable {
 		} catch (org.bytedeco.javacv.FrameGrabber.Exception e) {
 			e.printStackTrace();
 		}
-		cameraController = new CameraController(ip == null ? false : true);
+		cameraController = new CameraController(this,ip == null ? false : true);
 	}
 
 	private void setupWindows() {
@@ -223,8 +243,19 @@ public class ColoredObjectTrack implements Runnable {
 		double area = cvGetCentralMoment(moments, 0, 0);
 		int trackedPosX = (int) (mom10 / area);
 		int trackedPosY = (int) (mom01 / area);
+		playerDetected = false;
 		// only if its a valid position
 		if (trackedPosX > 0 && trackedPosY > 0) {
+			playerDetected = true;
+			playerBearing = cameraController.getPan() + (float)(trackedPosX - thresholdedImage.width()/2) / (float)thresholdedImage.width() * cameraController.VIEW_ANGLE;
+			if(playerBearing > 180)
+				playerBearing -= 360;
+			if(playerBearing < -180)
+				playerBearing += 360;
+			
+			//System.out.println("cameraBearing: " + cameraController.getPan());
+			//System.out.println("playerBearing: " + playerBearing);
+			
 			cvCircle(annotatedImage, new int[] { trackedPosX, trackedPosY }, 5, new CvScalar(255, 0, 0, 0));
 		}
 		drawBombs(annotatedImage);
@@ -242,7 +273,7 @@ public class ColoredObjectTrack implements Runnable {
 			bombs.get(i).Update(time);
 			if (bombs.get(i).hasExploded()) {
 				System.out.println("BOOM!");
-				//TODO: Tell the API that the game is over
+				//TODO: uncomment this
 				//gameState = GameState.GameOver;
 				bombs.remove(i);
 				i--;
