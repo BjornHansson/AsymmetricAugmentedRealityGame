@@ -23,11 +23,13 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import comm.GamesHolder;
 import comm.WebAPI;
+import logic.GamesHolder;
 import models.BombsInGame;
+import models.DefusesInformation;
 import models.GamesCollection;
 import models.SpecificBombInformation;
+import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.GamesCollectionSub;
@@ -74,15 +76,20 @@ public class TestWebAPI {
 		bomb.setName("Active bomb");
 		bombs.addActive(bomb);
 
+		SpecificDefuseInformation defuse = new SpecificDefuseInformation();
+		DefusesInformation defuses = new DefusesInformation();
+		defuses.addDefuses(defuse);
+
 		GamesHolder mockedGame = mock(GamesHolder.class);
 		when(mockedGame.getGamesCollection()).thenReturn(gc);
 		when(mockedGame.getInformationSpecificGame(gameIdToTest)).thenReturn(isg);
 		when(mockedGame.listPlayers(gameIdToTest)).thenReturn(players);
 		when(mockedGame.listAllBombs(gameIdToTest)).thenReturn(bombs);
 		when(mockedGame.getBombInformation(gameIdToTest, bombIdToTest)).thenReturn(bomb);
-		when(mockedGame.defuseBomb(gameIdToTest, bombIdToTest, playerIdToTest)).thenReturn(bomb);
+		when(mockedGame.defuseBomb(gameIdToTest, playerIdToTest)).thenReturn(defuse);
 		when(mockedGame.startGame(gameNameToTest)).thenReturn(sg);
 		when(mockedGame.joinGame(gameIdToTest, playerNameToTest)).thenReturn(player);
+		when(mockedGame.getDefuses(gameIdToTest)).thenReturn(defuses);
 
 		new WebAPI(mockedGame);
 	}
@@ -168,14 +175,22 @@ public class TestWebAPI {
 	}
 
 	@Test
-	public void testPutDefuseBomb() {
+	public void testPostDefuseBomb() {
 		Entity<String> payload = Entity.json("{'id': '" + playerIdToTest + "'}");
-		Response response = client.target(URL + "games/" + gameIdToTest + "/bombs/1").request(APPLICATION_JSON)
-				.put(payload);
+		Response response = client.target(URL + "games/" + gameIdToTest + "/defuses").request(APPLICATION_JSON)
+				.post(payload);
 		String actualBody = response.readEntity(String.class);
 		assertEquals(HttpURLConnection.HTTP_CREATED, response.getStatus());
 		SpecificBombInformation bomb = gson.fromJson(actualBody, SpecificBombInformation.class);
-		assertEquals("Active bomb", bomb.getName());
+		assertEquals(false, bomb.isDefused());
+	}
+
+	@Test
+	public void testGetDefuseInformation() {
+		Response response = client.target(URL + "games/" + gameIdToTest + "/defuses").request(APPLICATION_JSON).get();
+		String actualBody = response.readEntity(String.class);
+		DefusesInformation defuses = gson.fromJson(actualBody, DefusesInformation.class);
+		assertEquals(1, defuses.getAttempts().size());
 	}
 
 	@Test

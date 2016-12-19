@@ -3,21 +3,26 @@ package gamemaster;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import javax.ws.rs.HttpMethod;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import comm.GamesHolder;
+import logic.GamesHolder;
 import models.BombsInGame;
 import models.GamesCollection;
+import models.SpecificBombInformation;
+import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Player;
@@ -26,12 +31,14 @@ import opencv.ColoredObjectTrack;
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
 	private static ColoredObjectTrack track;
+	private static final int bombIdCanDefuseToTest = 42;
 
 	@BeforeClass
 	public static void onlyOnce() {
 		new ColoredObjectTrack();
 		track = mock(ColoredObjectTrack.class);
 		doNothing().when(track).SpawnBomb();
+		when(track.canDefuseBomb(bombIdCanDefuseToTest)).thenReturn(true);
 	}
 
 	@Before
@@ -80,26 +87,38 @@ public class TestGamesHolder {
 	@Test
 	public void testListAllBombs() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
+		Player player = gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
+		gamesHolderToTest.addBomb(bombIdCanDefuseToTest, DateTime.now());
+		gamesHolderToTest.addBomb(313, DateTime.now());
+		gamesHolderToTest.defuseBomb(createdGame.getGameId(), player.getId());
 		BombsInGame bombs = gamesHolderToTest.listAllBombs(createdGame.getGameId());
-		assertEquals(0, bombs.getActive().size());
-		assertEquals(0, bombs.getDefused().size());
-		// TODO: How to add bombs?
+		assertEquals(1, bombs.getActive().size());
+		assertEquals(1, bombs.getDefused().size());
 	}
 
 	@Test
 	public void testGetBombInformation() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
-		// BombInformation bomb = gamesHolderToTest.getBombInformation(gameId,
-		// bombId);
-		// TODO: Implement. Logic to add bombs
+		int bombId = 1;
+		DateTime dateTime = DateTime.now();
+		gamesHolderToTest.addBomb(bombId, dateTime);
+		SpecificBombInformation bomb = gamesHolderToTest.getBombInformation(createdGame.getGameId(), bombId);
+		assertEquals(bombId, bomb.getId());
+		assertEquals(dateTime, bomb.getExplosionAt());
 	}
 
 	@Test
 	public void testDefuseBomb() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
-		// BombInformation bomb = gamesHolderToTest.defuseBomb(gameId, bombId,
-		// playerId);
-		// TODO: Implement. Logic to add bombs
+		Player player = gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
+		gamesHolderToTest.addBomb(1, DateTime.now());
+		SpecificDefuseInformation defuse = gamesHolderToTest.defuseBomb(createdGame.getGameId(), player.getId());
+		assertEquals(1, defuse.getId());
+		assertEquals(player.getId(), defuse.getPlayer());
+		assertEquals(false, defuse.isDefused());
+		assertNotNull(defuse.getWhen());
+		assertEquals(HttpMethod.GET, defuse.getActions().getInformation().getMethod());
+		assertEquals("/games/1/bombs/1", defuse.getActions().getInformation().getUrl());
 	}
 
 	@Test

@@ -6,16 +6,18 @@ import static spark.Spark.get;
 import static spark.Spark.options;
 import static spark.Spark.port;
 import static spark.Spark.post;
-import static spark.Spark.put;
 
 import java.net.HttpURLConnection;
 import java.util.List;
 
 import com.google.gson.Gson;
 
+import logic.GamesHolder;
 import models.BombsInGame;
+import models.DefusesInformation;
 import models.GamesCollection;
 import models.SpecificBombInformation;
+import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.GameName;
@@ -110,15 +112,25 @@ public class WebAPI {
 		/*
 		 * Defuse a bomb
 		 */
-		put("/games/:gameid/bombs/:bombid", (request, response) -> {
+		post("/games/:gameid/defuses", (request, response) -> {
 			System.out.println("Try to defuse a bomb");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
-			int bombId = Integer.parseInt(request.params("bombid"));
 			String body = request.body();
 			Player player = myGson.fromJson(body, Player.class);
-			SpecificBombInformation bomb = myGamesHolder.defuseBomb(gameId, bombId, player.getId());
-			return myGson.toJson(bomb);
+			SpecificDefuseInformation defuse = myGamesHolder.defuseBomb(gameId, player.getId());
+			return myGson.toJson(defuse);
+		});
+
+		/*
+		 * Get a list of defuse attempts
+		 */
+		get("/games/:gameid/defuses", (request, response) -> {
+			System.out.println("Try to defuse a bomb");
+			response.status(HttpURLConnection.HTTP_CREATED);
+			int gameId = Integer.parseInt(request.params("gameid"));
+			DefusesInformation defuses = myGamesHolder.getDefuses(gameId);
+			return myGson.toJson(defuses);
 		});
 
 		/*

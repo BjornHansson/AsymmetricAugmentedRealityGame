@@ -27,8 +27,8 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import static org.bytedeco.javacpp.opencv_imgcodecs.cvLoadImage;
 import org.joda.time.DateTime;
 
-import comm.GamesHolder;
 import comm.WebAPI;
+import logic.GamesHolder;
 
 
 
