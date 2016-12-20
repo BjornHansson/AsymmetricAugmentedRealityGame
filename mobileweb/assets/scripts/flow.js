@@ -62,8 +62,6 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
         var countdown = 0;
         var currentBombCount = 0;
         var topBomb = 0;
-
-        $('#active_bombs_label').text(instance.bombs.length);
         $('#defusal_attempt_label').text(instance.attempts);
         $('#defuse_counter_label').text(instance.defuses);
 
@@ -73,8 +71,11 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
             now = new Date();
             bang = new Date(instance.bombs[0]['explosion_at']);
             countdown = Math.floor((bang - now)/1000);
+            effects.countdown(countdown);
+            $('#active_bombs_label').text(instance.bombs.length);
 
             instance.intervalId = setInterval(function() {
+                console.log('tic toc');
                 now = new Date();
                 if (ringsum === 0) {
                     // Fetch current bombs
