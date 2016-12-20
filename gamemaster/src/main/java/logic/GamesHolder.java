@@ -74,15 +74,13 @@ public class GamesHolder {
 		actions.setDefuses(defuses);
 
 		// Only support for one player
-		if (!isg.getAllPlayers().isEmpty()) {
-			Action join = new Action();
-			join.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
-			join.setMethod(HttpMethod.POST);
-			Parameter param2 = new Parameter();
-			param2.setName("string");
-			join.addParameter(param2);
-			actions.setJoinGame(join);
-		}
+		Action join = new Action();
+		join.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/players");
+		join.setMethod(HttpMethod.POST);
+		Parameter param2 = new Parameter();
+		param2.setName("string");
+		join.addParameter(param2);
+		actions.setJoinGame(join);
 		isg.setActions(actions);
 
 		return isg;

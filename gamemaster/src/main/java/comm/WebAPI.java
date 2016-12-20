@@ -24,6 +24,7 @@ import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.GameName;
 import models.sub.Player;
+import models.sub.PlayerName;
 
 public class WebAPI {
 	public static String SERVER_URL;
@@ -101,9 +102,9 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player postedPlayer = GSON.fromJson(body, Player.class);
+			System.out.println("Player name:" + body);
+			PlayerName postedPlayer = GSON.fromJson(body, PlayerName.class);
 			Player createdPlayer = myGamesHolder.joinGame(gameId, postedPlayer.getName());
-
 			return GSON.toJson(createdPlayer);
 		});
 

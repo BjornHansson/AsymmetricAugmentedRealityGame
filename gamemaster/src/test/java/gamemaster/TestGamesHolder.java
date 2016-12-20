@@ -75,7 +75,7 @@ public class TestGamesHolder {
 		assertEquals(HttpMethod.GET, isg.getActions().getDefuses().getMethod());
 
 		// join game
-		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getJoinGame().getUrl());
+		assertEquals(SERVER_URL + "/games/1/players", isg.getActions().getJoinGame().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getJoinGame().getMethod());
 		assertEquals("string", isg.getActions().getJoinGame().getParameters().get(0).getName());
 	}
