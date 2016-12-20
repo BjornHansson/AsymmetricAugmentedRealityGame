@@ -167,12 +167,15 @@ public class GamesHolder {
 	 */
 	public BombsInGame listAllBombs(int gameId) {
 		BombsInGame bombs = new BombsInGame();
+		int nBombs = 0;
 		for (int i = 0; i < myBombs.size(); i++) {
 			if (myBombs.get(i).getGameId() == gameId) {
+
 				if (myBombs.get(i).isDefused()) {
 					bombs.addDefused(myBombs.get(i));
 				} else if (!myBombs.get(i).isDefused()) {
 					bombs.addActive(myBombs.get(i));
+					nBombs++;
 				}
 			}
 		}
@@ -197,37 +200,32 @@ public class GamesHolder {
 	 */
 	public SpecificDefuseInformation defuseBomb(int gameId, int playerId) {
 		SpecificDefuseInformation defuse = new SpecificDefuseInformation();
-		SpecificBombInformation bomb = null;
 
-		List<Player> playersInTheGame = getInformationSpecificGame(gameId).getAllPlayers();
 		for (int bombsIndex = 0; bombsIndex < myBombs.size(); bombsIndex++) {
-			for (int playerIndex = 0; playerIndex < playersInTheGame.size(); playerIndex++) {
-				if (playersInTheGame.get(playerIndex).getId() == playerId) {
-					bomb = myBombs.get(bombsIndex);
-					if (coloredObjectTrack.canDefuseBomb(bomb.getId())) {
-						coloredObjectTrack.defuseBomb(bomb.getId());
-						bomb.setDefused(true);
-					}
-					myDefusesIdsCounter++;
-					defuse.setId(myDefusesIdsCounter);
-					defuse.setDefused(bomb.isDefused());
-					defuse.setPlayer(playerId);
-					defuse.setWhen(bomb.getExplosionAt());
-					defuse.setGameId(gameId);
-
-					Action information = new Action();
-					information.setMethod(HttpMethod.GET);
-					information.setUrl(SERVER_URL + "/games/" + gameId + "/bombs/" + bomb.getId());
-					AllActions actions = new AllActions();
-					actions.setInformation(information);
-					defuse.setActions(actions);
-
-					myDefuseAttempts.add(defuse);
-
-					if (bomb.isDefused())
-						break;
-				}
+			if (myBombs.get(bombsIndex).isDefused())
+				continue;
+			if (coloredObjectTrack.canDefuseBomb(myBombs.get(bombsIndex).getId())) {
+				coloredObjectTrack.defuseBomb(myBombs.get(bombsIndex).getId());
+				myBombs.get(bombsIndex).setDefused(true);
 			}
+			myDefusesIdsCounter++;
+			defuse.setId(myDefusesIdsCounter);
+			defuse.setDefused(myBombs.get(bombsIndex).isDefused());
+			defuse.setPlayer(playerId);
+			defuse.setWhen(myBombs.get(bombsIndex).getExplosionAt());
+			defuse.setGameId(gameId);
+
+			Action information = new Action();
+			information.setMethod(HttpMethod.GET);
+			information.setUrl(SERVER_URL + "/games/" + gameId + "/bombs/" + myBombs.get(bombsIndex).getId());
+			AllActions actions = new AllActions();
+			actions.setInformation(information);
+			defuse.setActions(actions);
+
+			myDefuseAttempts.add(defuse);
+
+			if (myBombs.get(bombsIndex).isDefused())
+				break;
 		}
 
 		return defuse;

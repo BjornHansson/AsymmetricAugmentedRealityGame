@@ -58,8 +58,8 @@ public class ColoredObjectTrack implements Runnable {
 	private CanvasFrame thresholdedVideoFrame;
 	private ColorValueControlInterface colorinterface;
 
-	private double spawnIntervalMin = 0.0;
-	private double spawnIntervalMax = 1.0;
+	private double spawnIntervalMin = 10;
+	private double spawnIntervalMax = 15;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
 
@@ -75,19 +75,23 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void SpawnBomb() {
 		DateTime dateTime = new DateTime();
-		dateTime = dateTime.plusSeconds(20 + random.nextInt(10));
-		bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360, dateTime));
+		dateTime = dateTime.plusSeconds(120 + random.nextInt(10));
+		// bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360,
+		// dateTime));
+		bombs.add(new Bomb(bombIdCounter, 0, dateTime));
 		gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
-		// bombs.add(new Bomb(20.3f, 20));
 		System.out.println("Bomb spawned at " + bombs.get(bombs.size() - 1).getBearing());
 	}
 
 	public boolean canDefuseBomb(int bombId) {
 		for (int i = 0; i < bombs.size(); i++) {
 			if (bombs.get(i).getId() == bombId) {
+				System.out.println("angle difference "
+						+ Math.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())));
 				if (!bombs.get(i).hasExploded() && Math
 						.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance) {
+					System.out.println("can defuse bomb");
 					return true;
 					// TODO: Put in a nice animation (or at least a different
 					// image) for this
@@ -100,6 +104,7 @@ public class ColoredObjectTrack implements Runnable {
 	public void defuseBomb(int bombId) {
 		for (int i = 0; i < bombs.size(); i++) {
 			if (bombs.get(i).getId() == bombId) {
+				System.out.println("Defusing bomb");
 				bombs.remove(i);
 				break;
 			}
@@ -143,9 +148,9 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void GameLoop() {
-		// setupCamera("192.168.20.253");
+		setupCamera("192.168.20.253");
 
-		setupCamera(null);
+		// setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
