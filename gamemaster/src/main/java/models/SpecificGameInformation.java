@@ -3,6 +3,8 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gson.annotations.SerializedName;
+
 import models.sub.AllActions;
 import models.sub.Player;
 
@@ -14,12 +16,13 @@ import models.sub.Player;
  *      link</a>
  */
 public class SpecificGameInformation {
+	@SerializedName("gameid")
 	private int gameId;
 	private String name;
 	private boolean status = false;
 	private int defuses = 0;
 	private AllActions actions = new AllActions();
-	private List<Player> allPlayers = new ArrayList<Player>();
+	private transient List<Player> allPlayers = new ArrayList<Player>();
 
 	public int getGameId() {
 		return gameId;

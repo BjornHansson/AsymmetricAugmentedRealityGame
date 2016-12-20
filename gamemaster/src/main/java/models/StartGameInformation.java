@@ -1,5 +1,7 @@
 package models;
 
+import com.google.gson.annotations.SerializedName;
+
 import models.sub.AllActions;
 
 /**
@@ -10,6 +12,7 @@ import models.sub.AllActions;
  *      link</a>
  */
 public class StartGameInformation {
+	@SerializedName("gameid")
 	private int gameId;
 	private String name;
 	private AllActions actions;
