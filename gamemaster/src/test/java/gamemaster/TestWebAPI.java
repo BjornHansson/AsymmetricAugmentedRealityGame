@@ -40,7 +40,7 @@ import models.sub.Player;
  * from JSON to Java.
  */
 public class TestWebAPI {
-	private static final String URL = "http://localhost:8080/";
+	private static final String URL = "http://localhost:8090/";
 	private static final Client client = ClientBuilder.newClient();
 	private static final Gson gson = new Gson();
 	private static final int gameIdToTest = 1337;

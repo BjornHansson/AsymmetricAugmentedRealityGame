@@ -1,5 +1,7 @@
 package logic;
 
+import static comm.WebAPI.SERVER_URL;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,32 +56,27 @@ public class GamesHolder {
 
 		AllActions actions = new AllActions();
 		Action information = new Action();
-		information.setUrl("/games/" + isg.getGameId());
+		information.setUrl(SERVER_URL + "/games/" + isg.getGameId());
 		information.setMethod(HttpMethod.GET);
 		actions.setInformation(information);
-		
+
 		Action defuse = new Action();
-		defuse.setUrl("/games/" + isg.getGameId() + "/defuse");
+		defuse.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/defuse");
 		defuse.setMethod(HttpMethod.POST);
 		actions.setDefuse(defuse);
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
-				
+
 		// Only support for one player
 		if (!isg.getAllPlayers().isEmpty()) {
 			Action join = new Action();
-			join.setUrl("/games/" + isg.getGameId() + "/" +  isg.getAllPlayers().get(0).getId());
+			join.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
 			join.setMethod(HttpMethod.POST);
 			Parameter param2 = new Parameter();
 			param2.setName("string");
 			join.addParameter(param2);
 			actions.setJoinGame(join);
-			
-			Action leave = new Action();
-			leave.setUrl("/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
-			leave.setMethod(HttpMethod.DELETE);
-			actions.setLeaveGame(leave);
 		}
 		isg.setActions(actions);
 
@@ -105,7 +102,7 @@ public class GamesHolder {
 
 		Action currentGame = new Action();
 		currentGame.setMethod(HttpMethod.GET);
-		currentGame.setUrl("/games/" + myCurrentGameId);
+		currentGame.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
 		AllActions actionsGc = new AllActions();
 		actionsGc.setCurrentGame(currentGame);
 		gamesCollection.setActions(actionsGc);
@@ -116,14 +113,14 @@ public class GamesHolder {
 
 		Action registration = new Action();
 		registration.setMethod(HttpMethod.POST);
-		registration.setUrl("/games/" + myCurrentGameId);
+		registration.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
 		Parameter param = new Parameter();
 		param.setName("string");
 		registration.addParameter(param);
 
 		Action information = new Action();
 		information.setMethod(HttpMethod.GET);
-		information.setUrl("/games/" + myCurrentGameId);
+		information.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
 
 		AllActions actions = new AllActions();
 		actions.setRegistration(registration);
@@ -147,12 +144,14 @@ public class GamesHolder {
 			gamesCollection.addGame(sub);
 		}
 
-		AllActions actions = new AllActions();
-		Action action = new Action();
-		action.setUrl("/games/" + myCurrentGameId);
-		action.setMethod(HttpMethod.GET);
-		actions.setCurrentGame(action);
-		gamesCollection.setActions(actions);
+		if (myGames.size() > 0) {
+			AllActions actions = new AllActions();
+			Action action = new Action();
+			action.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
+			action.setMethod(HttpMethod.GET);
+			actions.setCurrentGame(action);
+			gamesCollection.setActions(actions);
+		}
 
 		return gamesCollection;
 	}
@@ -215,12 +214,15 @@ public class GamesHolder {
 
 					Action information = new Action();
 					information.setMethod(HttpMethod.GET);
-					information.setUrl("/games/" + gameId + "/bombs/" + bomb.getId());
+					information.setUrl(SERVER_URL + "/games/" + gameId + "/bombs/" + bomb.getId());
 					AllActions actions = new AllActions();
 					actions.setInformation(information);
 					defuse.setActions(actions);
 
 					myDefuseAttempts.add(defuse);
+
+					if (bomb.isDefused())
+						break;
 				}
 			}
 		}
@@ -243,16 +245,12 @@ public class GamesHolder {
 
 		Action defuse = new Action();
 		defuse.setMethod(HttpMethod.POST);
-		defuse.setUrl("/games/" + gameId + "/defuse");
+		defuse.setUrl(SERVER_URL + "/games/" + gameId + "/defuse");
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
-		Action leave = new Action();
-		leave.setMethod(HttpMethod.DELETE);
-		leave.setUrl("/games/" + gameId + "/" + newPlayer.getId());
 		AllActions actions = new AllActions();
 		actions.setDefuse(defuse);
-		actions.setLeaveGame(leave);
 		newPlayer.setActions(actions);
 
 		for (int i = 0; i < myGames.size(); i++) {

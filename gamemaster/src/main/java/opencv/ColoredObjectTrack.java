@@ -57,12 +57,12 @@ public class ColoredObjectTrack implements Runnable {
 	private OverlayCanvasFrame videoFrame;
 	private CanvasFrame thresholdedVideoFrame;
 	private ColorValueControlInterface colorinterface;
-	
+
 	private double spawnIntervalMin = 0.0;
 	private double spawnIntervalMax = 1.0;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
-	
+
 	private double defuseDistance = 10;
 	private float playerBearing = 0;
 	private boolean playerDetected = false;
@@ -77,20 +77,22 @@ public class ColoredObjectTrack implements Runnable {
 		DateTime dateTime = new DateTime();
 		dateTime = dateTime.plusSeconds(20 + random.nextInt(10));
 		bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360, dateTime));
-		// gamesHolder.addBomb(bombIdCounter, dateTime);
+		gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
 		// bombs.add(new Bomb(20.3f, 20));
 		System.out.println("Bomb spawned at " + bombs.get(bombs.size() - 1).getBearing());
 	}
 
 	public boolean canDefuseBomb(int bombId) {
-		for(int i = 0; i < bombs.size(); i++){
-			if(bombs.get(i).getId() == bombId){
-				if(Math.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance){
+		for (int i = 0; i < bombs.size(); i++) {
+			if (bombs.get(i).getId() == bombId) {
+				if (!bombs.get(i).hasExploded() && Math
+						.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance) {
 					return true;
-					//TODO: Put in a nice animation (or at least a different image) for this
+					// TODO: Put in a nice animation (or at least a different
+					// image) for this
 				}
-			}	
+			}
 		}
 		return false;
 	}
@@ -104,19 +106,25 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
-	public void tryDefuseAll(){
-		for(int i = 0; i < bombs.size(); i++){
-			if(canDefuseBomb(bombs.get(i).getId())){
+	public void tryDefuseAll() {
+		for (int i = 0; i < bombs.size(); i++) {
+			if (canDefuseBomb(bombs.get(i).getId())) {
 				defuseBomb(bombs.get(i).getId());
 				break;
 			}
 		}
 	}
-	
+
+	private void explodeAll() {
+		for (int i = 0; i < bombs.size(); i++) {
+			if (!bombs.get(i).hasStartedToExplode())
+				bombs.get(i).explode();
+		}
+	}
+
 	public ColoredObjectTrack() {
 		gamesHolder = new GamesHolder(this);
 		webApi = new WebAPI(gamesHolder);
-
 	}
 
 	public void updatergbvalues(int a, int b, int c, int d, int e, int f) {
@@ -135,9 +143,9 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void GameLoop() {
-		setupCamera("192.168.20.253");
-		System.out.println("1");
-		// setupCamera(null);
+		// setupCamera("192.168.20.253");
+
+		setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
@@ -146,7 +154,7 @@ public class ColoredObjectTrack implements Runnable {
 		long lastLoopTime = System.nanoTime();
 		boolean gameRunning = true;
 		while (gameRunning) {
-			
+
 			long now = System.nanoTime();
 			long updateLength = now - lastLoopTime;
 			double updateLengthSeconds = (double) updateLength / 1000000000.0;
@@ -164,6 +172,9 @@ public class ColoredObjectTrack implements Runnable {
 				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
 			case GameOver:
+				Update(updateLengthSeconds);
+				trackAndAnnotate();
+				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
 			default:
 			}
@@ -175,7 +186,7 @@ public class ColoredObjectTrack implements Runnable {
 		thresholdedVideoFrame.setVisible(false);
 		colorinterface.hide();
 		gameState = GameState.Playing;
-
+		gamesHolder.startGame("Game 1");
 	}
 
 	private void loadBombImage() {
@@ -183,7 +194,7 @@ public class ColoredObjectTrack implements Runnable {
 		if (System.getProperty("os.name").startsWith("Windows")) {
 			filename = System.getProperty("user.dir") + "\\bomb_small.png";
 		} else {
-			ClassLoader classLoader = this.getClass().getClassLoader();  
+			ClassLoader classLoader = this.getClass().getClassLoader();
 			filename = classLoader.getResource("bomb_small.png").getFile();
 		}
 		bombImage = cvLoadImage(filename, -1);
@@ -208,7 +219,7 @@ public class ColoredObjectTrack implements Runnable {
 		} catch (org.bytedeco.javacv.FrameGrabber.Exception e) {
 			e.printStackTrace();
 		}
-		cameraController = new CameraController(this,ip == null ? false : true);
+		cameraController = new CameraController(this, ip == null ? false : true);
 	}
 
 	private void setupWindows() {
@@ -254,34 +265,43 @@ public class ColoredObjectTrack implements Runnable {
 		// only if its a valid position
 		if (trackedPosX > 0 && trackedPosY > 0) {
 			playerDetected = true;
-			playerBearing = cameraController.getPan() + (float)(trackedPosX - thresholdedImage.width()/2) / (float)thresholdedImage.width() * cameraController.VIEW_ANGLE;
-			if(playerBearing > 180)
+			playerBearing = cameraController.getPan() + (float) (trackedPosX - thresholdedImage.width() / 2)
+					/ (float) thresholdedImage.width() * cameraController.VIEW_ANGLE;
+			if (playerBearing > 180)
 				playerBearing -= 360;
-			if(playerBearing < -180)
+			if (playerBearing < -180)
 				playerBearing += 360;
-			
-			//System.out.println("cameraBearing: " + cameraController.getPan());
-			//System.out.println("playerBearing: " + playerBearing);
-			
+
+			// System.out.println("cameraBearing: " +
+			// cameraController.getPan());
+			// System.out.println("playerBearing: " + playerBearing);
+
 			cvCircle(annotatedImage, new int[] { trackedPosX, trackedPosY }, 5, new CvScalar(255, 0, 0, 0));
 		}
 		drawBombs(annotatedImage);
 	}
 
 	private void Update(double time) {
-		spawnTimer += time;
-		if(spawnTimer >= nextSpawn){
-			SpawnBomb();
-			spawnTimer = 0;
-			nextSpawn = spawnIntervalMin + Math.random()*(spawnIntervalMax - spawnIntervalMin);
+		if (gameState == GameState.Playing) {
+			spawnTimer += time;
+			if (spawnTimer >= nextSpawn) {
+				SpawnBomb();
+				spawnTimer = 0;
+				nextSpawn = spawnIntervalMin + Math.random() * (spawnIntervalMax - spawnIntervalMin);
+			}
 		}
-		
+
 		for (int i = 0; i < bombs.size(); i++) {
 			bombs.get(i).Update(time);
-			if (bombs.get(i).hasExploded()) {
-				System.out.println("BOOM!");
-				//TODO: uncomment this
-				//gameState = GameState.GameOver;
+			if (bombs.get(i).hasExploded() && !bombs.get(i).hasStartedToExplode()) {
+				// bombs.get(i).explode();
+				// System.out.println("BOOM!");
+				// TODO: uncomment this
+				explodeAll();
+				gameState = GameState.GameOver;
+
+			}
+			if (bombs.get(i).finishedExploding()) {
 				bombs.remove(i);
 				i--;
 			}
@@ -312,26 +332,28 @@ public class ColoredObjectTrack implements Runnable {
 		// org.bytedeco.javacpp.opencv_core.cvSet2D(imgAnnotated, j, i, m);
 		// }
 
-		for (int i = 0; i < bombs.size(); i++) {
-			// for each bomb:
-			// if it is within the view angle,
-			// calculate position in image and draw a dot
-			if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
-					cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
-
-				float diff = Utility.angleDifference(bombs.get(i).getBearing(), cameraController.getPan());
-				// System.out.println("diff = " + diff);
-				int w = imgAnnotated.width();
-				// System.out.println("w = " + w);
-				int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
-				// System.out.println("xPos = " + xPos);
-
-				cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 }, 10,
-						new CvScalar(255, 255, 255, 0));
-
-			}
-
-		}
+		// for (int i = 0; i < bombs.size(); i++) {
+		// // for each bomb:
+		// // if it is within the view angle,
+		// // calculate position in image and draw a dot
+		// if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
+		// cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
+		//
+		// float diff = Utility.angleDifference(bombs.get(i).getBearing(),
+		// cameraController.getPan());
+		// // System.out.println("diff = " + diff);
+		// int w = imgAnnotated.width();
+		// // System.out.println("w = " + w);
+		// int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
+		// // System.out.println("xPos = " + xPos);
+		//
+		// cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 },
+		// 10,
+		// new CvScalar(255, 255, 255, 0));
+		//
+		// }
+		//
+		// }
 	}
 
 	public ArrayList<Bomb> getBombs() {

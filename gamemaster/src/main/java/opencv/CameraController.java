@@ -23,8 +23,8 @@ class CameraController implements KeyListener, Runnable {
 	public static final float VIEW_ANGLE = 62.8f;
 
 
-	private float deltaPan = 20;
-	private float deltaPanStop = 0;
+	private int deltaPan = 20;
+	private int deltaPanStop = 0;
 	private float pan = 0;
 
 	private boolean isMoving = false;
@@ -114,8 +114,7 @@ class CameraController implements KeyListener, Runnable {
 			cot.tryDefuseAll();
 		case KeyEvent.VK_LEFT:
 			try {
-				System.out.println("LEFT");
-				pan(-deltaPanStop);
+				pan(deltaPanStop);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -123,7 +122,6 @@ class CameraController implements KeyListener, Runnable {
 			break;
 		case KeyEvent.VK_RIGHT:
 			try {
-				System.out.println("RIGHT");
 				pan(deltaPanStop);
 			} catch (UnirestException e1) {
 				// TODO Auto-generated catch block
@@ -137,13 +135,13 @@ class CameraController implements KeyListener, Runnable {
 		// TODO Auto-generated method stub
 	}
 
-	private void pan(float amount) throws UnirestException {
+	private void pan(int amount) throws UnirestException {
 		Unirest.get(HTTP_AXIS_URL).queryString("continuouspantiltmove", amount + ",0").asString();
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		while (enabled) {
 			getPanFromCamera();
 			setPanDelayed();
 			try {
