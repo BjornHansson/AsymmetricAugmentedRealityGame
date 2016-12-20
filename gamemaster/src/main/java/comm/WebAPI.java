@@ -12,7 +12,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import logic.GamesHolder;
 import models.BombsInGame;
@@ -29,7 +31,7 @@ import models.sub.PlayerName;
 public class WebAPI {
 	public static String SERVER_URL;
 	private static int serverPort = 8090;
-	private static final Gson GSON = new Gson();
+	private static final Gson GSON = Converters.registerDateTime(new GsonBuilder()).create();
 	private GamesHolder myGamesHolder;
 
 	/**

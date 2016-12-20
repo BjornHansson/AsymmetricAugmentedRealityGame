@@ -44,6 +44,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.9.6</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fatboyindustrial.gson-jodatime-serialisers</groupId>
+			<artifactId>gson-jodatime-serialisers</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<!-- Remove logger warning -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
