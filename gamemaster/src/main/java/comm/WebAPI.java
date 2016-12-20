@@ -24,7 +24,8 @@ import models.sub.GameName;
 import models.sub.Player;
 
 public class WebAPI {
-	private static final Gson myGson = new Gson();
+	public static final String SERVER_URL = "http://gamemaster.example";
+	private static final Gson GSON = new Gson();
 	private GamesHolder myGamesHolder;
 
 	/**
@@ -48,7 +49,7 @@ public class WebAPI {
 		get("/games", (request, response) -> {
 			System.out.println("Get information about older and current games");
 			GamesCollection gc = myGamesHolder.getGamesCollection();
-			return myGson.toJson(gc);
+			return GSON.toJson(gc);
 		});
 
 		/*
@@ -58,9 +59,9 @@ public class WebAPI {
 			System.out.println("Start a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			String body = request.body();
-			GameName gameName = myGson.fromJson(body, GameName.class);
+			GameName gameName = GSON.fromJson(body, GameName.class);
 			StartGameInformation sg = myGamesHolder.startGame(gameName.getName());
-			return myGson.toJson(sg);
+			return GSON.toJson(sg);
 		});
 
 		/*
@@ -70,7 +71,7 @@ public class WebAPI {
 			System.out.println("Get information on a specific game");
 			int gameId = Integer.parseInt(request.params("gameid"));
 			SpecificGameInformation isg = myGamesHolder.getInformationSpecificGame(gameId);
-			return myGson.toJson(isg);
+			return GSON.toJson(isg);
 		});
 
 		/*
@@ -80,7 +81,7 @@ public class WebAPI {
 			System.out.println("Join a game");
 			int gameId = Integer.parseInt(request.params("gameid"));
 			List<Player> players = myGamesHolder.listPlayers(gameId);
-			return myGson.toJson(players);
+			return GSON.toJson(players);
 		});
 
 		/*
@@ -91,10 +92,10 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player postedPlayer = myGson.fromJson(body, Player.class);
+			Player postedPlayer = GSON.fromJson(body, Player.class);
 			Player createdPlayer = myGamesHolder.joinGame(gameId, postedPlayer.getName());
 
-			return myGson.toJson(createdPlayer);
+			return GSON.toJson(createdPlayer);
 		});
 
 		/*
@@ -117,9 +118,9 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
-			Player player = myGson.fromJson(body, Player.class);
+			Player player = GSON.fromJson(body, Player.class);
 			SpecificDefuseInformation defuse = myGamesHolder.defuseBomb(gameId, player.getId());
-			return myGson.toJson(defuse);
+			return GSON.toJson(defuse);
 		});
 
 		/*
@@ -130,7 +131,7 @@ public class WebAPI {
 			response.status(HttpURLConnection.HTTP_CREATED);
 			int gameId = Integer.parseInt(request.params("gameid"));
 			DefusesInformation defuses = myGamesHolder.getDefuses(gameId);
-			return myGson.toJson(defuses);
+			return GSON.toJson(defuses);
 		});
 
 		/*
@@ -140,7 +141,7 @@ public class WebAPI {
 			System.out.println("Get information on all bombs");
 			int gameId = Integer.parseInt(request.params("gameid"));
 			BombsInGame bombs = myGamesHolder.listAllBombs(gameId);
-			return myGson.toJson(bombs);
+			return GSON.toJson(bombs);
 		});
 
 		/*
@@ -151,11 +152,8 @@ public class WebAPI {
 			int gameId = Integer.parseInt(request.params("gameid"));
 			int bombId = Integer.parseInt(request.params("bombid"));
 			SpecificBombInformation bomb = myGamesHolder.getBombInformation(gameId, bombId);
-			return myGson.toJson(bomb);
+			return GSON.toJson(bomb);
 		});
-		
-		System.out.println("End of init");
-		
 	}
 
 	private static void enableCORS(final String origin, final String methods, final String headers) {

@@ -1,5 +1,6 @@
 package gamemaster;
 
+import static comm.WebAPI.SERVER_URL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
@@ -59,22 +60,22 @@ public class TestGamesHolder {
 		assertEquals(nameOfTheGame, isg.getName());
 		assertEquals(status, isg.getStatus());
 		assertEquals(defuses, isg.getDefuses());
-		
-		//informations
-		assertEquals("/games/1", isg.getActions().getInformation().getUrl());
+
+		// informations
+		assertEquals(SERVER_URL + "/games/1", isg.getActions().getInformation().getUrl());
 		assertEquals(HttpMethod.GET, isg.getActions().getInformation().getMethod());
-		
-		//defuses
-		assertEquals("/games/1/defuse", isg.getActions().getDefuse().getUrl());
+
+		// defuses
+		assertEquals(SERVER_URL + "/games/1/defuse", isg.getActions().getDefuse().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
 		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
-		
-		//leave game
-		assertEquals("/games/1/1", isg.getActions().getLeaveGame().getUrl());
+
+		// leave game
+		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getLeaveGame().getUrl());
 		assertEquals(HttpMethod.DELETE, isg.getActions().getLeaveGame().getMethod());
-		
-		//join game
-		assertEquals("/games/1/1", isg.getActions().getJoinGame().getUrl());
+
+		// join game
+		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getJoinGame().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getJoinGame().getMethod());
 		assertEquals("string", isg.getActions().getJoinGame().getParameters().get(0).getName());
 	}
@@ -93,7 +94,7 @@ public class TestGamesHolder {
 		assertEquals(2, gc.getGames().size());
 		assertEquals(firstNameOfTheGame, gc.getGames().get(0).getName());
 		assertEquals(secondNameOfTheGame, gc.getGames().get(1).getName());
-		assertEquals("/games/2", gc.getActions().getCurrentgame().getUrl());
+		assertEquals(SERVER_URL + "/games/2", gc.getActions().getCurrentgame().getUrl());
 		assertEquals(HttpMethod.GET, gc.getActions().getCurrentgame().getMethod());
 	}
 
@@ -131,7 +132,7 @@ public class TestGamesHolder {
 		assertEquals(false, defuse.isDefused());
 		assertNotNull(defuse.getWhen());
 		assertEquals(HttpMethod.GET, defuse.getActions().getInformation().getMethod());
-		assertEquals("/games/1/bombs/1", defuse.getActions().getInformation().getUrl());
+		assertEquals(SERVER_URL + "/games/1/bombs/1", defuse.getActions().getInformation().getUrl());
 	}
 
 	@Test
@@ -141,10 +142,10 @@ public class TestGamesHolder {
 		Player joinedPlayer = gamesHolderToTest.joinGame(createdGameId, "Hodor");
 
 		assertEquals(1, joinedPlayer.getId());
-		assertEquals("/games/1/defuse", joinedPlayer.getActions().getDefuse().getUrl());
+		assertEquals(SERVER_URL + "/games/1/defuse", joinedPlayer.getActions().getDefuse().getUrl());
 		assertEquals(HttpMethod.POST, joinedPlayer.getActions().getDefuse().getMethod());
 		assertEquals("number", joinedPlayer.getActions().getDefuse().getParameters().get(0).getPlayerId());
-		assertEquals("/games/1/1", joinedPlayer.getActions().getLeaveGame().getUrl());
+		assertEquals(SERVER_URL + "/games/1/1", joinedPlayer.getActions().getLeaveGame().getUrl());
 		assertEquals(HttpMethod.DELETE, joinedPlayer.getActions().getLeaveGame().getMethod());
 	}
 
@@ -179,10 +180,10 @@ public class TestGamesHolder {
 
 		assertEquals(1, createdGame.getGameId());
 		assertEquals(nameOfTheGame, createdGame.getName());
-		assertEquals("/games/1", createdGame.getActions().getRegistration().getUrl());
+		assertEquals(SERVER_URL + "/games/1", createdGame.getActions().getRegistration().getUrl());
 		assertEquals(HttpMethod.POST, createdGame.getActions().getRegistration().getMethod());
 		assertEquals("string", createdGame.getActions().getRegistration().getParameters().get(0).getName());
-		assertEquals("/games/1", createdGame.getActions().getInformation().getUrl());
+		assertEquals(SERVER_URL + "/games/1", createdGame.getActions().getInformation().getUrl());
 		assertEquals(HttpMethod.GET, createdGame.getActions().getInformation().getMethod());
 	}
 }
