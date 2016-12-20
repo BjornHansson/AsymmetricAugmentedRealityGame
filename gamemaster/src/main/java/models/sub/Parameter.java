@@ -1,7 +1,10 @@
 package models.sub;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Parameter {
 	private String name;
+	@SerializedName("playerid")
 	private String playerId;
 
 	public String getName() {
