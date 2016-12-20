@@ -17,5 +17,11 @@ requirejs.config({
 
 requirejs(['config', 'jquery', 'effects', 'flow', 'game_controls'],
         function(config, $, Effects, Flow, GameControls) {
-    
+    var effects = new Effects();
+    var flow = new Flow();
+    var gameControls = new GameControls(config.serverAddress);
+
+    $('#join_game_button').click(function() { flow.joinGame() });
+    $('#start_over_button').click(function() { flow.startOver() });
+    $('#disarm_button').click(function() { flow.tryDefuse() });
 });

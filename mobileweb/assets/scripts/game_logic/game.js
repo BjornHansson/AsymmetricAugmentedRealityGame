@@ -102,6 +102,8 @@ define(function() {
         })
         .done(function(data) {
             return data.active;
+        })
+        .fail(function(data) {
         });
     };
 
