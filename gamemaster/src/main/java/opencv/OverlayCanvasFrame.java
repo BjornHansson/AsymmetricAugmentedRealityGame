@@ -170,7 +170,7 @@ public class OverlayCanvasFrame extends JFrame {
 
 	private void init(final boolean fullScreen, final DisplayMode displayMode, final double gamma) {
 		try {
-			if (false) {
+			if (System.getProperty("os.name").startsWith("Windows")) {
 				// Windows
 				bombImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\bomb_small_sprites.png"));
 				explosionImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\explosion_sprites.png"));
