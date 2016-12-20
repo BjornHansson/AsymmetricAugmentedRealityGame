@@ -221,6 +221,9 @@ public class GamesHolder {
 					defuse.setActions(actions);
 
 					myDefuseAttempts.add(defuse);
+					
+					if(bomb.isDefused())
+						break;
 				}
 			}
 		}
