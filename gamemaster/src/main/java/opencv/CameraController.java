@@ -143,7 +143,7 @@ class CameraController implements KeyListener, Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (enabled) {
 			getPanFromCamera();
 			setPanDelayed();
 			try {

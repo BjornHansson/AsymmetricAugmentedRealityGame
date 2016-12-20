@@ -40,6 +40,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -165,13 +166,14 @@ public class OverlayCanvasFrame extends JFrame {
 		init(true, displayMode, gamma);
 	}
 
-	BufferedImage bombImage;
+	BufferedImage bombImage, explosionImage;
 
 	private void init(final boolean fullScreen, final DisplayMode displayMode, final double gamma) {
 		try {
 			//ClassLoader classLoader = getClass().getClassLoader();
 			//bombImage = ImageIO.read(new File(classLoader.getResource("graphics/bomb_small.png").getFile()));
-			bombImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\bomb_small.png"));
+			bombImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\bomb_small_sprites.png"));
+			explosionImage = ImageIO.read(new File(System.getProperty("user.dir") + "\\explosion_sprites.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -288,16 +290,25 @@ public class OverlayCanvasFrame extends JFrame {
 				int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
 				// System.out.println("xPos = " + xPos);
 
-				g.drawImage(bombImage, xPos - bombImage.getTileWidth()/2, getHeight() / 2 - bombImage.getHeight()/2 - (int)bombs.get(i).getWobble(), null);
+				Rectangle r = bombs.get(i).getSrcRect();
+				int expOffX = 0;
+				int expOffY = 0;
+				
+				if(!bombs.get(i).hasExploded()){
+					//g.drawImage(bombImage, xPos - bombImage.getTileWidth()/2, getHeight() / 2 - bombImage.getHeight()/2 - (int)bombs.get(i).getWobble(), null);
+					g.drawImage(bombImage, xPos - r.width/2, getHeight() / 2 - r.height/2 - (int)bombs.get(i).getWobble(), xPos + r.width/2, getHeight() / 2 + r.height/2 - (int)bombs.get(i).getWobble(), r.x,r.y,r.x+r.width,r.y+r.height, null);
+					String timeLeft = "" + bombs.get(i).getSecondsRemaining();
 
-				String timeLeft = "" + bombs.get(i).getSecondsRemaining();
-
-				g.setFont(bombFont);
-				FontMetrics metrics = g.getFontMetrics();
-				int strH = metrics.getHeight();
-				int strW = metrics.stringWidth(timeLeft);
-				g.setColor(color.WHITE);
-				g.drawString(timeLeft, xPos - strW/2 - 25, getHeight() / 2 - strH/2	+70 - (int)bombs.get(i).getWobble());
+					g.setFont(bombFont);
+					FontMetrics metrics = g.getFontMetrics();
+					int strH = metrics.getHeight();
+					int strW = metrics.stringWidth(timeLeft);
+					g.setColor(color.WHITE);
+					g.drawString(timeLeft, xPos - strW/2 - 25, getHeight() / 2 - strH/2	+70 - (int)bombs.get(i).getWobble());
+				} else {
+					g.drawImage(explosionImage, xPos - r.width/2 + expOffX, getHeight() / 2 - r.height/2 - (int)bombs.get(i).getWobble() + expOffY, xPos + r.width/2 + expOffX, getHeight() / 2 + r.height/2 - (int)bombs.get(i).getWobble() + expOffY, r.x, r.y, r.x + r.width, r.y + r.height, null);
+				}
+				
 
 			}
 

@@ -86,7 +86,7 @@ public class ColoredObjectTrack implements Runnable {
 	public boolean canDefuseBomb(int bombId) {
 		for(int i = 0; i < bombs.size(); i++){
 			if(bombs.get(i).getId() == bombId){
-				if(Math.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance){
+				if(!bombs.get(i).hasExploded() && Math.abs(Utility.angleDifference(playerBearing, bombs.get(i).getBearing())) <= defuseDistance){
 					return true;
 					//TODO: Put in a nice animation (or at least a different image) for this
 				}
@@ -113,6 +113,13 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 	
+	private void explodeAll(){
+		for(int i = 0; i < bombs.size(); i++){
+			if(!bombs.get(i).hasStartedToExplode())
+				bombs.get(i).explode();
+		}
+	}
+	
 	public ColoredObjectTrack() {
 		gamesHolder = new GamesHolder(this);
 		webApi = new WebAPI(gamesHolder);
@@ -135,9 +142,9 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void GameLoop() {
-		setupCamera("192.168.20.253");
-		System.out.println("1");
-		// setupCamera(null);
+		//setupCamera("192.168.20.253");
+		
+		 setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
@@ -164,6 +171,9 @@ public class ColoredObjectTrack implements Runnable {
 				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
 			case GameOver:
+				Update(updateLengthSeconds);
+				trackAndAnnotate();
+				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
 			default:
 			}
@@ -269,19 +279,28 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void Update(double time) {
-		spawnTimer += time;
-		if(spawnTimer >= nextSpawn){
-			SpawnBomb();
-			spawnTimer = 0;
-			nextSpawn = spawnIntervalMin + Math.random()*(spawnIntervalMax - spawnIntervalMin);
+		if(gameState == GameState.Playing){
+			spawnTimer += time;
+			if(spawnTimer >= nextSpawn){
+				SpawnBomb();
+				spawnTimer = 0;
+				nextSpawn = spawnIntervalMin + Math.random()*(spawnIntervalMax - spawnIntervalMin);
+			}
 		}
+
 		
 		for (int i = 0; i < bombs.size(); i++) {
 			bombs.get(i).Update(time);
-			if (bombs.get(i).hasExploded()) {
-				System.out.println("BOOM!");
+			if (bombs.get(i).hasExploded() && !bombs.get(i).hasStartedToExplode()) {
+				//bombs.get(i).explode();
+				//System.out.println("BOOM!");
 				//TODO: uncomment this
-				//gameState = GameState.GameOver;
+				explodeAll();
+				gameState = GameState.GameOver;
+				
+				
+			}
+			if(bombs.get(i).finishedExploding()){
 				bombs.remove(i);
 				i--;
 			}
@@ -312,26 +331,26 @@ public class ColoredObjectTrack implements Runnable {
 		// org.bytedeco.javacpp.opencv_core.cvSet2D(imgAnnotated, j, i, m);
 		// }
 
-		for (int i = 0; i < bombs.size(); i++) {
-			// for each bomb:
-			// if it is within the view angle,
-			// calculate position in image and draw a dot
-			if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
-					cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
-
-				float diff = Utility.angleDifference(bombs.get(i).getBearing(), cameraController.getPan());
-				// System.out.println("diff = " + diff);
-				int w = imgAnnotated.width();
-				// System.out.println("w = " + w);
-				int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
-				// System.out.println("xPos = " + xPos);
-
-				cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 }, 10,
-						new CvScalar(255, 255, 255, 0));
-
-			}
-
-		}
+//		for (int i = 0; i < bombs.size(); i++) {
+//			// for each bomb:
+//			// if it is within the view angle,
+//			// calculate position in image and draw a dot
+//			if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
+//					cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
+//
+//				float diff = Utility.angleDifference(bombs.get(i).getBearing(), cameraController.getPan());
+//				// System.out.println("diff = " + diff);
+//				int w = imgAnnotated.width();
+//				// System.out.println("w = " + w);
+//				int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
+//				// System.out.println("xPos = " + xPos);
+//
+//				cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 }, 10,
+//						new CvScalar(255, 255, 255, 0));
+//
+//			}
+//
+//		}
 	}
 
 	public ArrayList<Bomb> getBombs() {
