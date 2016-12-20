@@ -8,6 +8,8 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -24,7 +26,7 @@ import models.sub.GameName;
 import models.sub.Player;
 
 public class WebAPI {
-	public static final String SERVER_URL = "http://gamemaster.example";
+	public static String SERVER_URL;
 	private static final Gson GSON = new Gson();
 	private GamesHolder myGamesHolder;
 
@@ -39,7 +41,13 @@ public class WebAPI {
 	}
 
 	private void init() {
-		System.out.println("Listening to stuff");
+		System.out.println("Starting server and listening to stuff");
+		try {
+			SERVER_URL = InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		port(8090);
 		enableCORS("*", "*", "*");
 

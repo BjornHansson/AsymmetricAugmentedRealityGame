@@ -149,12 +149,14 @@ public class GamesHolder {
 			gamesCollection.addGame(sub);
 		}
 
-		AllActions actions = new AllActions();
-		Action action = new Action();
-		action.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
-		action.setMethod(HttpMethod.GET);
-		actions.setCurrentGame(action);
-		gamesCollection.setActions(actions);
+		if (myGames.size() > 0) {
+			AllActions actions = new AllActions();
+			Action action = new Action();
+			action.setUrl(SERVER_URL + "/games/" + myCurrentGameId);
+			action.setMethod(HttpMethod.GET);
+			actions.setCurrentGame(action);
+			gamesCollection.setActions(actions);
+		}
 
 		return gamesCollection;
 	}
