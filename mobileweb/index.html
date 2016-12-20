@@ -36,7 +36,8 @@
           class="form-control" id="name" name="name">
       </div>
       <button type="button" class="btn btn-default"
-        id="join_game_button">Join game!</button>
+        id="join_game_button" name="join_game_button">Join
+        game!</button>
     </form>
   </div>
   <div id="create_game_view" class="jumbotron text-center hidden">
@@ -47,7 +48,9 @@
         <label for="game_name">Game name:</label> <input type="text"
           class="form-control" id="game_name" name="game_name">
       </div>
-      <button type="button" class="btn btn-default">Create game</button>
+      <button type="button" class="btn btn-default"
+        id="create_game_button" name="create_game_button">Create
+        game</button>
     </form>
   </div>
   <div id="defuse_view" class="hidden">
@@ -63,7 +66,8 @@
           You'd better give it another go.</p>
       </div>
       <button type="button" class="btn btn-danger btn-lg"
-        id="disarm_button">DISARM THAT BOMB!</button>
+        id="disarm_button" name="disarm_button">DISARM THAT
+        BOMB!</button>
     </div>
     <div class="container text-center">
       Number of active bombs: <strong id="active_bombs_label">x</strong>
@@ -84,7 +88,8 @@
     <p>
       <img src="assets/images/explosion.gif">
     </p>
-    <button type="button" class="btn btn-primary btn-lg">Start
+    <button type="button" class="btn btn-primary btn-lg"
+      id="start_over_button" name="start_over_button">Start
       over</button>
   </div>
 </body>

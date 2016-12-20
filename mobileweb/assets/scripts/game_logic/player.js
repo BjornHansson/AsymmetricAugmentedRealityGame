@@ -6,19 +6,14 @@ define(function() {
      * 
      * @constructor
      * 
-     * @param {string} controller - The controller's IP address.
      * @param {number} id - The player's ID number. Can be zero if not playing any games.
      * @param {string} name - The player's name.
      */
-    var Player = function(controller, id, name) {
+    var Player = function(id, name) {
         instance = this;
-        instance.controller = controller;
         instance.id = id;
         instance.name = name;
         instance.game = null;
-        instance.actions = {
-                
-        };
     };
     
     /**

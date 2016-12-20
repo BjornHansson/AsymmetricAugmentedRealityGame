@@ -189,7 +189,14 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void loadBombImage() {
-		bombImage = cvLoadImage(System.getProperty("user.dir") + "\\bomb_small.png", -1);
+		String filename = null;
+		if (System.getProperty("os.name").startsWith("Windows")) {
+			filename = System.getProperty("user.dir") + "\\bomb_small.png";
+		} else {
+			ClassLoader classLoader = this.getClass().getClassLoader();  
+			filename = classLoader.getResource("bomb_small.png").getFile();
+		}
+		bombImage = cvLoadImage(filename, -1);
 		if (bombImage == null)
 			System.out.println("Failed to load bomb image");
 	}

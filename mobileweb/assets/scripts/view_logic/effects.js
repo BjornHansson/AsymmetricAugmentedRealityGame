@@ -1,4 +1,6 @@
 define(['jquery'], function($) {
+    var intervalId = 0;
+    
     var Effects = function() {};
 
     /**
@@ -38,11 +40,12 @@ define(['jquery'], function($) {
      * @param timer - The number of seconds that remain
      */
     Effects.prototype.countdown = function(timer) {
+        clearInterval(intervalId);
         var label = $('#countdown');
 
         label.text(timer);
 
-        var intervalId = setInterval(function() {
+        intervalId = setInterval(function() {
             if (--timer >= 0) {
                 label.text(timer);
             } else {
