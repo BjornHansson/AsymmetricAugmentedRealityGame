@@ -82,15 +82,17 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
                 if (ringsum === 0) {
                     // Fetch current bombs
                     instance.game.listActiveBombs()
-                    .then(function() {
+                    .then(function(bombs) {
                         // Sort bombs based on remaining time
                         currentBombCount = instance.bombs.length;
                         topBomb = instance.bombs[0].id;
-                        instance.bombs = _.sortBy(data.active, 'explosion_at');
-                        if (currentBombCount !== instance.bombs.length &&
+                        instance.bombs = _.sortBy(bombs.active, 'explosion_at');
+                        console.log(instance.bombs);
+                        if (currentBombCount !== instance.bombs.length ||
                                 topBomb !== instance.bombs[0].id) {
                             bang = new Date(instance.bombs[0]['explosion_at']);
                             countdown = Math.floor((bang - now)/1000);
+                            $('#active_bombs_label').text(instance.bombs.length);
                             effects.countdown(countdown);
                         }
                     });
