@@ -61,12 +61,17 @@ public class GamesHolder {
 		actions.setInformation(information);
 
 		Action defuse = new Action();
-		defuse.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/defuse");
+		defuse.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/defuses");
 		defuse.setMethod(HttpMethod.POST);
 		actions.setDefuse(defuse);
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
+
+		Action defuses = new Action();
+		defuses.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/defuses");
+		defuses.setMethod(HttpMethod.GET);
+		actions.setDefuses(defuses);
 
 		// Only support for one player
 		if (!isg.getAllPlayers().isEmpty()) {

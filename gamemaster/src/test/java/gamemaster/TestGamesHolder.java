@@ -65,10 +65,14 @@ public class TestGamesHolder {
 		assertEquals(SERVER_URL + "/games/1", isg.getActions().getInformation().getUrl());
 		assertEquals(HttpMethod.GET, isg.getActions().getInformation().getMethod());
 
-		// defuses
-		assertEquals(SERVER_URL + "/games/1/defuse", isg.getActions().getDefuse().getUrl());
+		// Defuse
+		assertEquals(SERVER_URL + "/games/1/defuses", isg.getActions().getDefuse().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
 		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
+
+		// defuses
+		assertEquals(SERVER_URL + "/games/1/defuses", isg.getActions().getDefuses().getUrl());
+		assertEquals(HttpMethod.GET, isg.getActions().getDefuses().getMethod());
 
 		// join game
 		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getJoinGame().getUrl());

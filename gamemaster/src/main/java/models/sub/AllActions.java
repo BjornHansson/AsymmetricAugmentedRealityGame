@@ -8,6 +8,7 @@ public class AllActions {
 	private Action registration;
 	private Action information;
 	private Action defuse;
+	private Action defuses;
 	private Action join;
 
 	public Action getDefuse() {
@@ -16,6 +17,14 @@ public class AllActions {
 
 	public void setDefuse(Action defuse) {
 		this.defuse = defuse;
+	}
+
+	public Action getDefuses() {
+		return defuses;
+	}
+
+	public void setDefuses(Action defuses) {
+		this.defuses = defuses;
 	}
 
 	public Action getCurrentgame() {
