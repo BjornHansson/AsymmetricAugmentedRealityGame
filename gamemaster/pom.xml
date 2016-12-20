@@ -44,6 +44,12 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.9.6</version>
 		</dependency>
+		<!-- Remove logger warning -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.22</version>
+		</dependency>
 		<!-- Dependencies used for testing -->
 		<dependency>
 			<groupId>junit</groupId>
