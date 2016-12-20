@@ -43,7 +43,7 @@ public class WebAPI {
 	private void init() {
 		System.out.println("Starting server and listening to stuff");
 		try {
-			SERVER_URL = InetAddress.getLocalHost().getHostAddress();
+			SERVER_URL = "http://" + InetAddress.getLocalHost().getHostAddress();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

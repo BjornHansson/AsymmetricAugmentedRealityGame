@@ -124,9 +124,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public ColoredObjectTrack() {
 		gamesHolder = new GamesHolder(this);
-		gamesHolder.startGame("Game 1");
 		webApi = new WebAPI(gamesHolder);
-
 	}
 
 	public void updatergbvalues(int a, int b, int c, int d, int e, int f) {
@@ -188,7 +186,7 @@ public class ColoredObjectTrack implements Runnable {
 		thresholdedVideoFrame.setVisible(false);
 		colorinterface.hide();
 		gameState = GameState.Playing;
-
+		gamesHolder.startGame("Game 1");
 	}
 
 	private void loadBombImage() {
