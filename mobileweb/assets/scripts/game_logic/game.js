@@ -89,6 +89,21 @@ define(function() {
             return 0;
         });
     };
+    
+    /**
+     * Returns a list of bombs in game.
+     * 
+     * @return {array} - An array of active bombs.
+     */
+    Game.prototype.listActiveBombs = function() {
+        return $.get({
+            url: instance.actions.info + '/bombs',
+            dataType: 'json'
+        })
+        .done(function(data) {
+            return data.active;
+        });
+    };
 
     /**
      * Returns a list of defuse attempts.
