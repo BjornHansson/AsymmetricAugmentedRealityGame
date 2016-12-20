@@ -70,10 +70,6 @@ public class TestGamesHolder {
 		assertEquals(HttpMethod.POST, isg.getActions().getDefuse().getMethod());
 		assertEquals("number", isg.getActions().getDefuse().getParameters().get(0).getPlayerId());
 
-		// leave game
-		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getLeaveGame().getUrl());
-		assertEquals(HttpMethod.DELETE, isg.getActions().getLeaveGame().getMethod());
-
 		// join game
 		assertEquals(SERVER_URL + "/games/1/1", isg.getActions().getJoinGame().getUrl());
 		assertEquals(HttpMethod.POST, isg.getActions().getJoinGame().getMethod());
@@ -145,8 +141,6 @@ public class TestGamesHolder {
 		assertEquals(SERVER_URL + "/games/1/defuse", joinedPlayer.getActions().getDefuse().getUrl());
 		assertEquals(HttpMethod.POST, joinedPlayer.getActions().getDefuse().getMethod());
 		assertEquals("number", joinedPlayer.getActions().getDefuse().getParameters().get(0).getPlayerId());
-		assertEquals(SERVER_URL + "/games/1/1", joinedPlayer.getActions().getLeaveGame().getUrl());
-		assertEquals(HttpMethod.DELETE, joinedPlayer.getActions().getLeaveGame().getMethod());
 	}
 
 	@Test

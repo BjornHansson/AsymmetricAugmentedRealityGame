@@ -77,11 +77,6 @@ public class GamesHolder {
 			param2.setName("string");
 			join.addParameter(param2);
 			actions.setJoinGame(join);
-
-			Action leave = new Action();
-			leave.setUrl(SERVER_URL + "/games/" + isg.getGameId() + "/" + isg.getAllPlayers().get(0).getId());
-			leave.setMethod(HttpMethod.DELETE);
-			actions.setLeaveGame(leave);
 		}
 		isg.setActions(actions);
 
@@ -254,12 +249,8 @@ public class GamesHolder {
 		Parameter param = new Parameter();
 		param.setPlayerId("number");
 		defuse.addParameter(param);
-		Action leave = new Action();
-		leave.setMethod(HttpMethod.DELETE);
-		leave.setUrl(SERVER_URL + "/games/" + gameId + "/" + newPlayer.getId());
 		AllActions actions = new AllActions();
 		actions.setDefuse(defuse);
-		actions.setLeaveGame(leave);
 		newPlayer.setActions(actions);
 
 		for (int i = 0; i < myGames.size(); i++) {

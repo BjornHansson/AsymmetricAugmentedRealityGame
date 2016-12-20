@@ -1,20 +1,14 @@
 package models.sub;
 
+import com.google.gson.annotations.SerializedName;
+
 public class AllActions {
+	@SerializedName("currentgame")
 	private Action currentGame;
 	private Action registration;
 	private Action information;
 	private Action defuse;
-	private Action leaveGame;
 	private Action join;
-
-	public Action getLeaveGame() {
-		return leaveGame;
-	}
-
-	public void setLeaveGame(Action leaveGame) {
-		this.leaveGame = leaveGame;
-	}
 
 	public Action getDefuse() {
 		return defuse;
@@ -47,13 +41,14 @@ public class AllActions {
 	public void setInformation(Action information) {
 		this.information = information;
 	}
-	public Action getJoinGame(){
+
+	public Action getJoinGame() {
 		return join;
 	}
 
 	public void setJoinGame(Action join) {
 		this.join = join;
 		// TODO Auto-generated method stub
-		
+
 	}
 }
