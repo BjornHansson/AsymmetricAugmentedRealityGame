@@ -62,6 +62,9 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
         var countdown = 0;
         var currentBombCount = 0;
         var topBomb = 0;
+        
+        instance.defuses = 0;
+        instance.attempts = 0;
         $('#defusal_attempt_label').text(instance.attempts);
         $('#defuse_counter_label').text(instance.defuses);
 
@@ -75,7 +78,6 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
             $('#active_bombs_label').text(instance.bombs.length);
 
             instance.intervalId = setInterval(function() {
-                console.log('tic toc');
                 now = new Date();
                 if (ringsum === 0) {
                     // Fetch current bombs
@@ -121,10 +123,12 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
         instance.game.tryDefuse(player)
         .done(function(data) {
             instance.attempts++;
+            $('#defusal_attempt_label').text(instance.attempts);
 
             if (data.defused > 0) {
                 instance.defuses++;
                 effects.defuseSuccess();
+                $('#defuse_counter_label').text(instance.defuses);
             } else {
                 effects.defuseFailure();
             }
