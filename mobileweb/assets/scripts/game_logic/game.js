@@ -34,7 +34,8 @@ define(function() {
     Game.prototype.join = function(player) {
         return $.post({
             url: instance.actions.join,
-            data: { name: player.name },
+            contentType: 'application/json',
+            data: JSON.stringify({ name: player.name }),
             dataType: 'json'
         })
         .then(function(data) {
@@ -77,9 +78,8 @@ define(function() {
     Game.prototype.tryDefuse = function(player) {
         return $.post({
             url: instance.actions.defuse,
-            data: {
-                player: player.id
-            },
+            contentType: 'application/json',
+            data: JSON.stringify({ player: player.id }),
             dataType: 'json'
         })
         .done(function(data) {

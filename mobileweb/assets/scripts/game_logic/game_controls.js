@@ -55,6 +55,7 @@ define(['jquery', 'proxy', 'game'], function($, proxy, game) {
             })
             .then(function(data2) {
                 if (data2.gameid) {
+                    console.log(data2);
                     instance.currentGame = new game(instance.controller, data2.gameid, data2.name);
                     instance.currentGame.actions.info = p.proxy(data2.actions.information.url);
                     instance.currentGame.actions.join = p.proxy(data2.actions.join.url);
@@ -100,7 +101,8 @@ define(['jquery', 'proxy', 'game'], function($, proxy, game) {
     GameControls.prototype.createGame = function(name) {
         return $.post({
             url: instance.controller + '/games',
-            data: { name: name },
+            contentType: 'application/json',
+            data: JSON.stringify({ name: name }),
             dataType: 'json'
         })
         .done(function(data) {
