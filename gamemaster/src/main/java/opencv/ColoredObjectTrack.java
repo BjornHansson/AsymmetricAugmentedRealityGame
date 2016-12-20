@@ -124,6 +124,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public ColoredObjectTrack() {
 		gamesHolder = new GamesHolder(this);
+		gamesHolder.startGame("Game 1");
 		webApi = new WebAPI(gamesHolder);
 
 	}
