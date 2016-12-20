@@ -27,6 +27,7 @@ import models.sub.Player;
 
 public class WebAPI {
 	public static String SERVER_URL;
+	private static int serverPort = 8090;
 	private static final Gson GSON = new Gson();
 	private GamesHolder myGamesHolder;
 
@@ -43,12 +44,12 @@ public class WebAPI {
 	private void init() {
 		System.out.println("Starting server and listening to stuff");
 		try {
-			SERVER_URL = "http://" + InetAddress.getLocalHost().getHostAddress();
+			SERVER_URL = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + serverPort;
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		port(8090);
+		port(serverPort);
 		enableCORS("*", "*", "*");
 
 		/*
