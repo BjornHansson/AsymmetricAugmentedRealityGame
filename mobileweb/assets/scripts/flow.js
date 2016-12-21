@@ -91,9 +91,6 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
                     // Then, fetch a new bomb list
                     instance.game.listActiveBombs()
                     .then(function(bombs) {
-                        // OK, we have a list of bombs. Print it.
-                        console.log(bombs);
-                        
                         // Then, do stuff to it
                         instance.bombs = _.sortBy(bombs.active, 'explosion_at');
                         if (instance.bombs.length > 0 && topBomb != instance.bombs[0].id) {
@@ -159,16 +156,11 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
     };
     
     function removeBomb(id) {
-        console.log('removing ' + id);
-        console.log('before:');
-        console.log(instance.bombs);
         instance.bombs = _.find(instance.bombs,
                 function(bomb) { return bomb.id !== id });
         if (!instance.bombs) {
             instance.bombs = [];
         }
-        console.log('after:');
-        console.log(instance.bombs);
     }
 
     return Flow;

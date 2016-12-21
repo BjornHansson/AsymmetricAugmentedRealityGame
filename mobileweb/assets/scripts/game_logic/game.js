@@ -76,7 +76,6 @@ define(function() {
      * @return {number} - The ID of the bomb which was defused. If no bomb was defused, return 0. 
      */
     Game.prototype.tryDefuse = function(player) {
-        console.log(player);
         return $.post({
             url: instance.actions.defuse,
             contentType: 'application/json',
