@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>se.mah.aarg</groupId>
 	<artifactId>gamemaster</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>AARG Game Master</name>
 	<!-- Server dependencies -->
 	<dependencies>
