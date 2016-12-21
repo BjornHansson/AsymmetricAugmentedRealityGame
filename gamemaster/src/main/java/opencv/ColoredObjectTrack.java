@@ -161,30 +161,35 @@ public class ColoredObjectTrack implements Runnable {
 		double updateLengthSeconds = 0;
 		long lastLoopTime = System.nanoTime();
 		boolean gameRunning = true;
-		while (gameRunning) {
+		while (gameRunning && !Thread.currentThread().isInterrupted()) {
 
-			now = System.nanoTime();
-			updateLength = now - lastLoopTime;
-			updateLengthSeconds = (double) updateLength / 1000000000.0;
-			lastLoopTime = now;
-
-			grabFrame();
-
-			switch (gameState) {
-			case Calibration:
-				thresholdedVideoFrame.showImage(converter.convert(thresholdedImage));
-				break;
-			case Playing:
-				update(updateLengthSeconds);
-				trackAndAnnotate();
-				videoFrame.showImage(converter.convert(annotatedImage));
-				break;
-			case GameOver:
-				update(updateLengthSeconds);
-				trackAndAnnotate();
-				videoFrame.showImage(converter.convert(annotatedImage));
-				break;
-			default:
+			try{
+				now = System.nanoTime();
+				updateLength = now - lastLoopTime;
+				updateLengthSeconds = (double) updateLength / 1000000000.0;
+				lastLoopTime = now;
+	
+				grabFrame();
+	
+				switch (gameState) {
+				case Calibration:
+					thresholdedVideoFrame.showImage(converter.convert(thresholdedImage));
+					break;
+				case Playing:
+					update(updateLengthSeconds);
+					trackAndAnnotate();
+					videoFrame.showImage(converter.convert(annotatedImage));
+					break;
+				case GameOver:
+					update(updateLengthSeconds);
+					trackAndAnnotate();
+					videoFrame.showImage(converter.convert(annotatedImage));
+					break;
+				default:
+				}
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
