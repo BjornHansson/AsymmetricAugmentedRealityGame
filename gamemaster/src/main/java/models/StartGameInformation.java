@@ -5,11 +5,8 @@ import com.google.gson.annotations.SerializedName;
 import models.sub.AllActions;
 
 /**
- * Contains information when using POST on /games URL.
- * 
  * @see <a href=
- *      "http://docs.aarg.apiary.io/#reference/0/games-collection/start-a-game">Apiary
- *      link</a>
+ *      "http://docs.aarg.apiary.io/#reference/0/games-collection/start-a-game">Apiary</a>
  */
 public class StartGameInformation {
 	@SerializedName("gameid")

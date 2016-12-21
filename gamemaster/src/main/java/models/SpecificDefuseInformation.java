@@ -4,13 +4,16 @@ import org.joda.time.DateTime;
 
 import models.sub.AllActions;
 
+/**
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/bomb-defusal/try-to-defuse-a-bomb">Apiary</a>
+ */
 public class SpecificDefuseInformation {
 	private int id;
 	private int player;
 	private boolean defused = false;
 	private DateTime when;
 	private AllActions actions = new AllActions();
-	// TODO: Check that transient hides the field
 	private transient int gameId;
 
 	public int getId() {

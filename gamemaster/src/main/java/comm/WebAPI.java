@@ -24,9 +24,8 @@ import models.SpecificBombInformation;
 import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
-import models.sub.GameName;
+import models.sub.Name;
 import models.sub.Player;
-import models.sub.PlayerName;
 
 public class WebAPI {
 	public static String SERVER_URL;
@@ -35,7 +34,8 @@ public class WebAPI {
 	private GamesHolder myGamesHolder;
 
 	/**
-	 * Constructor that allows a games holder as parameter
+	 * Constructor that allows a games holder as parameter. Starting the web
+	 * server as well
 	 * 
 	 * @param game
 	 */
@@ -71,7 +71,7 @@ public class WebAPI {
 			System.out.println("Start a game");
 			response.status(HttpURLConnection.HTTP_CREATED);
 			String body = request.body();
-			GameName gameName = GSON.fromJson(body, GameName.class);
+			Name gameName = GSON.fromJson(body, Name.class);
 			StartGameInformation sg = myGamesHolder.startGame(gameName.getName());
 			return GSON.toJson(sg);
 		});
@@ -105,7 +105,7 @@ public class WebAPI {
 			int gameId = Integer.parseInt(request.params("gameid"));
 			String body = request.body();
 			System.out.println("Player name:" + body);
-			PlayerName postedPlayer = GSON.fromJson(body, PlayerName.class);
+			Name postedPlayer = GSON.fromJson(body, Name.class);
 			Player createdPlayer = myGamesHolder.joinGame(gameId, postedPlayer.getName());
 			return GSON.toJson(createdPlayer);
 		});

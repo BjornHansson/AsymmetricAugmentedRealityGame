@@ -6,7 +6,8 @@ import java.util.List;
 import models.sub.AllActions;
 
 /**
- * Contains information when using GET on /games/:gameid/bombs URL.
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/bomb-management/list-bombs-in-a-game">Apiary</a>
  */
 public class BombsInGame {
 	private List<SpecificBombInformation> active = new ArrayList<SpecificBombInformation>();

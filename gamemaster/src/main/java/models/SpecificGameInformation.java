@@ -9,11 +9,8 @@ import models.sub.AllActions;
 import models.sub.Player;
 
 /**
- * Contains information when using GET on /games/:gameid URL.
- * 
  * @see <a href=
- *      "http://docs.aarg.apiary.io/#reference/0/specific-games/get-information-about-a-game">Apiary
- *      link</a>
+ *      "http://docs.aarg.apiary.io/#reference/0/specific-games/get-information-about-a-game">Apiary</a>
  */
 public class SpecificGameInformation {
 	@SerializedName("gameid")

@@ -6,13 +6,17 @@ import com.google.gson.annotations.SerializedName;
 
 import models.sub.AllActions;
 
+/**
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/bomb-actions/bomb-information">Apiary</a>
+ */
 public class SpecificBombInformation {
 	private int id;
 	private String name;
 	private boolean defused;
 	@SerializedName("explosion_at")
 	private DateTime explosionAt;
-	// TODO: Check that transient hides the field
+	// Transient hides the field
 	private transient int gameId;
 	private AllActions actions = new AllActions();
 

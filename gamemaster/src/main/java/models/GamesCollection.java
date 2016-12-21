@@ -7,11 +7,8 @@ import models.sub.AllActions;
 import models.sub.GamesCollectionSub;
 
 /**
- * Contains information when using GET on /games URL.
- * 
  * @see <a href=
- *      "http://docs.aarg.apiary.io/reference/0/games-collection/get-information-about-current-and-historical-games">Apiary
- *      link</a>
+ *      "http://docs.aarg.apiary.io/#reference/0/games-collection/get-information-about-current-and-historical-games">Apiary</a>
  */
 public class GamesCollection {
 	private List<GamesCollectionSub> games = new ArrayList<GamesCollectionSub>();

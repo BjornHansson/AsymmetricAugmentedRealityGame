@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains information when using GET on /games/:gameid/defuses URL.
+ * @see <a href=
+ *      "http://docs.aarg.apiary.io/#reference/0/bomb-defusal/get-a-list-of-defuse-attempts">Apiary</a>
  */
 public class DefusesInformation {
 	private List<SpecificDefuseInformation> attempts = new ArrayList<SpecificDefuseInformation>();
