@@ -156,13 +156,16 @@ public class ColoredObjectTrack implements Runnable {
 		thPan.start();
 		loadBombImage();
 
+		long now = 0;
+		long updateLength = 0;
+		double updateLengthSeconds = 0;
 		long lastLoopTime = System.nanoTime();
 		boolean gameRunning = true;
 		while (gameRunning) {
 
-			long now = System.nanoTime();
-			long updateLength = now - lastLoopTime;
-			double updateLengthSeconds = (double) updateLength / 1000000000.0;
+			now = System.nanoTime();
+			updateLength = now - lastLoopTime;
+			updateLengthSeconds = (double) updateLength / 1000000000.0;
 			lastLoopTime = now;
 
 			grabFrame();
