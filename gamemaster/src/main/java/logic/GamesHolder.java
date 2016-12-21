@@ -35,6 +35,11 @@ public class GamesHolder {
 	private List<SpecificDefuseInformation> myDefuseAttempts = new ArrayList<SpecificDefuseInformation>();
 	private ColoredObjectTrack coloredObjectTrack;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param coloredObjectTrack
+	 */
 	public GamesHolder(ColoredObjectTrack coloredObjectTrack) {
 		this.coloredObjectTrack = coloredObjectTrack;
 	}
@@ -162,12 +167,11 @@ public class GamesHolder {
 	/**
 	 * Get information about all bombs in a game
 	 * 
-	 * @param game
+	 * @param gameId
 	 *            The game ID
 	 */
 	public BombsInGame listAllBombs(int gameId) {
 		BombsInGame bombs = new BombsInGame();
-		int nBombs = 0;
 		for (int i = 0; i < myBombs.size(); i++) {
 			if (myBombs.get(i).getGameId() == gameId) {
 
@@ -175,13 +179,19 @@ public class GamesHolder {
 					bombs.addDefused(myBombs.get(i));
 				} else if (!myBombs.get(i).isDefused()) {
 					bombs.addActive(myBombs.get(i));
-					nBombs++;
 				}
 			}
 		}
 		return bombs;
 	}
 
+	/**
+	 * Get specific information about a bomb
+	 * 
+	 * @param gameId
+	 * @param bombId
+	 * @return
+	 */
 	public SpecificBombInformation getBombInformation(int gameId, int bombId) {
 		for (int i = 0; i < myBombs.size(); i++) {
 			if (myBombs.get(i).getGameId() == gameId && myBombs.get(i).getId() == bombId) {
@@ -317,6 +327,12 @@ public class GamesHolder {
 		myBombs.add(bomb);
 	}
 
+	/**
+	 * Get all defuses
+	 * 
+	 * @param gameId
+	 * @return
+	 */
 	public DefusesInformation getDefuses(int gameId) {
 		DefusesInformation defuses = new DefusesInformation();
 		for (int i = 0; i < myDefuseAttempts.size(); i++) {
