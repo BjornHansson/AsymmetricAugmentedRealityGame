@@ -58,10 +58,14 @@ public class ColoredObjectTrack implements Runnable {
 	private CanvasFrame thresholdedVideoFrame;
 	private ColorValueControlInterface colorinterface;
 
-	private double spawnIntervalMin = 10;
-	private double spawnIntervalMax = 15;
+	// Settings
+	private double spawnIntervalMin = 1;
+	private double spawnIntervalMax = 5;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
+	private int bombM = 10;
+	private String cameraAddress = "192.168.20.253"; // null for local camera
+	//private String cameraAddress = null;
 
 	private double defuseDistance = 10;
 	private float playerBearing = 0;
@@ -73,11 +77,9 @@ public class ColoredObjectTrack implements Runnable {
 		th.start();
 	}
 
-	public void SpawnBomb() {
+	public void spawnBomb() {
 		DateTime dateTime = new DateTime();
-		dateTime = dateTime.plusSeconds(120 + random.nextInt(10));
-		// bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360,
-		// dateTime));
+		dateTime = dateTime.plusSeconds(bombM + random.nextInt(10));
 		bombs.add(new Bomb(bombIdCounter, 0, dateTime));
 		gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
@@ -127,7 +129,7 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
-	public ColoredObjectTrack() {
+	public void coloredObjectTrack() {
 		gamesHolder = new GamesHolder(this);
 		webApi = new WebAPI(gamesHolder);
 	}
@@ -144,13 +146,11 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	public void run() {
-		GameLoop();
+		gameLoop();
 	}
 
-	private void GameLoop() {
-		setupCamera("192.168.20.253");
-
-		// setupCamera(null);
+	private void gameLoop() {
+		setupCamera(cameraAddress);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
@@ -165,19 +165,19 @@ public class ColoredObjectTrack implements Runnable {
 			double updateLengthSeconds = (double) updateLength / 1000000000.0;
 			lastLoopTime = now;
 
-			GrabFrame();
+			grabFrame();
 
 			switch (gameState) {
 			case Calibration:
 				thresholdedVideoFrame.showImage(converter.convert(thresholdedImage));
 				break;
 			case Playing:
-				Update(updateLengthSeconds);
+				update(updateLengthSeconds);
 				trackAndAnnotate();
 				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
 			case GameOver:
-				Update(updateLengthSeconds);
+				update(updateLengthSeconds);
 				trackAndAnnotate();
 				videoFrame.showImage(converter.convert(annotatedImage));
 				break;
@@ -242,7 +242,7 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	// Grab a frame
-	private void GrabFrame() {
+	private void grabFrame() {
 		try {
 			grabbedImage = converter.convert(grabber.grab());
 			if (grabbedImage != null) {
@@ -286,11 +286,11 @@ public class ColoredObjectTrack implements Runnable {
 		drawBombs(annotatedImage);
 	}
 
-	private void Update(double time) {
+	private void update(double time) {
 		if (gameState == GameState.Playing) {
 			spawnTimer += time;
 			if (spawnTimer >= nextSpawn) {
-				SpawnBomb();
+				spawnBomb();
 				spawnTimer = 0;
 				nextSpawn = spawnIntervalMin + Math.random() * (spawnIntervalMax - spawnIntervalMin);
 			}

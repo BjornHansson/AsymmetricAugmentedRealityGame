@@ -38,7 +38,7 @@ public class TestGamesHolder {
 	public static void onlyOnce() {
 		new ColoredObjectTrack();
 		track = mock(ColoredObjectTrack.class);
-		doNothing().when(track).SpawnBomb();
+		doNothing().when(track).spawnBomb();
 		when(track.canDefuseBomb(BOMB_ID_CAN_DEFUSE)).thenReturn(true);
 	}
 
