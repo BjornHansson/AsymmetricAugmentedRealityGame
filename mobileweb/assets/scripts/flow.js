@@ -27,8 +27,8 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
         instance.gc.getCurrentGame().done(function(data) {
             if (data) {
                 instance.game = data;
-                instance.game.join(instance.player).done(function(data) {
-                    instance.player = data;
+                instance.game.join(instance.player).then(function(data2) {
+                    instance.player = data2;
                     effects.fadeBetween('welcome_view', 'defuse_view');
                     instance.playGame();
                 });
@@ -71,6 +71,7 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
         instance.game.listActiveBombs()
         .done(function(data) {
             instance.bombs = _.sortBy(data.active, 'explosion_at');
+            currentBombCount = instance.bombs.length;
             now = new Date();
             bang = new Date(instance.bombs[0]['explosion_at']);
             countdown = Math.floor((bang - now)/1000);
@@ -78,28 +79,45 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
             $('#active_bombs_label').text(instance.bombs.length);
 
             instance.intervalId = setInterval(function() {
-                now = new Date();
-                if (ringsum === 0) {
-                    // Fetch current bombs
+                if (ringsum === 0) { // Fetch new bombs twice a second
+                    // First, keep track of current affairs
+                    if (instance.bombs.length > 0) {
+                        topBomb = instance.bombs[0].id;
+                    } else {
+                        topBomb = 0;
+                    }
+                    
+                    
+                    // Then, fetch a new bomb list
                     instance.game.listActiveBombs()
                     .then(function(bombs) {
-                        // Sort bombs based on remaining time
-                        currentBombCount = instance.bombs.length;
-                        topBomb = instance.bombs[0].id;
+                        // OK, we have a list of bombs. Print it.
+                        console.log(bombs);
+                        
+                        // Then, do stuff to it
                         instance.bombs = _.sortBy(bombs.active, 'explosion_at');
-                        console.log(instance.bombs);
-                        if (currentBombCount !== instance.bombs.length ||
-                                topBomb !== instance.bombs[0].id) {
+                        if (instance.bombs.length > 0 && topBomb != instance.bombs[0].id) {
+                            // OK, the list has been updated. Let's do things.
                             bang = new Date(instance.bombs[0]['explosion_at']);
                             countdown = Math.floor((bang - now)/1000);
-                            $('#active_bombs_label').text(instance.bombs.length);
                             effects.countdown(countdown);
                         }
                     });
                     ringsum = 4;
-                } else {
+                } else { // Just update stuff in this cycle
                     ringsum--;
                 }
+
+                $('#active_bombs_label').text(instance.bombs.length);
+                
+                // Update countdown timer
+                if (instance.bombs.length === 0) {
+                    effects.countdown(0);
+                    ringsum = 0; // Fetch a new list of bombs
+                }
+                
+                // Detect lost games
+                now = new Date();
                 if (bang <= now) {
                     // Well, we lost the game.
                     clearInterval(instance.intervalId);
@@ -122,12 +140,15 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
      * Try to defuse.
      */
     Flow.prototype.tryDefuse = function() {
-        instance.game.tryDefuse(player)
+        instance.game.tryDefuse(instance.player)
         .done(function(data) {
             instance.attempts++;
             $('#defusal_attempt_label').text(instance.attempts);
 
             if (data.defused > 0) {
+                removeBomb(data.defused);
+                $('#active_bombs_label').text(instance.bombs.length);
+                
                 instance.defuses++;
                 effects.defuseSuccess();
                 $('#defuse_counter_label').text(instance.defuses);
@@ -136,6 +157,19 @@ define(['config', 'jquery', 'underscore', 'effects' ,'game_controls', 'game', 'p
             }
         });
     };
+    
+    function removeBomb(id) {
+        console.log('removing ' + id);
+        console.log('before:');
+        console.log(instance.bombs);
+        instance.bombs = _.find(instance.bombs,
+                function(bomb) { return bomb.id !== id });
+        if (!instance.bombs) {
+            instance.bombs = [];
+        }
+        console.log('after:');
+        console.log(instance.bombs);
+    }
 
     return Flow;
 });
