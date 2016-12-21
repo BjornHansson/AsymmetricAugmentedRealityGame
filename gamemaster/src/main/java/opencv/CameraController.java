@@ -12,16 +12,13 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import javafx.util.Pair;
 
 class CameraController implements KeyListener, Runnable {
+	private ArrayList<Pair<Float, DateTime>> cachedPans = new ArrayList<Pair<Float, DateTime>>();
 
-	
-	private ArrayList<Pair<Float,DateTime>> cachedPans = new ArrayList<Pair<Float,DateTime>>();
-	
-	int delayMS = 700; //HACK
-	
+	private static final int DELAY_MS = 700; // HACK
+
 	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
 
 	public static final float VIEW_ANGLE = 62.8f;
-
 
 	private int deltaPan = 20;
 	private int deltaPanStop = 0;
@@ -29,7 +26,7 @@ class CameraController implements KeyListener, Runnable {
 
 	private boolean isMoving = false;
 	private boolean enabled;
-	
+
 	private ColoredObjectTrack cot;
 
 	public synchronized float getPan() {
@@ -37,7 +34,7 @@ class CameraController implements KeyListener, Runnable {
 	}
 
 	public CameraController(ColoredObjectTrack cot) {
-		this(cot,true);
+		this(cot, true);
 	}
 
 	public CameraController(ColoredObjectTrack cot, boolean enabled) {
@@ -61,16 +58,16 @@ class CameraController implements KeyListener, Runnable {
 			int start = response.indexOf("pan=") + "pan=".length();
 			int end = response.indexOf("pan=") + response.indexOf("tilt=");
 			String resultString = response.substring(start, end);
-			cachedPans.add(new Pair<Float,DateTime>(Float.parseFloat(resultString),DateTime.now()));
+			cachedPans.add(new Pair<Float, DateTime>(Float.parseFloat(resultString), DateTime.now()));
 		} catch (UnirestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	public synchronized void setPanDelayed(){
-		for(int i = 0; i < cachedPans.size(); i++){
-			if(DateTime.now().getMillis() - cachedPans.get(i).getValue().getMillis() >= delayMS){
+
+	public synchronized void setPanDelayed() {
+		for (int i = 0; i < cachedPans.size(); i++) {
+			if (DateTime.now().getMillis() - cachedPans.get(i).getValue().getMillis() >= DELAY_MS) {
 				pan = cachedPans.get(i).getKey();
 				cachedPans.remove(i--);
 			}
@@ -132,7 +129,7 @@ class CameraController implements KeyListener, Runnable {
 	}
 
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+		// Not used
 	}
 
 	private void pan(int amount) throws UnirestException {

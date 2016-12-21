@@ -1,7 +1,13 @@
 package opencv;
 
 public class Utility {
-
+	/**
+	 * Calculate angle difference
+	 * 
+	 * @param a
+	 * @param b
+	 * @return the difference
+	 */
 	public static float angleDifference(float a, float b) {
 		float diff = a - b;
 		if (diff < -180)
@@ -10,5 +16,4 @@ public class Utility {
 			diff -= 360;
 		return diff;
 	}
-
 }
