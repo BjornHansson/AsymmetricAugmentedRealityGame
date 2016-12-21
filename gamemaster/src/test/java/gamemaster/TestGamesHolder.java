@@ -32,14 +32,14 @@ import opencv.ColoredObjectTrack;
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
 	private static ColoredObjectTrack track;
-	private static final int bombIdCanDefuseToTest = 42;
+	private static final int BOMB_ID_CAN_DEFUSE = 42;
 
 	@BeforeClass
 	public static void onlyOnce() {
 		new ColoredObjectTrack();
 		track = mock(ColoredObjectTrack.class);
 		doNothing().when(track).SpawnBomb();
-		when(track.canDefuseBomb(bombIdCanDefuseToTest)).thenReturn(true);
+		when(track.canDefuseBomb(BOMB_ID_CAN_DEFUSE)).thenReturn(true);
 	}
 
 	@Before
@@ -102,7 +102,7 @@ public class TestGamesHolder {
 	public void testListAllBombs() {
 		StartGameInformation createdGame = gamesHolderToTest.startGame("PieIsNice");
 		Player player = gamesHolderToTest.joinGame(createdGame.getGameId(), "Hodor");
-		gamesHolderToTest.addBomb(bombIdCanDefuseToTest, DateTime.now());
+		gamesHolderToTest.addBomb(BOMB_ID_CAN_DEFUSE, DateTime.now());
 		gamesHolderToTest.addBomb(313, DateTime.now());
 		gamesHolderToTest.defuseBomb(createdGame.getGameId(), player.getId());
 		BombsInGame bombs = gamesHolderToTest.listAllBombs(createdGame.getGameId());

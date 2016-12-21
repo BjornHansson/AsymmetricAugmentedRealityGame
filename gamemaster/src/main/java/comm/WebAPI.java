@@ -29,7 +29,7 @@ import models.sub.Player;
 
 public class WebAPI {
 	public static String SERVER_URL;
-	private static int serverPort = 8090;
+	private static final int SERVER_PORT = 8090;
 	private static final Gson GSON = Converters.registerDateTime(new GsonBuilder()).create();
 	private GamesHolder myGamesHolder;
 
@@ -47,12 +47,12 @@ public class WebAPI {
 	private void init() {
 		System.out.println("Starting server and listening to stuff");
 		try {
-			SERVER_URL = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + serverPort;
+			SERVER_URL = "http://" + InetAddress.getLocalHost().getHostAddress() + ":" + SERVER_PORT;
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		port(serverPort);
+		port(SERVER_PORT);
 		enableCORS("*", "*", "*");
 
 		/*
