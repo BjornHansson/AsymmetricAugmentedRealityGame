@@ -71,6 +71,11 @@ public class ColoredObjectTrack implements Runnable {
 	private float playerBearing = 0;
 	private boolean playerDetected = false;
 
+	public ColoredObjectTrack() {
+		gamesHolder = new GamesHolder(this);
+		webApi = new WebAPI(gamesHolder);
+	}
+
 	public static void main(String[] args) {
 		ColoredObjectTrack cot = new ColoredObjectTrack();
 		Thread th = new Thread(cot);
@@ -127,11 +132,6 @@ public class ColoredObjectTrack implements Runnable {
 			if (!bombs.get(i).hasStartedToExplode())
 				bombs.get(i).explode();
 		}
-	}
-
-	public void coloredObjectTrack() {
-		gamesHolder = new GamesHolder(this);
-		webApi = new WebAPI(gamesHolder);
 	}
 
 	public void updatergbvalues(int a, int b, int c, int d, int e, int f) {
