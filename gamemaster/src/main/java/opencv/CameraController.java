@@ -18,7 +18,7 @@ class CameraController implements KeyListener, Runnable {
 	
 	int delayMS = 700; //HACK
 	
-	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.253/axis-cgi/com/ptz.cgi";
+	private static final String HTTP_AXIS_URL = "http://root:pass@192.168.20.254/axis-cgi/com/ptz.cgi";
 
 	public static final float VIEW_ANGLE = 62.8f;
 

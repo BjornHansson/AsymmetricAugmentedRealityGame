@@ -61,7 +61,7 @@ public class ColoredObjectTrack implements Runnable {
 	private ColorValueControlInterface colorinterface;
 
 	private double spawnIntervalMin = 10;
-	private double spawnIntervalMax = 15;
+	private double spawnIntervalMax = 20;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
 	private double gameOverTimer = 0;
@@ -81,9 +81,8 @@ public class ColoredObjectTrack implements Runnable {
 	public void SpawnBomb() {
 		DateTime dateTime = new DateTime();
 		dateTime = dateTime.plusSeconds(bombMinSeconds + random.nextInt(bombRandSeconds));
-		// bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360,
-		// dateTime));
-		bombs.add(new Bomb(bombIdCounter, 0, dateTime));
+		bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360, dateTime));
+		//bombs.add(new Bomb(bombIdCounter, 0, dateTime));
 		gamesHolder.addBomb(bombIdCounter, dateTime);
 		bombIdCounter++;
 		System.out.println("Bomb spawned at " + bombs.get(bombs.size() - 1).getBearing());
@@ -153,9 +152,9 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void GameLoop() {
-		//setupCamera("192.168.20.253");
+		setupCamera("192.168.20.254");
 
-		 setupCamera(null);
+		//setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
@@ -198,6 +197,7 @@ public class ColoredObjectTrack implements Runnable {
 		colorinterface.hide();
 		gameState = GameState.Playing;
 		gamesHolder.startGame("Game 1");
+		videoFrame.requestFocus();
 	}
 
 	private void loadBombImage() {
@@ -287,7 +287,7 @@ public class ColoredObjectTrack implements Runnable {
 			// cameraController.getPan());
 			// System.out.println("playerBearing: " + playerBearing);
 
-			cvCircle(annotatedImage, new int[] { trackedPosX, trackedPosY }, 5, new CvScalar(255, 0, 0, 0));
+			cvCircle(annotatedImage, new int[] { trackedPosX, trackedPosY }, 15, new CvScalar(255, 0, 0, 0),  org.bytedeco.javacpp.opencv_imgproc.CV_FILLED, 8, 0);
 		}
 		drawBombs(annotatedImage);
 	}
