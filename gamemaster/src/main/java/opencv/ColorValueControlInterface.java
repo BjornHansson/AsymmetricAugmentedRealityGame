@@ -211,6 +211,10 @@ public class ColorValueControlInterface extends JFrame {
 		canvas2.setVisible(false);
 	}
 	
+	public void show(){
+		canvas2.setVisible(true);
+	}
+	
 	/*
 	 * Retrieve json data from file with previously saved slider state and set the values to the starting point of the sliders
 	 */

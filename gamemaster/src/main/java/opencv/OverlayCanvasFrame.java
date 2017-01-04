@@ -147,7 +147,7 @@ public class OverlayCanvasFrame extends JFrame {
 	}
 	public OverlayCanvasFrame(String title, double gamma) {
 		super(title);
-		init(false, null, gamma);
+		init(true, null, gamma);
 	}
 
 	public OverlayCanvasFrame(String title, GraphicsConfiguration gc) {

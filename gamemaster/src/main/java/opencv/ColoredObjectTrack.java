@@ -16,6 +16,8 @@ import static org.bytedeco.javacpp.opencv_imgproc.cvSmooth;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.JFrame;
+
 import org.bytedeco.javacpp.opencv_core.CvScalar;
 import org.bytedeco.javacpp.opencv_core.IplImage;
 import org.bytedeco.javacpp.opencv_imgproc.CvMoments;
@@ -62,6 +64,9 @@ public class ColoredObjectTrack implements Runnable {
 	private double spawnIntervalMax = 15;
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
+	private double gameOverTimer = 0;
+	private int bombMinSeconds = 10;
+	private int bombRandSeconds = 20;
 
 	private double defuseDistance = 10;
 	private float playerBearing = 0;
@@ -75,7 +80,7 @@ public class ColoredObjectTrack implements Runnable {
 
 	public void SpawnBomb() {
 		DateTime dateTime = new DateTime();
-		dateTime = dateTime.plusSeconds(120 + random.nextInt(10));
+		dateTime = dateTime.plusSeconds(bombMinSeconds + random.nextInt(bombRandSeconds));
 		// bombs.add(new Bomb(bombIdCounter, -180 + random.nextFloat() * 360,
 		// dateTime));
 		bombs.add(new Bomb(bombIdCounter, 0, dateTime));
@@ -148,9 +153,9 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	private void GameLoop() {
-		setupCamera("192.168.20.253");
+		//setupCamera("192.168.20.253");
 
-		// setupCamera(null);
+		 setupCamera(null);
 		setupWindows();
 		Thread thPan = new Thread(cameraController);
 		thPan.start();
@@ -187,6 +192,7 @@ public class ColoredObjectTrack implements Runnable {
 	}
 
 	public void play() {
+		
 		videoFrame.setVisible(true);
 		thresholdedVideoFrame.setVisible(false);
 		colorinterface.hide();
@@ -294,23 +300,48 @@ public class ColoredObjectTrack implements Runnable {
 				spawnTimer = 0;
 				nextSpawn = spawnIntervalMin + Math.random() * (spawnIntervalMax - spawnIntervalMin);
 			}
+			
+			for (int i = 0; i < bombs.size(); i++) {
+				bombs.get(i).Update(time);
+				if (bombs.get(i).hasExploded() && !bombs.get(i).hasStartedToExplode()) {
+					// bombs.get(i).explode();
+					// System.out.println("BOOM!");
+					// TODO: uncomment this
+					explodeAll();
+					gameState = GameState.GameOver;
+					this.gameOverTimer = 10;
+
+				}
+				if (bombs.get(i).finishedExploding()) {
+					bombs.remove(i);
+					i--;
+				}
+			}
+		}
+		
+		if(gameState == GameState.GameOver){
+			for (int i = 0; i < bombs.size(); i++) {
+				bombs.get(i).Update(time);
+				if (bombs.get(i).finishedExploding()) {
+					bombs.remove(i);
+					i--;
+				}
+			}
+			gameOverTimer -= time;
+			if(gameOverTimer <= 0){
+				Restart();
+			}
 		}
 
-		for (int i = 0; i < bombs.size(); i++) {
-			bombs.get(i).Update(time);
-			if (bombs.get(i).hasExploded() && !bombs.get(i).hasStartedToExplode()) {
-				// bombs.get(i).explode();
-				// System.out.println("BOOM!");
-				// TODO: uncomment this
-				explodeAll();
-				gameState = GameState.GameOver;
-
-			}
-			if (bombs.get(i).finishedExploding()) {
-				bombs.remove(i);
-				i--;
-			}
-		}
+		
+	}
+	
+	private void Restart(){
+		gameState = GameState.Calibration;
+		videoFrame.setVisible(false);
+		thresholdedVideoFrame.setVisible(true);
+		colorinterface.show();
+		bombs.clear();
 	}
 
 	private void drawBombs(IplImage imgAnnotated) {
