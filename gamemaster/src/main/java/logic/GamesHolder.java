@@ -21,7 +21,7 @@ import models.sub.AllActions;
 import models.sub.GamesCollectionSub;
 import models.sub.Parameter;
 import models.sub.Player;
-import opencv.ColoredObjectTrack;
+import opencv.CoreGame;
 
 /**
  * Holds current game and history of games
@@ -33,14 +33,14 @@ public class GamesHolder {
 	private List<SpecificGameInformation> myGames = new ArrayList<SpecificGameInformation>();
 	private List<SpecificBombInformation> myBombs = new ArrayList<SpecificBombInformation>();
 	private List<SpecificDefuseInformation> myDefuseAttempts = new ArrayList<SpecificDefuseInformation>();
-	private ColoredObjectTrack coloredObjectTrack;
+	private CoreGame coloredObjectTrack;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param coloredObjectTrack
 	 */
-	public GamesHolder(ColoredObjectTrack coloredObjectTrack) {
+	public GamesHolder(CoreGame coloredObjectTrack) {
 		this.coloredObjectTrack = coloredObjectTrack;
 	}
 

@@ -33,10 +33,10 @@ import org.json.simple.parser.ParseException;
 public class ColorValueControlInterface extends JFrame {
 	int a = 0, b = 0, c = 0, d = 100, e = 255, f = 255;
 	static CanvasFrame canvas2 = new CanvasFrame("Controller");
-	ColoredObjectTrack cot;
+	CoreGame cot;
 	CameraController aCameraControll;
 	
-	public ColorValueControlInterface( ColoredObjectTrack cot ) {
+	public ColorValueControlInterface( CoreGame cot ) {
 		this.cot = cot;
 	}
 		

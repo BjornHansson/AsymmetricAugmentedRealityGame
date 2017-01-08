@@ -1,3 +1,5 @@
+//Modified from https://github.com/bytedeco/javacv/blob/master/src/main/java/org/bytedeco/javacv/CanvasFrame.java
+
 /*
  * Copyright (C) 2009-2015 Samuel Audet
  *
@@ -73,7 +75,7 @@ import org.bytedeco.javacv.Java2DFrameConverter;
 public class OverlayCanvasFrame extends JFrame {
 
 	private CameraController cameraController;
-	private ColoredObjectTrack coloredObjectTrack;
+	private CoreGame coloredObjectTrack;
 	private Font bombFont;
 
 	public static class Exception extends java.lang.Exception {
@@ -135,7 +137,7 @@ public class OverlayCanvasFrame extends JFrame {
 		return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 	}
 
-	public OverlayCanvasFrame(String title, CameraController cam, ColoredObjectTrack cot) {
+	public OverlayCanvasFrame(String title, CameraController cam, CoreGame cot) {
 		this(title, 0.0);
 		cameraController = cam;
 		coloredObjectTrack = cot;

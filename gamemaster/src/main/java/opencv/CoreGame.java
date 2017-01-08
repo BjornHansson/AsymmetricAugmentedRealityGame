@@ -1,3 +1,4 @@
+//Adapted from https://github.com/bytedeco/javacv/blob/master/samples/ColoredObjectTrack.java
 package opencv;
 
 import static org.bytedeco.javacpp.opencv_core.cvCreateImage;
@@ -31,7 +32,7 @@ import org.joda.time.DateTime;
 import comm.WebAPI;
 import logic.GamesHolder;
 
-public class ColoredObjectTrack implements Runnable {
+public class CoreGame implements Runnable {
 
 	enum GameState {
 		Menu, Calibration, Playing, GameOver
@@ -65,15 +66,15 @@ public class ColoredObjectTrack implements Runnable {
 	private double spawnTimer = 0;
 	private double nextSpawn = 0;
 	private double gameOverTimer = 0;
-	private int bombMinSeconds = 10;
+	private int bombMinSeconds = 15;
 	private int bombRandSeconds = 20;
 
-	private double defuseDistance = 10;
+	private double defuseDistance = 8;
 	private float playerBearing = 0;
 	private boolean playerDetected = false;
 
 	public static void main(String[] args) {
-		ColoredObjectTrack cot = new ColoredObjectTrack();
+		CoreGame cot = new CoreGame();
 		Thread th = new Thread(cot);
 		th.start();
 	}
@@ -131,7 +132,7 @@ public class ColoredObjectTrack implements Runnable {
 		}
 	}
 
-	public ColoredObjectTrack() {
+	public CoreGame() {
 		gamesHolder = new GamesHolder(this);
 		webApi = new WebAPI(gamesHolder);
 	}
@@ -283,13 +284,8 @@ public class ColoredObjectTrack implements Runnable {
 			if (playerBearing < -180)
 				playerBearing += 360;
 
-			// System.out.println("cameraBearing: " +
-			// cameraController.getPan());
-			// System.out.println("playerBearing: " + playerBearing);
-
 			cvCircle(annotatedImage, new int[] { trackedPosX, trackedPosY }, 15, new CvScalar(255, 0, 0, 0),  org.bytedeco.javacpp.opencv_imgproc.CV_FILLED, 8, 0);
 		}
-		drawBombs(annotatedImage);
 	}
 
 	private void Update(double time) {
@@ -342,54 +338,6 @@ public class ColoredObjectTrack implements Runnable {
 		thresholdedVideoFrame.setVisible(true);
 		colorinterface.show();
 		bombs.clear();
-	}
-
-	private void drawBombs(IplImage imgAnnotated) {
-
-		// This overlays a bomb, but is horrendously slow - find a better way
-		// for(int i = 0; i < bombImage.width(); i++)
-		// for(int j = 0; j < bombImage.height(); j++){
-		// CvScalar c1 = org.bytedeco.javacpp.opencv_core.cvGet2D(imgAnnotated,
-		// j, i);
-		// CvScalar c2 = org.bytedeco.javacpp.opencv_core.cvGet2D(bombImage, j,
-		// i);
-		//
-		// CvScalar m = new CvScalar();
-		// for(int k = 0; k < 4; k++)
-		// {
-		// if(c2.getVal(k) == 0)
-		// m.setVal(k, c1.getVal(k));
-		// else
-		// m.setVal(k, 0*c1.getVal(k) + 1*c2.getVal(k));
-		//
-		// }
-		//
-		//
-		// org.bytedeco.javacpp.opencv_core.cvSet2D(imgAnnotated, j, i, m);
-		// }
-
-		// for (int i = 0; i < bombs.size(); i++) {
-		// // for each bomb:
-		// // if it is within the view angle,
-		// // calculate position in image and draw a dot
-		// if (Math.abs(Utility.angleDifference(bombs.get(i).getBearing(),
-		// cameraController.getPan())) < CameraController.VIEW_ANGLE / 2.0f) {
-		//
-		// float diff = Utility.angleDifference(bombs.get(i).getBearing(),
-		// cameraController.getPan());
-		// // System.out.println("diff = " + diff);
-		// int w = imgAnnotated.width();
-		// // System.out.println("w = " + w);
-		// int xPos = w / 2 + (int) (diff / CameraController.VIEW_ANGLE * w);
-		// // System.out.println("xPos = " + xPos);
-		//
-		// cvCircle(imgAnnotated, new int[] { xPos, imgAnnotated.height() / 2 },
-		// 10,
-		// new CvScalar(255, 255, 255, 0));
-		//
-		// }
-		//
-		// }
 	}
 
 	public ArrayList<Bomb> getBombs() {

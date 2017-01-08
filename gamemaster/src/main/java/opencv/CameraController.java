@@ -30,17 +30,17 @@ class CameraController implements KeyListener, Runnable {
 	private boolean isMoving = false;
 	private boolean enabled;
 	
-	private ColoredObjectTrack cot;
+	private CoreGame cot;
 
 	public synchronized float getPan() {
 		return pan;
 	}
 
-	public CameraController(ColoredObjectTrack cot) {
+	public CameraController(CoreGame cot) {
 		this(cot,true);
 	}
 
-	public CameraController(ColoredObjectTrack cot, boolean enabled) {
+	public CameraController(CoreGame cot, boolean enabled) {
 		this.cot = cot;
 		this.enabled = enabled;
 		if (enabled) {

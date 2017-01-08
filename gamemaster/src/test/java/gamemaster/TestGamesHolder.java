@@ -27,17 +27,17 @@ import models.SpecificDefuseInformation;
 import models.SpecificGameInformation;
 import models.StartGameInformation;
 import models.sub.Player;
-import opencv.ColoredObjectTrack;
+import opencv.CoreGame;
 
 public class TestGamesHolder {
 	private GamesHolder gamesHolderToTest;
-	private static ColoredObjectTrack track;
+	private static CoreGame track;
 	private static final int BOMB_ID_CAN_DEFUSE = 42;
 
 	@BeforeClass
 	public static void onlyOnce() {
-		new ColoredObjectTrack();
-		track = mock(ColoredObjectTrack.class);
+		new CoreGame();
+		track = mock(CoreGame.class);
 		doNothing().when(track).SpawnBomb();
 		when(track.canDefuseBomb(BOMB_ID_CAN_DEFUSE)).thenReturn(true);
 	}
